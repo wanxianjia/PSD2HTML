@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<title>PSD2CSS</title>
+<style>
+ul,li{list-style:none;}
+h2{color:#555;}
+#drop-box{ font-size:24px; border:1px dashed #ccc; background:rgba(222,222,222,0.3); height:200px; line-height:200px; text-align:center;}
+#css-box{border:1px dashed #ccc; margin-top:8px; padding:8px; outline:0 none;}
+#css-box:focus{ border-color:#ff7300;}
+#image-output{ margin-top:8px;}
+#pre-box{margin-top:8px; border:1px dashed #ccc; overflow:hidden; padding:8px;}
+#pre-box li{float:left; margin-left:8px;}
+#image-output{border:1px dashed #ccc;padding:8px;}
+</style>
+</head>
+<body>
+<h1>PSD TO CSS</h1>
+<div id="drop-box">
+    Drag psd here
+</div>
+<h2>CSS</h2>
+<div id="css-box" contentEditable="true">Output：.psdlayername{width:**px;height:**px;background-position:-**px -**px;}</div>
+<h2>Preview</h2>
+<ul id="pre-box"></ul>
+<h2>PNG</h2>
+<div id="image-output"></div>
+<script src="http://style.china.alibaba.com/js/lib/fdev-v4/core/fdev-min.js"></script>
+<script src="./js/psd.js"></script>
+<script src="./js/psd2css.js"></script>
+</body>
+</html>
