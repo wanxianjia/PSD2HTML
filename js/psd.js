@@ -1578,6 +1578,7 @@ arraySum = function(arr, from, to) {
       this.parseBlendingRanges();
       namelen = Util.pad4(this.file.read(1)[0]);
       this.name = this.file.readString(namelen);
+      //this.name = this.file.readLengthWithString(namelen);
       Log.debug("Layer name: " + this.name);
       this.parseExtraData();
       Log.debug("Layer " + layerIndex + ":", this);

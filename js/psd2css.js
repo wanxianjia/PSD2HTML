@@ -48,6 +48,7 @@ jQuery(function($){
 				var bytes = new Uint8Array(f.target.result);
 				// For demo purposes, we parse the image data only first
 				var psd = new PSD(bytes);
+				PSD.DEBUG = true;
 				var src = psd.toImage();
 				var image = $("<img />").attr('src', src);
 				$("#image-output").html(image);
