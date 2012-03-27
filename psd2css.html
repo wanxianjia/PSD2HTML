@@ -5,6 +5,8 @@
 <title>PSD2CSS</title>
 <style>
 ul,li{list-style:none;}
+h1 sup{font-size:14px; vertical-align:13px; padding-left:5px;}
+h1 sup a{color:#ff7300; }
 h2{color:#555;}
 #drop-box{ font-size:24px; border:1px dashed #ccc; background:rgba(222,222,222,0.3); height:200px; line-height:200px; text-align:center;}
 #css-box{border:1px dashed #ccc; margin-top:8px; padding:8px; outline:0 none;}
@@ -16,12 +18,12 @@ h2{color:#555;}
 </style>
 </head>
 <body>
-<h1>PSD TO CSS</h1>
+<h1>PSD TO CSS<sup><a href="./about.html">V0.5<a/></sup></h1>
 <div id="drop-box">
     Drag psd here
 </div>
 <h2>CSS</h2>
-<div id="css-box" contentEditable="true">Output：.psdlayername{width:**px;height:**px;background-position:-**px -**px;}</div>
+<div id="css-box" contentEditable="true">Output：psdlayername{width:**px;height:**px;background-position:-**px -**px;}</div>
 <h2>Preview</h2>
 <ul id="pre-box"></ul>
 <h2>PNG</h2>

@@ -8,10 +8,17 @@ jQuery(function($){
 
 	var page = {
 		init: function(){
+			this.html5test();
 			this.initDropEvent();
 		},
-		imageSrc: '',				//PSD½âÎö³ÉPNGºóµÄurl(DataUrl)
-		image: null,				//PSD½âÎöºóµÄPNG(html img¶ÔÏó)
+		html5test: function(){
+			if(!window.FileReader){
+				dropBox.html('è¯·ä½¿ç”¨æ”¯æŒHTML5çš„æµè§ˆå™¨ï¼');
+				return false;
+			}
+		},
+		imageSrc: '',				//PSD (DataUrl)
+		image: null,				
 		initDropEvent: function(){
 			var _this = this;
 			
@@ -26,9 +33,8 @@ jQuery(function($){
 				var file = e.dataTransfer.files ? e.dataTransfer.files[0] : null;
 				if(!file) return false;
 				if(file.name.slice(-4).toLowerCase() !== '.psd'){
-				//windows ÏÂfile.typeÎª¿Õ£¬Òò´Ë¸Ä³ÉÅĞ¶ÏÎÄ¼şºó×º
 				//if(file.type !== "image/vnd.adobe.photoshop" && file.type !== "application/x-photoshop") {
-					cssBox.html("²»ÊÇPSDÎÄ¼ş");
+					cssBox.html("NOT PSD");
 					return false;
 				}
 				_this.parsePsd(file);
@@ -36,7 +42,7 @@ jQuery(function($){
 			});
 		},
 		/*
-		 * ½âÎöPSD
+		 * PARSE PSD
 		*/
 		parsePsd: function(file){
 			cssBox.html('<progress></proress>');
@@ -77,15 +83,11 @@ jQuery(function($){
 			};
 		},
 		/*
-		 * ½âÎöÍ¼²ã
+		 * 
 		*/
 		parseLayers: function(layers){
-			var _this = this, layer, arr = [], htmlArr = [];
-			/*console.log(psd.resources);
-			for(var i = 0, res = psd.resources, l = res.length; i < l; i++){
-				var re = res[i];
-				console.log(re.id);
-			}*/
+			var _this = this, layer, arr = [], htmlArr = [], layerNameArr = [];
+			
 			for (var i = 0, _ref = layers, l = _ref.length; i < l; i++) {
 				layer = _ref[i];
 				if(layer.isHidden || layer.blendMode.visible === 0 || layer.cols === 0 || layer.rows === 0) continue;
@@ -110,21 +112,24 @@ jQuery(function($){
 					left = layer.left,
 					top = layer.top;
 					
-				var str = 'width:'+width+'px;height:'+height+'px;background-position:-'+left+'px -'+top+'px;';
+				var str = 'width:'+width+'px; height:'+height+'px; background-position:-'+left+'px -'+top+'px;';
 				
-				htmlArr.push('<li style="',str,'"></li>');
+				layerNameArr.push(layer.name);						
+				htmlArr.push('<li style="',str,'"></li>');		
 				arr.push(layer.name + '{' + str + '}' + '\n');
 				//_this.importPng(layer);
 			}
 			preBox.html(htmlArr.join(''));
 			$('li', preBox).css({'background-image':'url('+_this.imageSrc+')'});
-			cssBox.html('<pre>'+arr.join('')+'</pre>');
+			
+			var outPutCss = layerNameArr.join(', ')+'{background:url() no-repeat;}\n'+arr.join('');
+			cssBox.html('<pre>'+outPutCss+'</pre>');
 		},
 		/*
-		 * ¸÷¸öÍ¼²ãÊä³öPNG
+		 * 
 		*/
 		importPng: function(layer){
-			//Êä³öÍ¼²ã
+			
 			var width = layer.cols,
 				height = layer.rows,
 				left = layer.left,
