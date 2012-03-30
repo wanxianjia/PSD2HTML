@@ -251,7 +251,7 @@ function JSPack()
 };
 
 var jspack = new JSPack(); ;
-  function ord (string) {
+function ord (string) {
     // http://kevin.vanzonneveld.net
     // +   original by: Kevin van Zonneveld (http://kevin.vanzonneveld.net)
     // +   bugfixed by: Onno Marsman
@@ -1578,7 +1578,6 @@ arraySum = function(arr, from, to) {
       this.parseBlendingRanges();
       namelen = Util.pad4(this.file.read(1)[0]);
       this.name = this.file.readString(namelen);
-      //this.name = this.file.readLengthWithString(namelen);
       Log.debug("Layer name: " + this.name);
       this.parseExtraData();
       Log.debug("Layer " + layerIndex + ":", this);
@@ -1701,6 +1700,14 @@ arraySum = function(arr, from, to) {
             this.readLayerSectionDivider();
             break;
           case "luni":
+			var strLen = this.file.readf(">HH")[1];
+			var strArr = this.file.readf(">"+strLen+"H");
+			var arr = [];
+			for(var i = 0; i < strLen; i++){
+				arr.push(String.fromCharCode(strArr[i]));
+			}
+			this.name = arr.join('');
+			Log.debug(this.name);
             this.file.seek(length);
             break;
           case "vmsk":
