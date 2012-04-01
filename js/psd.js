@@ -337,12 +337,16 @@ arraySum = function(arr, from, to) {
     __hasProp = Object.prototype.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor; child.__super__ = parent.prototype; return child; };
 
+try{
   if (typeof exports !== "undefined" && exports !== null) {
     Root = exports;
     fs = require('fs');
   } else {
     Root = window;
   }
+ }catch(e){
+    Root = self;
+ }
 
   Root.PSD = PSD = (function() {
 
@@ -2229,7 +2233,7 @@ arraySum = function(arr, from, to) {
         }
       },
       1050: {
-        name: 'Slices'
+        name: 'Slices'        
       },
       1051: {
         name: 'Workflow URL',
@@ -2276,6 +2280,7 @@ arraySum = function(arr, from, to) {
       },
       1060: {
         name: 'XMP metadata'
+		
       },
       1061: {
         name: 'Caption digest'
@@ -2429,6 +2434,7 @@ arraySum = function(arr, from, to) {
       styledText = [];
       psDict = this.textData.EngineData.value;
       text = psDict.EngineDict.Editor.Text;
+      console.warn(text);
       styleRun = psDict.EngineDict.StyleRun;
       stylesList = styleRun.RunArray;
       stylesRunList = styleRun.RunLengthArray;
