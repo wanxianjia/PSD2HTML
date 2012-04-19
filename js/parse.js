@@ -1,49 +1,42 @@
 importScripts('./psd.js');
 
+onmessage = function(e){
+	self.run(e);
+	postMessage(JSON.stringify(self.data));
+	close();
+}
+
 self.data = {};
 
 self.run = function(e){
 	var bytes = JSON.parse(e.data);
-	// For demo purposes, we parse the image data only first
-	//PSD.DEBUG = true;
 	var psd = new PSD(bytes);
-	//var src = psd.toImage();
-	//self.data.imgSrc = src;
-	// Start over and parse the whole file.
-	//psd = new PSD(bytes);
 
 	try {
 		psd.parse();
 	} catch (e) {
-		self.data.css = 'Error';
+		self.data.msg = 'Error';
 	}
 	self.parseLayers(psd.layerMask.layers);
 }
 
 self.parseLayers = function(layers){
-	var layer, arr = [], htmlArr = [], layerNameArr = [];
+	var layer, arr = [], newLayer = {};
 	
-	for (var i = 0, _ref = layers, l = _ref.length; i < l; i++) {
-		layer = _ref[i];
-		if(layer.isHidden || layer.blendMode.visible === 0 || layer.cols === 0 || layer.rows === 0) continue;
+	for (var i = 0, l = layers.length; i < l; i++) {
+		layer = layers[i];
 		
 		if (typeof layer.name === "undefined") {
 			layer.name = "Layer " + i;
 		}
-		var width = layer.cols,
-			height = layer.rows,
-			left = layer.left,
-			top = layer.top;
+		newLayer = {"width":layer.cols, "height":layer.rows, "left":layer.left, "top":layer.top};
+		newLayer.name = layer.name;
+		newLayer.isHidden = layer.isHidden;
+		newLayer.visible = layer.blendMode.visible;
 			
-		var str = 'width:'+width+'px; height:'+height+'px; background-position:-'+left+'px -'+top+'px;';
-		
-		layerNameArr.push(layer.name);						
-		htmlArr.push('<li style="',str,'"></li>');		
-		arr.push(layer.name + '{' + str + '}' + '\n');
-		//_this.importPng(layer);
+		arr.push(newLayer);
 	}
-	self.data.html = htmlArr.join('');
-	self.data.css = layerNameArr.join(', ')+'{background:url() no-repeat;}\n'+arr.join('');
+	self.data.layers = arr;
 }
 
 /*self.importPng = function(layer){
@@ -62,7 +55,4 @@ self.parseLayers = function(layers){
 	$('<img />').attr('src', png).appendTo($(document.body));
 }*/
 
-onmessage = function(e){
-	self.run(e);
-	postMessage(JSON.stringify(self.data));
-}
+
