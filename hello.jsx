@@ -11,11 +11,14 @@
 // @include "json2-min.jsx"
 
 (function(){
-    
+
+app.preferences.rulerUnits = Units.PIXELS;
+
 var doc = app.activeDocument;
 var layers = doc.layers;
 var artLayers = doc.artLayers;
 var tree = {childs:[]};
+var imgFolderPath = 'C:\\Users\\xianjia.wanxj\\Documents\\Adobe Scripts\\images\\';
 
 var index = 0;
 iterator(layers);
@@ -43,7 +46,7 @@ function getLayerInfo(layer, context){
                         child.textInfo = {color:textItem.color.rgb.hexValue, contents:textItem.contents, font:textItem.font, size:textItem.size.toString().replace(' ','')};
                         layer.visible = false;
                 }
-                
+                //alert(clipboardData);
                 context.childs.push(child);
         }else if(layer.typename == 'LayerSet'){
                 //alert(layer.artLayers.length);
@@ -57,16 +60,31 @@ function getLayerInfo(layer, context){
 
 //var ff = app.openDialog();
 //alert(ff);
-var f = new File (app.openDialog());
-f.open('w', 'TEXT');
-f.write(JSON.stringify(tree));
-f.close();
-        
-app.preferences.imagePreviews = SaveBehavior.ASKWHENSAVING;
-//app.ExportType = 'SAVEFORWEB';
-var png = new File('C:\\Users\\xianjia.wanxj\\Documents\\Adobe Scripts\\p.png');
-var options = new ExportOptionsSaveForWeb();
-doc.exportDocument (png, ExportType.SAVEFORWEB, options);
+var sf = File.saveDialog ('保存JSON文件');
+
+if(sf){
+        var f = new File (sf);
+        f.encoding = 'UTF-8';
+        f.open('w', 'TEXT');
+        f.write(JSON.stringify(tree));
+        f.close();
+                
+        //app.preferences.imagePreviews = SaveBehavior.ASKWHENSAVING;
+        //app.ExportType = 'SAVEFORWEB';
+        try{
+                sf = File.saveDialog ('保存PNG文件');
+                var img = new File(sf);
+                var options = new ExportOptionsSaveForWeb();
+                doc.exportDocument (img, ExportType.SAVEFORWEB, options);
+        }catch(e){
+                alert(e);
+        }
+        /*var img = new File();
+        var options = new PNGSaveOptions();
+        doc.saveAs (img, options, false);*/
+}else{
+        alert('输出失败！');
+}
         
 })();
 

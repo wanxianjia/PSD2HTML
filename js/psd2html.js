@@ -99,15 +99,7 @@ jQuery(function($){
 							height = layer.bottom - layer.top,
 							top = layer.top,
 							left = layer.left,
-							className = layer.name.replace(/\s+/g, '_');
-
-						// 利用canvas对每个图层生成png图片
-						var canvas = document.createElement('canvas');
-						canvas.width = width;
-						canvas.height = height;
-						var cvs = canvas.getContext('2d');
-						cvs.drawImage(_this.image, left, top, width, height, 0, 0, width, height);
-						var src = canvas.toDataURL('image/png');
+							className = 'layer'+layer.index;						
 
 						var div = document.createElement('div');
 						div.className = className;
@@ -117,10 +109,21 @@ jQuery(function($){
 
 							if(layer.kind === 'LayerKind.TEXT'){
 								div.innerHTML = layer.textInfo.contents;
+								styleArr.push('.',className,'{font-size:',layer.textInfo.size,'; color:',layer.textInfo.color,'; position:absolute; width:',width,'px; height:',height,'px; top:',top,'px; left:',left,'px;}');
 							}else{
+								// 利用canvas对每个图层生成png图片
+								var canvas = document.createElement('canvas');
+								canvas.width = width;
+								canvas.height = height;
+								var cvs = canvas.getContext('2d');
+								cvs.drawImage(_this.image, left, top, width, height, 0, 0, width, height);
+								var src = canvas.toDataURL('image/png');
+
 								var img = new Image();
 								img.src = src;
 								div.appendChild( img);
+
+								styleArr.push('.',className,'{position:absolute; width:',width,'px; height:',height,'px; top:',top,'px; left:',left,'px;}');
 							}
 							context.appendChild( div);
 						}else if(layer.type === 'LayerSet'){
@@ -135,6 +138,8 @@ jQuery(function($){
 					}
 				})(data.childs);
 
+				$('#htmlPrev').remove();
+
 				var iframe = document.createElement('iframe');
 				iframe.setAttribute('id', 'htmlPrev');
 				iframe.src = 'about:blank';
@@ -142,10 +147,12 @@ jQuery(function($){
 
 				iframe.onload = function(){
 					iframe.contentWindow.document.body.appendChild(_this.doc);
+					var style = document.createElement('style');
+					style.innerHTML = styleArr.join('');
+					iframe.contentWindow.document.head.appendChild(style);
 				}
 			}
-		},
-		htmlTemplate: '<!DOCTYPE html><html><head><style>#{style}</style></head><body><div id="doc" style="position:relative">#{html}</div></body></html>'
+		}
 	}
 
 	page.init();
