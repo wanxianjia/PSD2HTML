@@ -17,11 +17,11 @@ var layers = doc.layers;
 var artLayers = doc.artLayers;
 var tree = {childs:[]};
 
-var count = 0;
+var index = 0;
 iterator(layers);
 
 function iterator(layers, context){        
-        for(var i = 0, l = layers.length; i < l; i++){
+        for(var i = layers.length - 1; i >= 0; i--){
                 getLayerInfo(layers[i], context);
         }
 }
@@ -34,22 +34,24 @@ function getLayerInfo(layer, context){
                 //alert(layer.kind.toString());
                 var kind = layer.kind.toString();
                 var bounds = layer.bounds;
-                var child = {type:layer.typename, visible:layer.visible, left:bounds[0].toString().replace(' ',''), top:bounds[1].toString().replace(' ',''), right:bounds[2].toString().replace(' ',''), bottom:bounds[3].toString().replace(' ',''), kind:kind}
+                var child = {type:layer.typename, name:layer.name, visible:layer.visible, left:bounds[0].value, top:bounds[1].value, right:bounds[2].value, bottom:bounds[3].value, kind:kind}
                 child.isBackgroundLayer = layer.isBackgroundLayer;
+                child.index = index;
                 
                 if(kind === 'LayerKind.TEXT'){
                         var textItem = layer.textItem;
                         child.textInfo = {color:textItem.color.rgb.hexValue, contents:textItem.contents, font:textItem.font, size:textItem.size.toString().replace(' ','')};
+                        layer.visible = false;
                 }
                 
                 context.childs.push(child);
         }else if(layer.typename == 'LayerSet'){
                 //alert(layer.artLayers.length);
-                var o = {type:layer.typename, childs:[]};
+                var o = {type:layer.typename, name:layer.name, childs:[]};
                 context.childs.push(o);
-                iterator(layer.artLayers, o);
+                iterator(layer.layers, o);
         }
-        count++;
+        index++;
 }
 //alert(count);
 
