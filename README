@@ -1,1 +1,7 @@
+<<<<<<< HEAD
 hello
+=======
+1、builder中为生成器（JSON TO HTML）。可用FIREFOX打开demo1中的psd2html.html，拖入JSON文件和对应的PNG即可生成一个预览页面。
+2、psScript文件夹是ps中运行的脚本，入口脚本为psd2json.jsx
+3、res文件夹中提供的是两组测试JSON和图片（json.txt对应p.png，json2.txt对应p2.png）。
+>>>>>>> 79a231fb8462a67050a89c09e686b29c21b3f29f
