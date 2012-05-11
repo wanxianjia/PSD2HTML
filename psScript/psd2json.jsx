@@ -85,8 +85,7 @@ if(sf){
         //app.preferences.imagePreviews = SaveBehavior.ASKWHENSAVING;
         //app.ExportType = 'SAVEFORWEB';
         try{
-                sf = File.saveDialog ('保存PNG文件');
-                var img = new File(sf);
+                var img = new File(sf+'.png');
                 var options = new ExportOptionsSaveForWeb();
                 options.format = SaveDocumentType.PNG;
                 doc.exportDocument (img, ExportType.SAVEFORWEB, options);
