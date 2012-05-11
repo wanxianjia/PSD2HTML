@@ -1,0 +1,3 @@
+1、psd2json.jsx为PS使用脚本，执行这个脚本讲导出一个文本文件（JSON）和一个PNG图片。
+2、psd2html.html为根据第一步生成的JSON和图片生成HTML，使用方法：同时将JSON文件和PNG拖入指定区域。
+3、res文件夹中提供的是两组测试JSON和图片（json.txt对应p.png，json2.txt对应p2.png）。

@@ -61,7 +61,11 @@ jQuery(function($){
 						_this.image = new Image();
 						_this.image.src = _this.imageSrc;
 
-						if(_this.data && _this.image) _this.toHTML();
+						_this.image.onload = function(){
+							_this.imageHasReady = true;
+							if(_this.data && _this.imageHasReady) _this.toHTML();
+						}
+						
 					}
 					break;
 				case 'text/plain':
@@ -69,7 +73,7 @@ jQuery(function($){
 					var handler = function(f){
 						_this.data = JSON.parse(f.target.result);
 
-						if(_this.data && _this.image) _this.toHTML();
+						if(_this.data && _this.imageHasReady) _this.toHTML();
 					}
 					break;
 			}
@@ -105,11 +109,11 @@ jQuery(function($){
 						div.className = className;
 
 						if(layer.type === 'ArtLayer'){
-							if(layer.isBackgroundLayer) continue;
+							//if(layer.isBackgroundLayer) continue;
 
 							if(layer.kind === 'LayerKind.TEXT'){
 								div.innerHTML = layer.textInfo.contents;
-								styleArr.push('.',className,'{font-size:',layer.textInfo.size,'; color:',layer.textInfo.color,'; position:absolute; width:',width,'px; height:',height,'px; top:',top,'px; left:',left,'px;}');
+								styleArr.push('.',className,'{font-family:',layer.textInfo.font,'; font-size:',layer.textInfo.size,'; color:',layer.textInfo.color,'; position:absolute; width:',width,'px; height:',height,'px; top:',top,'px; left:',left,'px;}');
 							}else{
 								// 利用canvas对每个图层生成png图片
 								var canvas = document.createElement('canvas');
@@ -138,18 +142,25 @@ jQuery(function($){
 					}
 				})(data.childs);
 
-				$('#htmlPrev').remove();
+				// $('#htmlPrev').remove();
 
-				var iframe = document.createElement('iframe');
-				iframe.setAttribute('id', 'htmlPrev');
-				iframe.src = 'about:blank';
-				document.body.appendChild(iframe);
+				// var iframe = document.createElement('iframe');
+				// iframe.setAttribute('id', 'htmlPrev');
+				// iframe.src = 'about:blank';
+				// document.body.appendChild(iframe);
 
-				iframe.onload = function(){
-					iframe.contentWindow.document.body.appendChild(_this.doc);
+				// iframe.onload = function(){
+				// 	iframe.contentWindow.document.body.appendChild(_this.doc);
+				// 	var style = document.createElement('style');
+				// 	style.innerHTML = styleArr.join('');
+				// 	iframe.contentWindow.document.head.appendChild(style);
+				// }
+				var win = window.open('about:blank', 'preview');
+				win.onload = function(){
+					win.document.body.appendChild(_this.doc);
 					var style = document.createElement('style');
 					style.innerHTML = styleArr.join('');
-					iframe.contentWindow.document.head.appendChild(style);
+					win.document.head.appendChild(style);
 				}
 			}
 		}
