@@ -33,7 +33,7 @@ function main(){
          var name=les.childs[i].name+".html";
          var path=scriptsFile.parent + "/comps/"+name;
          var f =  File(scriptsFile.parent + "/comps/"+name);
-         f .encoding = 'UTF-8';
+         f .encoding = 'GBK';
          f .open('r');
          while(!f.eof){
                fragementArr.push(f.readln());
@@ -42,8 +42,8 @@ function main(){
      }
     $.writeln(fragementArr);
          var f = new File (scriptsFile.parent + "/comps/"+"composite.html");
-        f.encoding = 'UTF-8';
-        f.open('w', 'TEXT');
+        f.encoding = 'GBK';
+        f.open('w', 'HTML');
         f.write(fragementArr.join(''));
         f.close();
                 

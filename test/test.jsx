@@ -51,7 +51,7 @@ function main(){
 	 The Flash movie to load into the dialog window
 	 @type File
 	*/
-	var f =  File(scriptsFile.parent + "/comps/nav.html");
+	var f =  File(scriptsFile.parent + "/comps/comp_thirdpf_header.html");
      f .encoding = 'UTF-8';
      f .open('r');
      while(!f.eof){
