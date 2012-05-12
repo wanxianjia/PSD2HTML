@@ -42,11 +42,11 @@ PSD.prototype.iterator=function(layers, context)  {
 }
 
 PSD.prototype.getWidth=function() {
-      return this.doc.width;   // the whole psd canvas width
+   return  this.doc.width; 
  }
 
 PSD.prototype.getHeight=function() {
-      return this.doc.height;  // the whole psd canvas width
+      return this.doc.height ; 
  }
 
 PSD.prototype.getLayerInfo=function (layer, context) {
@@ -64,6 +64,10 @@ PSD.prototype.getLayerInfo=function (layer, context) {
                         child.index = this.index;
                         
                         if(kind === 'LayerKind.TEXT'){
+                               if(layer.textItem.kind ==TextType.PARAGRAPHTEXT){
+                                   child.width=layer.textItem.width;
+                                   child.height=layer.textItem.height;
+                                }
                                 var textItem = layer.textItem;
                                 child.textInfo = {color:textItem.color.rgb.hexValue, contents:textItem.contents, font:textItem.font, size:textItem.size.toString().replace(' ','')};
                                 layer.visible = false;
@@ -107,7 +111,7 @@ PSD.prototype.exporeJSON=function () {
 
 // this is the very simple parse for html, later will have a parse engine for it.
 PSD.prototype.exporeHTML= function() {
-      this.htmlfragement.push('<div style="width:'+this.getWidth()+',height:'+this.getHeight()+',background-image:url('../img/'+this.getPSDName()+'.png') >');
+      this.htmlfragement.push('<div style="width:'+this.getWidth()+';height:'+this.getHeight()+";background-image:url('../img/"+this.getPSDName()+".png')\" >");
       this.walkTree(this.getJSON());
       this.htmlfragement.push('<div>');
 
@@ -127,7 +131,12 @@ PSD.prototype.walkTree=function (tree){
          }
     }else{
         if(tree.kind=='LayerKind.TEXT'){
-            this.htmlfragement.push("<span style='position:absolute;top:"+tree.top+";left:"+tree.left+";color:#"+tree.textInfo.color+";font-size:'"+tree.textInfo.size+"'>"+tree.textInfo.contents+"</span>")
+             if(tree.width){
+              this.htmlfragement.push("<span style='position:absolute;top:"+parseInt(tree.top)+";left:"+parseInt(tree.left)+";color:#"+tree.textInfo.color+";font-size:"+tree.textInfo.size+";width:"+parseInt(tree.width)+"px;height:"+parseInt(tree.height)+"px'>"+tree.textInfo.contents+"</span>")
+            }else{
+              this.htmlfragement.push("<span style='position:absolute;top:"+parseInt(tree.top)+";left:"+parseInt(tree.left)+";color:#"+tree.textInfo.color+";font-size:"+tree.textInfo.size+"'>"+tree.textInfo.contents+"</span>")
+
+            }
          }
      }
 }
