@@ -4,7 +4,37 @@ body {
 
 a {color: #00B7FF;}
 
-.content{margin: 50px 100px;}
-.content h1{font-size: 15px;margin: 10px 0px;color: #6D79E1;}
-.drop-box{width: 300px;height: 100px;background-color: gray;}
+.SI-FILES-STYLIZED label.cabinet
+{
+    width: 79px;
+    height: 30px;
+    background: url(../images/btn-choose-file.gif) 0 0 no-repeat;
+
+    display: block;
+    overflow: hidden;
+    cursor: pointer;
+}
+
+.SI-FILES-STYLIZED label.cabinet input.file
+{
+    position: relative;
+    height: 100%;
+    width: auto;
+    opacity: 0;
+    -moz-opacity: 0;
+    filter:progid:DXImageTransform.Microsoft.Alpha(opacity=0);
+}
+
+.commbtn{border:0;padding: 5px 12px;background: orange;cursor: pointer;font-weight: bold;color: #333;font-family: "Tahoma";font-size:12px;}
+.content{margin: 50px auto;width:900px;}
+.content h1,.content h2{font-size: 22px;margin: 10px 0px 20px;color: #6D79E1;font-weight: bold;font-family: "Tahoma";}
+.content h2{margin-bottom: 0;background: #666;color: #FFF;width: 20px;padding: 0 12px;}
+
+.upload-wraper,.drop-box,.download-wraper{width: 100%;height: 160px;background-color: #eee;}
+.drop-box .tips{margin: 50px 200px;display: inline-block;font-size: 20px;color: #888;font-family: "Century Gothic";}
+.upload-wraper{margin: 0 0px 20px;height: 50px;padding:30px 200px;width:500px;}
+.download-wraper{padding:30px 200px;width:500px;height:30px;}
+.upload-wraper .file-chooser,.upload-wraper .upload-div{width:200px;float:left;}
+.download-wraper a:hover{text-decoration: none;color: #333;}
+.download-wraper .download-btn{}
 #uploadForm input{clear: both;display: block; margin: 8px 0;}
