@@ -73,7 +73,7 @@ PSD.prototype._getLayerInfo=function (layer, context) {
 			}
 			var textItem = layer.textItem;
 			child.textInfo = {color:textItem.color.rgb.hexValue, contents:textItem.contents, font:textItem.font, size:textItem.size.toString().replace(' ','')};
-			//layer.visible = false;
+			layer.visible = false;
 			this.textLayers.push(layer);
 		}else{
 			if(this.option.exportImage) this.exportImage(layer, this.index);
@@ -102,6 +102,7 @@ PSD.prototype.exportPng =function() {
 	var options = new ExportOptionsSaveForWeb();
 	options.format = SaveDocumentType.PNG;
 	this.doc.exportDocument (img, ExportType.SAVEFORWEB, options);
+	this.visibleTextLayers();
 	//img.close();
 }
 
@@ -166,7 +167,7 @@ PSD.prototype.walkTree=function (tree){
 }
 
 PSD.prototype.visibleTextLayers =function() {
-	for(var i = 0, l = textLayers.length; i < l; i++){
+	for(var i = 0, l = this.textLayers.length; i < l; i++){
 		this.textLayers[i].visible = true;
 	}
 }
