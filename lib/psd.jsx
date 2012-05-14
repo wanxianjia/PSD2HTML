@@ -113,7 +113,7 @@ PSD.prototype.exporeJSON=function () {
 PSD.prototype.exporeHTML= function() {
       this.htmlfragement.push('<div style="width:'+this.getWidth()+';height:'+this.getHeight()+";background-image:url('../img/"+this.getPSDName()+".png')\" >");
       this.walkTree(this.getJSON());
-      this.htmlfragement.push('<div>');
+      this.htmlfragement.push('</div>');
 
         var f = new File (scriptsFile.parent.parent + "/output/html/"+this.getPSDName()+".html");
         f.encoding = 'GBK';
