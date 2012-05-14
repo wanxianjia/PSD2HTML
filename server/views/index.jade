@@ -1,0 +1,20 @@
+
+//-
+//- Admin Home.
+//-
+//-	Author: justin.maj
+//- Date: 2012-2-13 
+//-
+
+div.content
+	h1= title
+	div.drop-box#drop-box
+
+	form(method="post", enctype="multipart/form-data", name="uploadForm", id="uploadForm", action="/upload")
+		input(type="file", name="upfile1", id="upfile1", required="true")
+		input(type="file", name="upfile2", id="upfile2", required="true")
+		input(type="submit", value="Upload", class="upload-btn")
+
+script(src='http://style.china.alibaba.com/fdevlib/js/fdev-v4/core/fdev-min.js')
+script(src='/javascripts/psd2html.js')
+script(src='/javascripts/index.js')
