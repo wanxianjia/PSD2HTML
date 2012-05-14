@@ -1,4 +1,5 @@
 ﻿#target photoshop
+// @include "../lib/json2-min.jsx"
 
 /**
 * @author: zhouquan.yezq
