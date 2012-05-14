@@ -134,7 +134,7 @@ PSD.prototype.exportJSON=function () {
  }
 
 // this is the very simple parse for html, later will have a parse engine for it.
-<<<<<<< HEAD
+
 PSD.prototype.exporeHTML= function() {
       this.htmlfragement.push('<div style="width:'+this.getWidth()+';height:'+this.getHeight()+";background-image:url('../img/"+this.getPSDName()+".png')\" >");
       this.walkTree(this.getJSON());
@@ -145,19 +145,6 @@ PSD.prototype.exporeHTML= function() {
         f.open('w', 'TEXT');
         f.write(this.htmlfragement.join(''));
         f.close();
-=======
-PSD.prototype.exportHTML= function() {
-	this.htmlfragement.push('<div style="width:'+this.getWidth()+';height:'+this.getHeight()+";background-image:url('../img/"+this.getPSDName()+".png')\" >");
-	this.walkTree(this.getJSON());
-	this.htmlfragement.push('<div>');
-
-	var f = new File (scriptsFile.parent.parent + "/output/html/"+this.getPSDName()+".html");
-	f.encoding = 'GBK';
-	f.open('w', 'TEXT');
-	f.write(this.htmlfragement.join(''));
-	f.close();
->>>>>>> 305f0b9afab2d2e8903d6d71b5dea1546b5deb83
- }
 
 // to walk throng every el, if the text layer, it will generate the html fragement
 // righ now do not think more about the UI component, later will implement it.
