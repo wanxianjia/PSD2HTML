@@ -1,0 +1,10 @@
+body {
+  padding: 50px;
+  font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;}
+
+a {color: #00B7FF;}
+
+.content{margin: 50px 100px;}
+.content h1{font-size: 15px;margin: 10px 0px;color: #6D79E1;}
+.drop-box{width: 300px;height: 100px;background-color: gray;}
+#uploadForm input{clear: both;display: block; margin: 8px 0;}
