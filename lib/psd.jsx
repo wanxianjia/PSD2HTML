@@ -102,7 +102,7 @@ PSD.prototype.exportPng =function() {
 	var options = new ExportOptionsSaveForWeb();
 	options.format = SaveDocumentType.PNG;
 	this.doc.exportDocument (img, ExportType.SAVEFORWEB, options);
-	this.visibleTextLayers();
+	this._visibleTextLayers();
 	//img.close();
 }
 
@@ -166,7 +166,7 @@ PSD.prototype.walkTree=function (tree){
      }
 }
 
-PSD.prototype.visibleTextLayers =function() {
+PSD.prototype._visibleTextLayers =function() {
 	for(var i = 0, l = this.textLayers.length; i < l; i++){
 		this.textLayers[i].visible = true;
 	}

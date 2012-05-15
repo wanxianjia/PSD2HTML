@@ -1,7 +1,7 @@
 
 =======
-1、builder中为生成器（JSON TO HTML）。可用FIREFOX打开demo1中的psd2html.html，拖入JSON文件和对应的PNG即可生成一个预览页面。
-2、psScript文件夹是ps中运行的脚本，入口脚本为psd2json.jsx
-3、res文件夹中提供的是两组测试JSON和图片（json.txt对应p.png，json2.txt对应p2.png）。
+1、builder 中为生成器（JSON TO HTML）。可用FIREFOX打开demo1中的psd2html.html，拖入JSON文件和对应的PNG即可生成一个预览页面。
+2、lib 为psd解析核心库；psd.jsx为核心文件
+3、example 为一些例子
 4、test目录是一些很细节的test case,每个test case 完成某个功能或技术点的测试
 5: test/comps 目前是放一些组件的html片段，做测试之用，后期会挪地
