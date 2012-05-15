@@ -5,6 +5,7 @@
 就可以了，不过由于其中cavas(node-canvas)是基于cairo移植过来的，
 所以需要cairo支持。同时如果要处理png和jpg，gif等图像，还需要安装
 这几个库的相关支持。
+
 一言以蔽之，按如下三个步骤即可实现系统部署：
 
 ## * Mac 下部署说明：
@@ -14,6 +15,7 @@
 *brew install giflib*
 
 来安装gif依赖，不了解brew是什么的可以访问：http://mxcl.github.com/homebrew/
+
 ### 通过npm自动安装其他依赖模块
 更新工程代码至最新，进入server目录，执行：
 
@@ -23,13 +25,14 @@
 ### 启动应用
 *node app.js*
 
-通过该命令即可启动应用，应用启动后在浏览器里访问：http://localhost:3000 即可。
+通过该命令即可启动应用，应用启动后在浏览器里访问：http://localhost:6666 即可。
 
 ## * Ubuntu下部署说明(12.04)
 ### Canvas 相关依赖准备
 1. 安装cairo
 
 sudo apt-get install libcairo2-dev
+
 2. 安装png、jpg、gif支持库
 
 sudo apt-get install libpng12-dev
