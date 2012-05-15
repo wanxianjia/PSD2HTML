@@ -31,9 +31,17 @@ function PSD(){
 	this.textLayers = [];        //存储所有的文本图层
 	this.htmlfragement = []; // store the html fragement 
 	this.index = -1;
-	this.layers = this.doc.layers; 
+	this.layers = this.doc.layers;
 	this.option = {
 		exportImages: true		//是否导出图片
+	}
+
+	var dir = new Folder((new File($.fileName)).parent.parent+'/output/' + this.getPSDName());
+	dir.create();
+	this.dir = dir;
+	if(this.option.exportImages){
+		this.imagesFolder = new Folder(this.dir + '/images/');
+		this.imagesFolder.create();
 	}
 }
 
@@ -76,7 +84,9 @@ PSD.prototype._getLayerInfo=function (layer, context) {
 			layer.visible = false;
 			this.textLayers.push(layer);
 		}else{
-			if(this.option.exportImage) this.exportImage(layer, this.index);
+			if(this.option.exportImages){
+				this.exportImage(layer, this.index);
+			}
 		}
 
 		context.childs.push(child);
@@ -97,8 +107,7 @@ PSD.prototype.getPSDName= function() {
 }
 
 PSD.prototype.exportPng =function() {
-	var img= new File(scriptsFile.parent.parent + "/output/img/"+this.getPSDName()+".png");
-	img.encoding = 'GBK';
+	var img= new File(this.dir+"/psd.png");
 	var options = new ExportOptionsSaveForWeb();
 	options.format = SaveDocumentType.PNG;
 	this.doc.exportDocument (img, ExportType.SAVEFORWEB, options);
@@ -116,55 +125,23 @@ PSD.prototype.exportImage = function(layer, index){
 		newDoc.paste();
 		newDoc.layers[newDoc.layers.length - 1].remove();
 		
-		var img= new File(scriptsFile.parent.parent + "/output/img/layer_"+index+".png");
+		var img= new File(this.imagesFolder + "/layer_"+index+".png");
 		var options = new ExportOptionsSaveForWeb();
 		options.format = SaveDocumentType.PNG;
 		newDoc.exportDocument (img, ExportType.SAVEFORWEB, options);
 		newDoc.close(SaveOptions.DONOTSAVECHANGES);
 	}catch(e){	//目前发现具有蒙层的图层无法执行layer.copy();
-			alert(e+'#####'+layer.name);
+		alert(e+'#####'+layer.name);
 	}
 }
 
 PSD.prototype.exportJSON=function () {
-	var f = new File(scriptsFile.parent.parent + "/output/json/"+this.getPSDName()+".json");
+	var f = new File(this.dir + "/json.txt");
 	f.encoding = 'UTF-8';
 	f.open('w', 'TEXT');
 	f.write(JSON.stringify(this.tree));
 	f.close();
  }
-
-// this is the very simple parse for html, later will have a parse engine for it.
-
-PSD.prototype.exporeHTML= function() {
-      this.htmlfragement.push('<div style="width:'+this.getWidth()+';height:'+this.getHeight()+";background-image:url('../img/"+this.getPSDName()+".png')\" >");
-      this.walkTree(this.getJSON());
-      this.htmlfragement.push('</div>');
-
-        var f = new File (scriptsFile.parent.parent + "/output/html/"+this.getPSDName()+".html");
-        f.encoding = 'GBK';
-        f.open('w', 'TEXT');
-        f.write(this.htmlfragement.join(''));
-        f.close();
-
-// to walk throng every el, if the text layer, it will generate the html fragement
-// righ now do not think more about the UI component, later will implement it.
-PSD.prototype.walkTree=function (tree){
-    if(tree.childs){
-        for(var i=0;i<tree.childs.length;i++){
-			this.walkTree (tree.childs[i]);
-		}
-    }else{
-        if(tree.kind=='LayerKind.TEXT'){
-             if(tree.width){
-				this.htmlfragement.push("<span style='position:absolute;top:"+parseInt(tree.top)+";left:"+parseInt(tree.left)+";color:#"+tree.textInfo.color+";font-size:"+tree.textInfo.size+";width:"+parseInt(tree.width)+"px;height:"+parseInt(tree.height)+"px'>"+tree.textInfo.contents+"</span>")
-            }else{
-				this.htmlfragement.push("<span style='position:absolute;top:"+parseInt(tree.top)+";left:"+parseInt(tree.left)+";color:#"+tree.textInfo.color+";font-size:"+tree.textInfo.size+"'>"+tree.textInfo.contents+"</span>")
-
-            }
-		}
-     }
-}
 
 PSD.prototype._visibleTextLayers =function() {
 	for(var i = 0, l = this.textLayers.length; i < l; i++){
