@@ -2,19 +2,33 @@
 //-
 //- Admin Home.
 //-
-//-	Author: justin.maj
+//-	Author: hustcer
 //- Date: 2012-2-13 
 //-
 
 div.content
 	h1= title
+	h2 1
 	div.drop-box#drop-box
+		span.tips Drop Files Here To See Preview...
 
-	form(method="post", enctype="multipart/form-data", name="uploadForm", id="uploadForm", action="/upload")
-		input(type="file", name="upfile1", id="upfile1", required="true")
-		input(type="file", name="upfile2", id="upfile2", required="true")
-		input(type="submit", value="Upload", class="upload-btn")
+	h2 2
+	div.upload-wraper
+		form(method="post", enctype="multipart/form-data", name="uploadForm", id="uploadForm", action="/upload")
+			div.file-chooser
+				label.cabinet
+					input(type="file", name="upfile1", id="upfile1", required="true", class="file")
+				label.cabinet
+					input(type="file", name="upfile2", id="upfile2", required="true", class="file")
+			div.upload-div
+				input(type="submit", value="Upload", class="upload-btn commbtn")
+
+	h2 3
+	div.download-wraper
+		a.commbtn(href="javascript:;") View Output Html 
+		a.commbtn.download-btn(href="javascript:;") DownLoad Zip Ball
 
 script(src='http://style.china.alibaba.com/fdevlib/js/fdev-v4/core/fdev-min.js')
 script(src='/javascripts/psd2html.js')
+script(src='/javascripts/si.files.js')
 script(src='/javascripts/index.js')

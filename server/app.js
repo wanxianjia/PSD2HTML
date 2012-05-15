@@ -2,7 +2,7 @@
 /**
  * Module dependencies.
  *
- * Author:  justin.maj
+ * Author:  hustcer
  * Date:    2012-05-10 
  */
 
@@ -36,7 +36,7 @@ app.get('/index.htm', routes.index);
 app.get('/index.html', routes.index);
 app.post('/upload', routes.upload);
 
-app.listen(3000, function(){
+app.listen(7777, function(){
     console.log("Express server listening on port %d in %s mode", app.address().port, app.settings.env);
 });
 

@@ -14,26 +14,38 @@ console.log= $.write;
   * @description current use the activeDocument as the target PSD
   * todo: use the psd file path to load the psd file
   */
+
+var doc=app.activeDocument;
+var docW=doc.width;   // the whole psd canvas width
+var docH=doc.height;   // the whole psd canvas height
+var horMargin=parseInt((docW-952)/2);  //the horizontal margin left and margin right
+
  function PSD(){
      
   }
 
-PSD.prototype.getLayGroups=function(){
+PSD.prototype.getLayGroups=function() {
  }
 
 //get all the layers
-PSD.prototype.getAllLayers=function(){
+PSD.prototype.getAllLayers=function() {
  }
 /**
   * get the active layer   
   */
-PSD.prototype.getActiveLayer=function(){
+PSD.prototype.getActiveLayer=function() {
     return app.activeDocument.activeLayer;
  }
-
+PSD.prototype.getLayerByName=function(name) {
+   // var layer;
+    return app.activeDocument.layers.getByName(name);
+    
+}
 function main(){
      var p=new PSD ();
      var al=p.getActiveLayer ();
+     app.preferences.rulerUnits = Units.PIXELS;
+     app.preferences.typeUnits = TypeUnits.PIXELS;
      if(al.kind==LayerKind.TEXT){  //here , just text layer, but for html , we should use lots of html el to express it.
          $.writeln("position is:"+al.textItem.position);
           $.writeln("text is:"+al.textItem.contents);
