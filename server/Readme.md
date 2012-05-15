@@ -1,6 +1,6 @@
 # 部署说明：
 **首先假定您的系统已经安装好node.js 推荐：V0.6.17 或以上版本。**<br/>
-**系统运行所依赖的node模块：express/jade/jsdom/canvas. **<br/>
+系统运行所依赖的node模块：express/jade/jsdom/canvas. <br/>
 工程clone下来后，理论上说直接在server目录里执行：npm install -d 
 就可以了，不过由于其中cavas(node-canvas)是基于cairo移植过来的，
 所以需要cairo支持。同时如果要处理png和jpg，gif等图像，还需要安装
@@ -27,8 +27,8 @@
 
 通过该命令即可启动应用，应用启动后在浏览器里访问：http://localhost:7777 即可。
 
-## Ubuntu下部署说明(12.04)
-### Canvas 相关依赖准备
+## Ubuntu下部署说明
+### Canvas 相关依赖准备(Ubuntu 12.04)
 1. 安装cairo
 
 	sudo apt-get install libcairo2-dev
