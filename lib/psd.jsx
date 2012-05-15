@@ -27,7 +27,7 @@ var scriptsFile = new File($.fileName);
 function PSD(){
 	this.doc=app.activeDocument;
 	this.docs = app.documents;
-	this.tree = {name:this.doc.name, childs:[]};
+	this.tree = {name:this.doc.name, imgCount:0, childs:[]};
 	this.textLayers = [];        //存储所有的文本图层
 	this.htmlfragement = []; // store the html fragement 
 	this.index = -1;
@@ -86,6 +86,7 @@ PSD.prototype._getLayerInfo=function (layer, context) {
 		}else{
 			if(this.option.exportImages){
 				this.exportImage(layer, this.index);
+				this.tree.imgCount++;
 			}
 		}
 
