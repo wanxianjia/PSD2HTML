@@ -51,6 +51,8 @@ exports.upload = function(req, res, next){
 
 /*
  * Save Upload Files to Target Path.
+ * @param uploadFiles 	上传的文件
+ * @param targetPath 	上传文件的保存路径
  */
 _saveUploadFile = function(uploadFiles, targetPath){
 	var tmpPath, destPath;
@@ -93,6 +95,7 @@ _saveUploadFile = function(uploadFiles, targetPath){
 
 /*
  * 根据resourceDir里的图片和数据生成对应的html及相关资源文件.
+ * @param resourceDir 图片和数据等资源文件存放的目录名
  */
 _generateHtml = function(resourceDir){
 	var document 	= jsdom('<!DOCTYPE html><html><head><meta charset="UTF-8"/></head><body></body></html>'),
@@ -123,6 +126,10 @@ _generateHtml = function(resourceDir){
 
 /*
  * 根据resourceDir里的图片和数据生成对应的html及相关资源文件.
+ * @param data  		生成html所需要的图层信息Json对象
+ * @param image 		生成html所需要的image对象
+ * @param resourceDir 	图片和数据等资源文件存放的目录名，也即生成的html输出目录名
+ * @param window 	  	Jsdom window 对象
  */
 _toHTML = function(data, image, resourceDir, window){
 	var _this 		= this;
@@ -165,6 +172,7 @@ _toHTML = function(data, image, resourceDir, window){
 						var ctx 	= canvas.getContext('2d');
 						ctx.drawImage(image, left, top, width, height, 0, 0, width, height);
 
+						// 以className命名保存的文件
 						(function(className){
 
 						  	var out 	= fs.createWriteStream(uploadDir + resourceDir + '/images/' + className + '.png')
@@ -208,6 +216,7 @@ _toHTML = function(data, image, resourceDir, window){
 
 /*
  * Compress Given Directory of Upload Dir.
+ * @param dirToCompress 待压缩的目录名
  */
 _compressFile = function(dirToCompress){
 	var child, exec = require('child_process').exec,
@@ -223,5 +232,6 @@ _compressFile = function(dirToCompress){
       		console.log('exec error: ' + error);
     	}
 	});
+
 }
 
