@@ -1,4 +1,4 @@
-jQuery.namespace('PSD2CSS');
+jQuery.namespace('PSD2HTML');
 
 jQuery(function($){
 

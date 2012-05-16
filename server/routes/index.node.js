@@ -2,7 +2,7 @@
 /**
  * Homepage and upload Handlers.
  *
- * Author:  justin.maj
+ * Author:  hustcer
  * Date:    2012-05-10 
  */
 
@@ -40,12 +40,7 @@ exports.upload = function(req, res, next){
 
   	_saveUploadFile(uploadFiles, targetPath);
 
-  	_generateHtml(dateString);
-
-  	_compressFile(dateString);
-
-  	// res.redirect('back');
-  	res.send();
+  	_generateHtml(dateString, res);
 	
 };
 
@@ -97,7 +92,7 @@ _saveUploadFile = function(uploadFiles, targetPath){
  * 根据resourceDir里的图片和数据生成对应的html及相关资源文件.
  * @param resourceDir 图片和数据等资源文件存放的目录名
  */
-_generateHtml = function(resourceDir){
+_generateHtml = function(resourceDir, res){
 	var document 	= jsdom('<!DOCTYPE html><html><head><meta charset="UTF-8"/></head><body></body></html>'),
     	window   	= document.createWindow();
     var image 		= new Image, data;
@@ -119,7 +114,7 @@ _generateHtml = function(resourceDir){
 	  	// console.log($('html').html());
 	  	// console.log(window.document.innerHTML);
 
-	  	_toHTML(data, image, resourceDir, window);
+	  	_toHTML(data, image, resourceDir, window, res);
 	});
 
 };
@@ -131,13 +126,15 @@ _generateHtml = function(resourceDir){
  * @param resourceDir 	图片和数据等资源文件存放的目录名，也即生成的html输出目录名
  * @param window 	  	Jsdom window 对象
  */
-_toHTML = function(data, image, resourceDir, window){
+_toHTML = function(data, image, resourceDir, window, res){
 	var _this 		= this;
 	var $ 			= window.$;
 	var document 	= window.document;
 
 	if(data && data.childs){
+		
 		var htmlArr = [], styleArr = [], layer;
+		var counter = 0,  imgCount = data.imgCount;
 		_this.doc 	= document.createElement('div');
 		_this.doc.className = 'wrap';
 
@@ -163,13 +160,14 @@ _toHTML = function(data, image, resourceDir, window){
 
 					if(layer.kind === 'LayerKind.TEXT'){
 						div.innerHTML = layer.textInfo.contents;
-						styleArr.push('.',className,'{font-family:',layer.textInfo.font,'; font-size:',layer.textInfo.size,'; color:',layer.textInfo.color,'; position:absolute; width:',width,'px; height:',height,'px; top:',top,'px; left:',left,'px;}');
+						styleArr.push('.',className,'{font-family:"',layer.textInfo.font,'"; font-size:',layer.textInfo.size,'; color:',layer.textInfo.color,'; position:absolute; width:',width,'px; height:',height,'px; top:',top,'px; left:',left,'px;}');
 						
 					}else{
 
 						// 利用canvas对每个图层生成png图片
 						var canvas 	= new Canvas(width, height);
 						var ctx 	= canvas.getContext('2d');
+						//FIXME: 同尺寸、同坐标图片匹配，避免重复
 						ctx.drawImage(image, left, top, width, height, 0, 0, width, height);
 
 						// 以className命名保存的文件
@@ -183,7 +181,13 @@ _toHTML = function(data, image, resourceDir, window){
 							});
 
 							stream.on('end', function(){
-							  	console.log('Saved Png File:' + className);
+								counter ++;
+								if(counter === imgCount){
+									console.log('Image Out Put Finish!');
+  									_compressFile(resourceDir, res);
+
+								}
+							  	console.log('Saved Png File:' + className + "counter: " + counter);
 							});
 
 						})(className);
@@ -218,8 +222,8 @@ _toHTML = function(data, image, resourceDir, window){
  * Compress Given Directory of Upload Dir.
  * @param dirToCompress 待压缩的目录名
  */
-_compressFile = function(dirToCompress){
-	var child, exec = require('child_process').exec,
+_compressFile = function(dirToCompress, res){
+	var child, exec = require('child_process').exec, response, 
     	// 切换到对应目录然后打包压缩，否则会把路径信息打包进去
     	cmd	 = 'cd '+ uploadDir +';zip -r ' + dirToCompress + '.zip ' + dirToCompress + '/';
 
@@ -230,7 +234,14 @@ _compressFile = function(dirToCompress){
     	// console.log('stderr: ' + stderr);
     	if (error !== null) {
       		console.log('exec error: ' + error);
+      		response = '<script>parent.window.PSD2HTML.callback("error", "文件处理失败！")</script>';
+      		res.send(response);
     	}
+    	console.log('File Compress Finished!');
+    	// res.redirect('back');
+	  	response = '<script>parent.window.PSD2HTML.callback("' + dirToCompress + '", "文件处理完毕！")</script>';
+	  	res.send(response);
+    	
 	});
 
 }

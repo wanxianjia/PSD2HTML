@@ -6,29 +6,28 @@
 //- Date: 2012-2-13 
 //-
 
-div.content
+.content
 	h1= title
 	h2 1
-	div.drop-box#drop-box
+	.drop-box#drop-box
 		span.tips Drop Files Here To See Preview...
 
 	h2 2
-	div.upload-wraper
-		form(method="post", enctype="multipart/form-data", name="uploadForm", id="uploadForm", action="/upload")
+	.upload-wraper
+		form(method="post", enctype="multipart/form-data", name="uploadForm", id="uploadForm", action="/upload", target="hiddenFrame", accept="text/plain, image/jpeg, image/png")
 			div.file-chooser
 				label.cabinet
 					input(type="file", name="upfile1", id="upfile1", required="true", class="file")
 				label.cabinet
 					input(type="file", name="upfile2", id="upfile2", required="true", class="file")
+				iframe.fd-hide(name='hiddenFrame', id="hidden-frame")
 			div.upload-div
 				input(type="submit", value="Upload", class="upload-btn commbtn")
 
 	h2 3
-	div.download-wraper
-		a.commbtn(href="javascript:;") View Output Html 
+	.download-wraper
+		a.commbtn.preview-btn(href="javascript:;", target="_blank") View Output Html 
 		a.commbtn.download-btn(href="javascript:;") DownLoad Zip Ball
 
-script(src='http://style.china.alibaba.com/fdevlib/js/fdev-v4/core/fdev-min.js')
-script(src='/javascripts/psd2html.js')
-script(src='/javascripts/si.files.js')
-script(src='/javascripts/index.js')
+script(src='/javascripts/psd2html-index-merge.js')
+

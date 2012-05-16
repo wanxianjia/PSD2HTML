@@ -1,2 +1,4 @@
+Todo*
+*.sh
 public/uploads/*
 node_modules/*
