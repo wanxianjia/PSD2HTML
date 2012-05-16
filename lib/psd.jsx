@@ -89,7 +89,7 @@ PSD.prototype._getLayerInfo=function (layer, context) {
 			child.index = this.index;
 
 			if(kind === 'LayerKind.TEXT'){
-				$.writeln(layer.textItem);
+
 				if(layer.textItem.kind ==TextType.PARAGRAPHTEXT){
 					child.width=layer.textItem.width;
 					child.height=layer.textItem.height;
@@ -128,6 +128,7 @@ PSD.prototype.exportPng =function() {
 	var img= new File(this.dir+"/psd.png");
 	var options = new ExportOptionsSaveForWeb();
 	options.format = SaveDocumentType.PNG;
+	options.PNG8 = false;
 	this.doc.exportDocument (img, ExportType.SAVEFORWEB, options);
 	this._visibleTextLayers();
 	//img.close();
