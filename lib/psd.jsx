@@ -91,8 +91,8 @@ PSD.prototype._getLayerInfo=function (layer, context) {
 			if(kind === 'LayerKind.TEXT'){
 
 				if(layer.textItem.kind ==TextType.PARAGRAPHTEXT){
-					child.width=layer.textItem.width;
-					child.height=layer.textItem.height;
+					child.width=layer.textItem.width.value;
+					child.height=layer.textItem.height.value;
 				}
 				var textItem = layer.textItem;
 				child.textInfo = {color:textItem.color.rgb.hexValue, contents:textItem.contents, font:textItem.font, size:textItem.size.toString().replace(' ','')};
@@ -108,9 +108,9 @@ PSD.prototype._getLayerInfo=function (layer, context) {
 					this.exportImage(layer, this.index);
 				}
 			}
+            context.childs.push(child);
 		}
-
-		context.childs.push(child);
+		
 	}else if(layer.typename == 'LayerSet' && layer.visible === true){
 			
 		var o = {type:layer.typename, name:layer.name, index:this.index, childs:[]};
