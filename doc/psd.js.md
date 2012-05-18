@@ -79,3 +79,7 @@
 >
 @description 获取所有文本图层信息  
 @return Array
+
+##### getTextLayersAndSlices
+@description 获取所有文本图层信息和切片信息  
+@return Object

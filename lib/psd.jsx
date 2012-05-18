@@ -4,29 +4,12 @@
 app.preferences.rulerUnits = Units.PIXELS;
 app.preferences.typeUnits = TypeUnits.PIXELS;
      
-     
-/*****************************************************************************
-*                                                                                                                                *
-*         the PSD Class for process the PSD file                                                 *
-*           method:  iterator                                                                                        *
-*                           getLayerInfo                                                                              *
-*                           getPSDName                                                                           *
-*                           exportPng                                                                                *
-*                           exportJSON                                                                             *
-*                           exportHTML                                                                            *
-*                           getWidth                                                                                    *
-*                          getHeight                                                                                   *
-*                          walkTree                                                                                    *
-*                           getJSON                                                                                    *
-*                                                                                                                               *
-******************************************************************************/
 
 function PSD(option){
 	this.doc = app.activeDocument;
 	this.docs = app.documents;
 	this.tree = {name:this.doc.name, imgCount:0, childs:[]};
 	this.textLayers = [];        //存储所有的文本图层
-	this.index = -1;
 	this.layers = this.doc.layers;
 	this.option = {
 		exportImages: false,		//是否导出图片
@@ -43,7 +26,9 @@ function PSD(option){
 
 (function(){
 
-
+var index = -1,
+	slices = [],
+	textLayersInfo = [];
 
 PSD.fn = PSD.prototype = {
 	_init: function(){
@@ -76,7 +61,7 @@ PSD.fn = PSD.prototype = {
 		return this.doc.name.substr (0, this.doc.name.length - 4);
 	},
 	_getLayerInfo: function(layer, context){
-		this.index++;
+		index++;
 		context = context || this.tree;
 		
 		if(layer.typename === 'ArtLayer' && layer.visible === true){
@@ -96,7 +81,7 @@ PSD.fn = PSD.prototype = {
 				var kind = layer.kind.toString();
 				var child = {type:layer.typename, name:layer.name, visible:layer.visible, left:left, top:top, right:right, bottom:bottom, kind:kind}
 				child.isBackgroundLayer = layer.isBackgroundLayer;
-				child.index = this.index;
+				child.index = index;
 
 				if(kind === 'LayerKind.TEXT'){
 
@@ -116,10 +101,11 @@ PSD.fn = PSD.prototype = {
 					}
 					//layer.visible = false;
 					this.textLayers.push(layer);
+					textLayersInfo.push(child);
 				}else{
 					this.tree.imgCount++;
 					if(this.option.exportImages){
-						this.exportImage(layer, this.index);
+						this.exportImage(layer, index);
 					}
 				}
 	            context.childs.push(child);
@@ -127,7 +113,7 @@ PSD.fn = PSD.prototype = {
 			
 		}else if(layer.typename == 'LayerSet' && layer.visible === true){
 				
-			var o = {type:layer.typename, name:layer.name, index:this.index, childs:[]};
+			var o = {type:layer.typename, name:layer.name, index:index, childs:[]};
 			context.childs.push(o);
 			this.parseLayers(layer.layers, o);
 		}
@@ -225,6 +211,8 @@ PSD.fn = PSD.prototype = {
 				options = options || defaultOptions;
 				newDoc.exportDocument (img, ExportType.SAVEFORWEB, options);
 				newDoc.close(SaveOptions.DONOTSAVECHANGES);
+
+				slices.push({index:index, name:'slice_'+index, width: docWidth+'px', height:(HEIGHT - y + fy)+'px'});
 				index++;
 			}
 		}catch(e){
@@ -232,9 +220,14 @@ PSD.fn = PSD.prototype = {
 		}
 		this.visibleTextLayers();
 	},
+	getTextLayersAndSlices: function(){
+		if(slices.length <= 0) this.autoSliceAndExport();
+		var data = {slices:slices, layers:textLayersInfo};
+		return data;
+	},
 	/* 获取所有文本图层信息，return Array */
 	getTextLayers: function(){
-		return this.textLayersInfo;
+		return textLayersInfo;
 	}
 }
 
