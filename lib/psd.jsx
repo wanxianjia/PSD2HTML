@@ -37,7 +37,7 @@ function PSD(option){
 			this.option[k] = option[k];
 		}
 	}
-	this.init();
+	this._init();
 }
 
 
@@ -46,7 +46,7 @@ function PSD(option){
 
 
 PSD.fn = PSD.prototype = {
-	init: function(){
+	_init: function(){
 		this.output = new Folder((new File($.fileName)).parent.parent+'/output/');
 		!this.output.exists && this.output.create();
 
@@ -109,7 +109,11 @@ PSD.fn = PSD.prototype = {
 					child.textInfo.bold = textItem.fauxBold;
 					child.textInfo.italic = textItem.fauxItalic;
 					child.textInfo.indent = textItem.firstLineIndent.value + textItem.firstLineIndent.type;
-					if(!textItem.useAutoLeading) child.textInfo.lineHeight = textItem.leading.value + textItem.leading.type;
+					if(!textItem.useAutoLeading){
+						child.textInfo.lineHeight = textItem.leading.value + textItem.leading.type;
+					}else{
+						child.textInfo.lineHeight = autoLeadingAmount;
+					}
 					layer.visible = false;
 					this.textLayers.push(layer);
 				}else{
@@ -188,6 +192,9 @@ PSD.fn = PSD.prototype = {
 		if(defaultOptions.format == SaveDocumentType.PNG){
 			extension = 'png';
 		}
+
+		var slicesFolder = new Folder(this.dir + '/slices/');
+		!slicesFolder.exists && slicesFolder.create();
 		
 		while(y < docHeight){
 			y = y + HEIGHT;
@@ -199,9 +206,6 @@ PSD.fn = PSD.prototype = {
 			var newDoc = this.docs.add(docWidth, HEIGHT);
 			newDoc.paste();
 			newDoc.layers[newDoc.layers.length - 1].remove();
-			
-			var slicesFolder = new Folder(this.dir + '/slices/');
-			!slicesFolder.exists && slicesFolder.create();		
 			
 			var img = new File(slicesFolder + "/slice_" + index + "." + extension);
 			options = options || defaultOptions;
