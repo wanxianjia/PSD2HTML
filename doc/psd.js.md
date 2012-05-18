@@ -1,75 +1,80 @@
-### Class PSD
-##### properise:
-###### doc
+## Class PSD
+#### properise:
+##### doc
 >
 @description 当前PSD文档
-@type Document
-###### docs
+@type Document  
+
+##### docs
 >
 @description PS中所有打开的文档
 @type Documents
-###### output
+
+##### output  
 >
 @description 输出文件夹
 @type Folder
-###### dir
+
+##### dir
 >
 @description output中PSD对应的输出文件夹
 @type Foolder
-###### option
+
+##### option
 >
 @description 配置
-{
-	exportImages: true //是否导出每个图层对应的图片
+{  
+	exportImages: true //是否导出每个图层对应的图片  
 }
 @type Object
 
-##### methods
-###### parseLayers
+#### methods
+##### parseLayers
 >
 @param Layers 
 @param Object
 
-###### getWidth
+##### getWidth
 >
 @return Number PSD文档宽度
 
-###### getHeight
+##### getHeight
 >
 @return Number PSD文档高度
 
-###### getPSDName
+##### getPSDName
 >
 @return String PSD文档名
 
-###### exportPng
+##### exportPng
 >
 @description 导出PSD对应的png-24图片
 
-###### exportImage
+##### exportImage
 >
 @description 导出图层对应的图片
 @param Layer 图层
 @param Number 图层序号
 
-###### exportJSON
+##### exportJSON
 >
 @description 导出PSD文档的图层数信息
 @param String 文件编码，default:'UTF-8'
 
-###### getJSON
+##### getJSON
 >
 @description 获取PSD文档的图层数信息
 @return Object
 
-###### visibleTextLayers
+##### visibleTextLayers
 >
 @description 显示所有解析时被隐藏的文本图层
 
-###### autoSliceAndExport
+##### autoSliceAndExport
 >
 @description 自动对PSD文件切片并导出切片
 
-###### getTextLayers
+##### getTextLayers
+>
 @description 获取所有文本图层信息
 @return Array
