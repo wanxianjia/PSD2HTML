@@ -90,14 +90,41 @@ PSD.fn = PSD.prototype = {
 						child.height=layer.textItem.height.value;
 					}
 					var textItem = layer.textItem;
-					child.textInfo = {color:textItem.color.rgb.hexValue, contents:textItem.contents, font:textItem.font, size:textItem.size.toString().replace(' ','')};
+					child.textInfo = {
+						color:textItem.color.rgb.hexValue, 
+						contents:textItem.contents, 
+						font:textItem.font, 
+						size:textItem.size.toString().replace(/\s+/,'')};
+
 					child.textInfo.bold = textItem.fauxBold;
 					child.textInfo.italic = textItem.fauxItalic;
 					child.textInfo.indent = textItem.firstLineIndent.value + textItem.firstLineIndent.type;
+					// line height
 					if(!textItem.useAutoLeading){
 						child.textInfo.lineHeight = textItem.leading.value + textItem.leading.type;
 					}else{
 						child.textInfo.lineHeight = textItem.autoLeadingAmount / 100;
+					}
+					// text justification
+					switch(textItem.justification){
+						case 'Justification.LEFT':
+							child.textInfo.textAlign = 'left';
+							break;
+						case 'Justification.RIGHT':
+							child.textInfo.textAlign = 'right';
+							break;
+						case 'Justification.CENTER':
+							child.textInfo.textAlign = 'certer';
+							break;
+						case 'Justification.CENTERJUSTIFIED':
+						case 'Justification.FULLYJUSTIFIED':
+						case 'Justification.LEFTJUSTIFIED':
+						case 'Justification.RIGHTJUSTIFIED':
+							child.textInfo.textAlign = 'justify';
+							break;
+						default:
+							child.textInfo.textAlign = 'left';
+
 					}
 					//layer.visible = false;
 					this.textLayers.push(layer);
