@@ -52,7 +52,7 @@ PSD.fn = PSD.prototype = {
 		this.option.done(this);
 	},
 	getWidth: function(){
-		return this.doc.width.value; 
+		return this.doc.width.value;
 	},
 	getHeight: function(){
 		return this.doc.height.value;
@@ -86,22 +86,23 @@ PSD.fn = PSD.prototype = {
 				if(kind === 'LayerKind.TEXT'){
 
 					if(layer.textItem.kind ==TextType.PARAGRAPHTEXT){
-						child.width=layer.textItem.width.value;
-						child.height=layer.textItem.height.value;
+						child.width = layer.textItem.width.value;
+						child.height = layer.textItem.height.value;
 					}
 					var textItem = layer.textItem;
 					child.textInfo = {
 						color:textItem.color.rgb.hexValue, 
 						contents:textItem.contents, 
 						font:textItem.font, 
-						size:textItem.size.toString().replace(/\s+/,'')};
+						size:Math.round(textItem.size.value)
+					};
 
 					child.textInfo.bold = textItem.fauxBold;
 					child.textInfo.italic = textItem.fauxItalic;
-					child.textInfo.indent = textItem.firstLineIndent.value + textItem.firstLineIndent.type;
+					child.textInfo.indent = Math.round(textItem.firstLineIndent.value);
 					// line height
 					if(!textItem.useAutoLeading){
-						child.textInfo.lineHeight = textItem.leading.value + textItem.leading.type;
+						child.textInfo.lineHeight = Math.round(textItem.leading.value);
 					}else{
 						child.textInfo.lineHeight = textItem.autoLeadingAmount / 100;
 					}
