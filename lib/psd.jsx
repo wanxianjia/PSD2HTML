@@ -97,7 +97,7 @@ PSD.fn = PSD.prototype = {
 					if(!textItem.useAutoLeading){
 						child.textInfo.lineHeight = textItem.leading.value + textItem.leading.type;
 					}else{
-						child.textInfo.lineHeight = autoLeadingAmount;
+						child.textInfo.lineHeight = textItem.autoLeadingAmount / 100;
 					}
 					//layer.visible = false;
 					this.textLayers.push(layer);
