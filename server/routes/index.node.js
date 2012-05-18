@@ -8,17 +8,17 @@
 
 // we need the fs module for moving the uploaded files
 var fs 			= require('fs'),
-	Canvas 		= require('canvas'),
-	Image 		= Canvas.Image,
-	jsdom  		= require("jsdom").jsdom,
-	uploadDir	= './public/uploads/',	 	// Global File Upload Dir
-	dateFormat 	= require('../lib/dateformat');
+    Canvas 		= require('canvas'),
+    Image 		= Canvas.Image,
+    jsdom  		= require("jsdom").jsdom,
+    uploadDir	= './public/uploads/',	 	// Global File Upload Dir
+    dateFormat 	= require('../lib/dateformat');
 
 /*
  * GET home page.
  */
 exports.index = function(req, res){
-  	res.render('index', { title: 'Welcome Using PSD To Html' })
+    res.render('index', { title: 'Welcome Using PSD To Html' })
 };
 
 
@@ -93,8 +93,8 @@ _saveUploadFile = function(uploadFiles, targetPath){
  * @param resourceDir 图片和数据等资源文件存放的目录名
  */
 _generateHtml = function(resourceDir, res){
-	var document 	= jsdom('<!DOCTYPE html><html><head><meta charset="UTF-8"/></head><body></body></html>'),
-    	window   	= document.createWindow();
+    var document 	= jsdom('<!DOCTYPE html><html><head><meta charset="UTF-8"/></head><body></body></html>'),
+        window   	= document.createWindow();
     var image 		= new Image, data;
 	
 	image.src 		= fs.readFileSync(uploadDir + resourceDir + '/view.png');
@@ -146,7 +146,7 @@ _toHTML = function(data, image, resourceDir, window, res){
 			for(var i = 0, layers = childs, l = layers.length; i < l; i++){
 				layer = layers[i];
 
-				var width 		= layer.right  - layer.left,
+                var width       = layer.right  - layer.left,
 					height 		= layer.bottom - layer.top,
 					top 		= layer.top,
 					left 		= layer.left,
@@ -181,13 +181,15 @@ _toHTML = function(data, image, resourceDir, window, res){
 							});
 
 							stream.on('end', function(){
+								// out.end();
+								// out.destroy();
 								counter ++;
 								if(counter === imgCount){
 									console.log('Image Out Put Finish!');
   									_compressFile(resourceDir, res);
 
 								}
-							  	console.log('Saved Png File:' + className + "counter: " + counter);
+							  	// console.log('Saved Png File:' + className + "counter: " + counter);
 							});
 
 						})(className);
@@ -225,7 +227,7 @@ _toHTML = function(data, image, resourceDir, window, res){
 _compressFile = function(dirToCompress, res){
 	var child, exec = require('child_process').exec, response, 
     	// 切换到对应目录然后打包压缩，否则会把路径信息打包进去
-    	cmd	 = 'cd '+ uploadDir +';zip -r ' + dirToCompress + '.zip ' + dirToCompress + '/';
+    	cmd    = 'cd '+ uploadDir +';zip -r ' + dirToCompress + '.zip ' + dirToCompress + '/';
 
     // console.log(cmd);
 
