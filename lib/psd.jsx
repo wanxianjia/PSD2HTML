@@ -109,7 +109,7 @@ PSD.fn = PSD.prototype = {
 					child.textInfo.bold = textItem.fauxBold;
 					child.textInfo.italic = textItem.fauxItalic;
 					child.textInfo.indent = textItem.firstLineIndent.value + textItem.firstLineIndent.type;
-					child.textInfo.lineHeight = textItem.leading.value + textItem.leading.type;
+					if(!textItem.useAutoLeading) child.textInfo.lineHeight = textItem.leading.value + textItem.leading.type;
 					layer.visible = false;
 					this.textLayers.push(layer);
 				}else{
