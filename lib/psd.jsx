@@ -114,7 +114,7 @@ PSD.fn = PSD.prototype = {
 					}else{
 						child.textInfo.lineHeight = autoLeadingAmount;
 					}
-					layer.visible = false;
+					//layer.visible = false;
 					this.textLayers.push(layer);
 				}else{
 					this.tree.imgCount++;
@@ -133,14 +133,17 @@ PSD.fn = PSD.prototype = {
 		}
 	},
 	exportPng: function(){
+		this.hiddenTextLayers();
 		var img= new File(this.dir+"/psd.png");
 		var options = new ExportOptionsSaveForWeb();
 		options.format = SaveDocumentType.PNG;
 		options.PNG8 = false;
 		this.doc.exportDocument (img, ExportType.SAVEFORWEB, options);
 		this.visibleTextLayers();
+		//this.visibleTextLayers();
 	},
 	exportImage: function(layer, index){
+		this.hiddenTextLayers();
 		try{
 			var bounds = layer.bounds;
 			layer.copy();
@@ -158,6 +161,7 @@ PSD.fn = PSD.prototype = {
 		}catch(e){	//TODO 目前发现具有蒙层的图层无法执行layer.copy();
 			alert(e+'#####'+layer.name);
 		}
+		this.visibleTextLayers();
 	},
 	exportJSON: function(format){
 		var f = new File(this.dir + "/json.txt");
@@ -169,20 +173,29 @@ PSD.fn = PSD.prototype = {
 	getJSON: function(){
 		return this.tree;
 	},
+	hiddenTextLayers: function(){
+		for(var i = 0, l = this.textLayers.length; i < l; i++){
+			if(!this.textLayers[i].visible) continue;
+			this.textLayers[i].visible = false;
+		}
+	},
 	visibleTextLayers: function(){
 		for(var i = 0, l = this.textLayers.length; i < l; i++){
+			if(this.textLayers[i].visible) continue;
 			this.textLayers[i].visible = true;
 		}
 	},
 	/* 自动切片并导出图片 */
 	autoSliceAndExport: function(options){
-		var HEIGHT = 90,
+		this.hiddenTextLayers();
+
+		var HEIGHT = 120,
 			selection = this.doc.selection,
-			docWidth = this.doc.width,
-			docHeight = this.doc.height,
+			docWidth = this.doc.width.value,
+			docHeight = this.doc.height.value,
 			region = [],
 			index = 0,
-			y = 0,
+			y = 0, fy,
 			defaultOptions = new ExportOptionsSaveForWeb();
 
 		defaultOptions.format = SaveDocumentType.JPEG;
@@ -196,23 +209,28 @@ PSD.fn = PSD.prototype = {
 		var slicesFolder = new Folder(this.dir + '/slices/');
 		!slicesFolder.exists && slicesFolder.create();
 		
-		while(y < docHeight){
-			y = y + HEIGHT;
-			y = y > docHeight ? docHeight : y;
-			region = [[0, y - HEIGHT], [docWidth, y - HEIGHT], [docWidth, y], [0, y]];
-			selection.select(region);
-			selection.copy(true);
-			
-			var newDoc = this.docs.add(docWidth, HEIGHT);
-			newDoc.paste();
-			newDoc.layers[newDoc.layers.length - 1].remove();
-			
-			var img = new File(slicesFolder + "/slice_" + index + "." + extension);
-			options = options || defaultOptions;
-			newDoc.exportDocument (img, ExportType.SAVEFORWEB, options);
-			newDoc.close(SaveOptions.DONOTSAVECHANGES);
-			index++;
+		try{
+			while(y < docHeight){
+				y = y + HEIGHT;
+				fy = y > docHeight ? docHeight : y;
+				region = [[0, y - HEIGHT], [docWidth, y - HEIGHT], [docWidth, fy], [0, fy]];
+				selection.select(region);
+				selection.copy(true);
+				
+				var newDoc = this.docs.add(docWidth, HEIGHT - (y - fy));
+				newDoc.paste();
+				newDoc.layers[newDoc.layers.length - 1].remove();
+				
+				var img = new File(slicesFolder + "/slice_" + index + "." + extension);
+				options = options || defaultOptions;
+				newDoc.exportDocument (img, ExportType.SAVEFORWEB, options);
+				newDoc.close(SaveOptions.DONOTSAVECHANGES);
+				index++;
+			}
+		}catch(e){
+			// TODO
 		}
+		this.visibleTextLayers();
 	},
 	/* 获取所有文本图层信息，return Array */
 	getTextLayers: function(){
