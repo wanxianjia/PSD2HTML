@@ -28,7 +28,7 @@
 }  
 @type Object
 
-### methods
+### methods：
 ##### parseLayers
 >
 @description 解析所有图层，其他需要用的图层信息的方法都依赖该方法（即必须先调用该方法后才会产生图层信息）  
