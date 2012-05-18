@@ -212,7 +212,7 @@ PSD.fn = PSD.prototype = {
 				newDoc.exportDocument (img, ExportType.SAVEFORWEB, options);
 				newDoc.close(SaveOptions.DONOTSAVECHANGES);
 
-				slices.push({index:index, name:'slice_'+index, width: docWidth+'px', height:(HEIGHT - y + fy)+'px'});
+				slices.push({index:index, name:'slice_'+index+'.'+extension, width: docWidth+'px', height:(HEIGHT - y + fy)+'px'});
 				index++;
 			}
 		}catch(e){
