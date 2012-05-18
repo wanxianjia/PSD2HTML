@@ -29,7 +29,7 @@ function PSD(option){
 	this.index = -1;
 	this.layers = this.doc.layers;
 	this.option = {
-		exportImages: true,		//是否导出图片
+		exportImages: false,		//是否导出图片
 		done: function(){}
 	}
 	if(option){
