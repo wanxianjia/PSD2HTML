@@ -6,9 +6,9 @@
 			size:[284, 50]\
 			text:"请选择解析器",\
 			a: Group{\
-				r: RadioButton{text:"EDM"},\
-				r: RadioButton{text:"论坛帖"},\
-				r: RadioButton{text:"静态页"}\
+				e: RadioButton{text:"EDM", data:"EDM"},\
+				l: RadioButton{text:"论坛帖", data:"BBS"},\
+				j: RadioButton{text:"静态页", data:"normal"}\
 			}\
 		},\
 		output:Group{\
@@ -23,12 +23,31 @@
 	}\
 }';
 
-var win = new Window(ui);
-
+var win = new Window(ui);//alert(win.option.builder.a.children[1].data);
+var OPTION = {};
 win.option.output.b.onClick = function(){
 	var output = Folder.selectDialog ('选择输出文件夹','~/Documents');
 	if(output){
-		win.option.output.s.text = output;
+		win.option.output.s.text  = OPTION.output = output;
+	}
+}
+win.buttons.ok.onClick = function(){
+	if(!OPTION.output){
+		alert('请选择输出文件夹');
+	}else{
+		var radios = win.option.builder.a.children;
+		for(var i = 0, l = radios.length; i < l; i++){
+			var radio = radios[i];
+			if(radio.value === true){
+				OPTION.builder = radio.data;
+				break;
+			}
+		}
+		if(!OPTION.builder){
+			alert('请选择生成器');
+		}else{
+			$.evalFile(File($.fileName).parent+'/eval.jsx');
+		}
 	}
 }
 
