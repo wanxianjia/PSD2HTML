@@ -12,8 +12,8 @@ function PSD(option){
 	this.textLayers = [];        //存储所有的文本图层
 	this.layers = this.doc.layers;
 	this.option = {
-		exportImages: false,		//是否导出图片
-		done: function(){}
+		exportImages: false,											//是否对每个图层导出图片
+		output: File($.fileName).parent.parent.parent + '/output/'		//输出目录
 	}
 	if(option){
 		for(k in option){
@@ -32,10 +32,10 @@ var index = -1,
 
 PSD.fn = PSD.prototype = {
 	_init: function(){
-		this.output = new Folder((new File($.fileName)).parent.parent+'/output/');
+		this.output = Folder(this.option.output);
 		!this.output.exists && this.output.create();
 
-		this.dir = new Folder(this.output + '/' + this.getPSDName());
+		this.dir = Folder(this.output + '/' + this.getPSDName());
 		!this.dir.exists && this.dir.create();
 	},
 	parseLayers: function(layers, context){
@@ -49,7 +49,6 @@ PSD.fn = PSD.prototype = {
 		for(var i = layers.length - 1; i >= 0; i--){
 			this._getLayerInfo(layers[i], context);
 		}
-		this.option.done(this);
 	},
 	getWidth: function(){
 		return this.doc.width.value;
@@ -201,7 +200,7 @@ PSD.fn = PSD.prototype = {
 		}
 	},
 	/* 自动切片并导出图片 */
-	autoSliceAndExport: function(options){
+	autoSliceAndExport: function(option){
 		this.hiddenTextLayers();
 
 		var HEIGHT = 120,
@@ -210,14 +209,16 @@ PSD.fn = PSD.prototype = {
 			docHeight = this.doc.height.value,
 			region = [],
 			index = 0,
-			y = 0, fy,
-			defaultOptions = new ExportOptionsSaveForWeb();
+			y = 0, fy;
 
-		defaultOptions.format = SaveDocumentType.JPEG;
-		defaultOptions.quality = 60;
+		if(!option){
+			option = new ExportOptionsSaveForWeb();
+			option.format = SaveDocumentType.JPEG;
+			option.quality = 60;
+		}
 
 		var extension = 'jpg';
-		if(defaultOptions.format == SaveDocumentType.PNG){
+		if(option.format == SaveDocumentType.PNG){
 			extension = 'png';
 		}
 
@@ -237,11 +238,10 @@ PSD.fn = PSD.prototype = {
 				newDoc.layers[newDoc.layers.length - 1].remove();
 				
 				var img = new File(slicesFolder + "/slice_" + index + "." + extension);
-				options = options || defaultOptions;
-				newDoc.exportDocument (img, ExportType.SAVEFORWEB, options);
+				newDoc.exportDocument (img, ExportType.SAVEFORWEB, option);
 				newDoc.close(SaveOptions.DONOTSAVECHANGES);
 
-				slices.push({index:index, name:'slice_'+index+'.'+extension, width: docWidth+'px', height:(HEIGHT - y + fy)+'px'});
+				slices.push({index:index, name:'slice_'+index+'.'+extension, width: docWidth, height:(HEIGHT - y + fy)});
 				index++;
 			}
 		}catch(e){
@@ -249,8 +249,8 @@ PSD.fn = PSD.prototype = {
 		}
 		this.visibleTextLayers();
 	},
-	getTextLayersAndSlices: function(){
-		if(slices.length <= 0) this.autoSliceAndExport();
+	getTextLayersAndSlices: function(option){
+		if(slices.length <= 0) this.autoSliceAndExport(option);
 		var data = {slices:slices, layers:textLayersInfo};
 		return data;
 	},
