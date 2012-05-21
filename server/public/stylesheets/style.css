@@ -29,6 +29,7 @@ a {color: #00B7FF;}
 .commbtn{border:0;padding: 5px 12px;background: orange;cursor: pointer;font-weight: bold;color: #333;font-family: "Tahoma";font-size:12px;}
 .disable-btn{background: #DDD;color: #777;cursor: not-allowed;}
 .content{margin: 50px auto;width:900px;}
+.content .none-exist{color: #C40000;font-size: 13px;}
 .content h1,.content h2{font-size: 28px;margin: 10px 0px 30px;color: #6D79E1;font-weight: bold;font-family: "Tahoma";}
 .content h2{margin: 20px 0 0;background: #666;color: #FFF;font-size: 22px;width: 20px;padding: 0 12px;}
 

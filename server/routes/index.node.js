@@ -8,10 +8,13 @@
 
 // we need the fs module for moving the uploaded files
 var fs 			= require('fs'),
+    path        = require('path'),
     Canvas 		= require('canvas'),
     Image 		= Canvas.Image,
     jsdom  		= require("jsdom").jsdom,
-    uploadDir	= './public/uploads/',	 	// Global File Upload Dir
+    messages    = require('./conf.node.js').nodeMsg
+    conf        = require('./conf.node.js').conf,
+    uploadDir	= conf.UPLOAD_DIR,	 	// Global File Upload Dir
     dateFormat 	= require('../lib/dateformat');
 
 /*
@@ -25,9 +28,6 @@ exports.index = function(req, res){
 /*
  * File Upload Handler.
  */
-// FIXME:上传文件时如果uploads目录不存在则自动创建该目录。
-// FIXME:上传路径 ./public/uploads/ 设置为配置项
-// FIXME:文件命名规范化：保证唯一性
 exports.upload = function(req, res, next){
   	// the uploaded file can be found as `req.files.uploadfiledname` 
   	// console.log(req.files);
@@ -38,10 +38,18 @@ exports.upload = function(req, res, next){
   	uploadFiles.push(req.files.upfile1);
   	uploadFiles.push(req.files.upfile2);
 
-  	_saveUploadFile(uploadFiles, targetPath);
+    // 判断上传路径是否存在，如果不存在则自动创建该路径
+    path.exists( uploadDir, function( pExists ){
+        if(!pExists){
+            fs.mkdirSync( uploadDir );
+        }
 
-  	_generateHtml(dateString, res);
-	
+        _saveUploadFile(uploadFiles, targetPath);
+
+        _generateHtml(dateString, res);
+
+    });
+  	
 };
 
 /*
@@ -70,11 +78,11 @@ _saveUploadFile = function(uploadFiles, targetPath){
 
 	  	switch( uploadFiles[i].type ){
 		  	case 'image/png':
-		  		destPath = targetPath + 'view.png';
+		  		destPath = targetPath + conf.IMG_FILE_NAME;
 		  		break;
 		  	// FIXME:上传文件为json时的异常处理
 		  	case 'text/plain':
-		  		destPath = targetPath + 'conf.txt';
+		  		destPath = targetPath + conf.CONF_FILE_NAME;
 		  		break;
 		  	default:
 		  		destPath = targetPath + uploadFiles[i].name;
@@ -96,11 +104,21 @@ _generateHtml = function(resourceDir, res){
     var document    = jsdom('<!DOCTYPE html><html><head><meta charset="UTF-8"/></head><body></body></html>'),
         window      = document.createWindow();
     var image       = new Image, data;
+    var imgFile     = uploadDir + resourceDir + '/' + conf.IMG_FILE_NAME;
+    var confFile    = uploadDir + resourceDir + '/' + conf.CONF_FILE_NAME;
 	
-    // FIXME: CHECK FILE HERE
-	image.src       = fs.readFileSync(uploadDir + resourceDir + '/view.png');
-    // FIXME: CHECK FILE HERE
-	data            = JSON.parse(fs.readFileSync(uploadDir + resourceDir + '/conf.txt'));
+    if (!path.existsSync(imgFile)){
+        res.send( _buildResponse('error', messages.IMG_NOT_EXIST) );
+        return;
+    }
+    
+    if (!path.existsSync(confFile)){
+        res.send( _buildResponse('error', messages.CONF_NOT_EXIST) );
+        return;
+    }
+
+	image.src       = fs.readFileSync(imgFile);
+	data            = JSON.parse(fs.readFileSync(confFile));
 
 	// 创建图片文件保存文件夹
 	fs.mkdirSync( uploadDir + resourceDir + '/images' );
@@ -183,11 +201,12 @@ _toHTML = function(data, image, resourceDir, window, res){
 							});
 
 							stream.on('end', function(){
-								// out.end();
-								// out.destroy();
+								out.end();
+								out.destroy();
+                                // 貌似在Ubuntu下可以，在Mac下有问题？
 								counter ++;
 								if(counter === imgCount){
-									console.log('Image Out Put Finish!');
+									console.log('Image Output Finish!');
   									_compressFile(resourceDir, res);
 
 								}
@@ -219,7 +238,9 @@ _toHTML = function(data, image, resourceDir, window, res){
 		document.head.appendChild(style);
 		fs.writeFileSync(uploadDir + resourceDir + '/output.html', document.innerHTML, 'utf8');
 		
-	}
+	}else{
+        res.send(_buildResponse('error', messages.DATA_ERROR));
+    }
 };
 
 /*
@@ -227,7 +248,7 @@ _toHTML = function(data, image, resourceDir, window, res){
  * @param dirToCompress 待压缩的目录名
  */
 _compressFile = function(dirToCompress, res){
-	var child, exec = require('child_process').exec, response, 
+	var child, exec = require('child_process').exec, 
     	// 切换到对应目录然后打包压缩，否则会把路径信息打包进去
     	cmd    = 'cd '+ uploadDir +';zip -r ' + dirToCompress + '.zip ' + dirToCompress + '/';
 
@@ -238,15 +259,25 @@ _compressFile = function(dirToCompress, res){
     	// console.log('stderr: ' + stderr);
     	if (error !== null) {
       		console.log('exec error: ' + error);
-      		response = '<script>parent.window.PSD2HTML.callback("error", "文件处理失败！")</script>';
-      		res.send(response);
+      		
+      		res.send(_buildResponse('error', messages.COMMON_FAIL));
     	}
     	console.log('File Compress Finished!');
     	// res.redirect('back');
-	  	response = '<script>parent.window.PSD2HTML.callback("' + dirToCompress + '", "文件处理完毕！")</script>';
-	  	res.send(response);
+	  	res.send(_buildResponse(dirToCompress, ''));
     	
 	});
 
-}
+};
+
+/*
+ * 生成response内容
+ * @param dirName response返回的文件名
+ * @param msg     response返回信息
+ */
+_buildResponse = function( dirName, msg ){
+    var response = '<script>parent.window.PSD2HTML.callback("'+ dirName + '", "' + msg + '")</script>';
+    // console.log(response);
+    return response;
+};
 
