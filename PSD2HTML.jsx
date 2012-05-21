@@ -30,7 +30,7 @@ var APP = {};
 				a: Group{\
 					e: RadioButton{text:"EDM", data:"EDM"},\
 					l: RadioButton{text:"论坛帖", data:"BBS"},\
-					j: RadioButton{text:"静态页", data:"normal"}\
+					j: RadioButton{text:"静态页", data:"normal", value:true}\
 				}\
 			},\
 			image: Group{\
@@ -117,6 +117,7 @@ var APP = {};
 				$.evalFile(File($.fileName).parent+'/PSD2HTML/builder/test.jsx');
 			}
 		}
+		APP.win.hide();
 	}
 	
 	APP.win.show();
