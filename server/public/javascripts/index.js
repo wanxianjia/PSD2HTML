@@ -6,6 +6,8 @@ jQuery(function($){
 	var module = {
 		$uploadBtn 	: $('div.content .upload-btn'),
 		$upForm 	: $('#uploadForm'),
+		$upFile1 	: $('#upfile1'),
+		$upFile2 	: $('#upfile2'),
 
 		init:function(){
 			this.initUI();
@@ -18,14 +20,34 @@ jQuery(function($){
 			this.$uploadBtn.click(function(e){
 				e.preventDefault();
 
-				if($('#upfile1').val() === '' && $('#upfile2').val() === '')
+				if($('#upfile1').val() === '' || $('#upfile2').val() === ''){
+					module.$upForm.find('.message').text('请选择生成HTML所需的图片和Json配置文件！');
 					return false;
-				// console.log(module.$upForm.serialize());
-				// $.post('upload', module.$upForm.serialize(), function(data){
-				// 	console.log(data);
-				// });
+				}
+				
+				module.$upForm.find('.message').text('');
 				module.$upForm[0].submit();
+				module.$upForm.find('.message').html('<img class="loading" src="../images/loading.gif">');
 			});
+
+			this.$upFile1.on({
+				change: function(){
+					var filePath = $(this).val()
+					,	fileName = filePath.substring(filePath.lastIndexOf('\\') + 1);
+					$('#fileName1').text(fileName);
+					$('div.download-wraper a.commbtn').addClass('disable-btn').attr('href','javascript:;').attr('target','_self');
+				}
+			});
+
+			this.$upFile2.on({
+				change: function(){
+					var filePath = $(this).val()
+					,	fileName = filePath.substring(filePath.lastIndexOf('\\') + 1);
+					$('#fileName2').text(fileName);
+					$('div.download-wraper a.commbtn').addClass('disable-btn').attr('href','javascript:;').attr('target','_self');
+				}
+			});
+
 		}
 	}
 
@@ -36,9 +58,12 @@ jQuery(function($){
 	 */
 	PSD2HTML.callback = function(dirName, msg){
 		if(dirName === 'error'){
-			console.log("文件处理失败");
+			module.$upForm.find('.message').text('文件处理失败，请重试！');
 		}else{
-			$('div.content a.preview-btn').attr("href", "uploads/" + dirName + "/output.html");
+			$('div.download-wraper a.commbtn').removeClass('disable-btn');
+			module.$upForm.find('.message').text('恭喜，HTML文件生成成功！');
+			$('div.content a.preview-btn').attr("href", "uploads/" + dirName + "/output.html").attr('target','_blank');
+			$('#dirName').val(dirName);
 			$('div.content a.download-btn').attr("href", "uploads/" + dirName + ".zip");
 		}
 		
