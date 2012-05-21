@@ -12,7 +12,7 @@ var fs 			= require('fs'),
     Canvas 		= require('canvas'),
     Image 		= Canvas.Image,
     jsdom  		= require("jsdom").jsdom,
-    messages    = require('./conf.node.js').nodeMsg
+    messages    = require('./msg.node.js').nodeMsg,
     conf        = require('./conf.node.js').conf,
     uploadDir	= conf.UPLOAD_DIR,	 	// Global File Upload Dir
     dateFormat 	= require('../lib/dateformat');
@@ -251,8 +251,7 @@ _compressFile = function(dirToCompress, res){
 	var child, exec = require('child_process').exec, 
     	// 切换到对应目录然后打包压缩，否则会把路径信息打包进去
     	cmd    = 'cd '+ uploadDir +';zip -r ' + dirToCompress + '.zip ' + dirToCompress + '/';
-
-    // console.log(cmd);
+        // console.log(cmd);
 
 	child = exec(cmd, function (error, stdout, stderr) {
     	// console.log('stdout: ' + stdout);
