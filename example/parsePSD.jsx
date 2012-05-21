@@ -3,6 +3,6 @@
 var psd = new PSD();
 psd.option.exportImages = false;
 psd.parseLayers();
-psd.exportJSON();
+psd.exportJSON(psd.getTextLayersAndSlices());
 psd.exportPng();
 alert('done')
