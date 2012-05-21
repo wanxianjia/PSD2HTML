@@ -35,7 +35,7 @@ PSD.fn = PSD.prototype = {
 		this.output = Folder(this.option.output);
 		!this.output.exists && this.output.create();
 
-		this.dir = Folder(this.output + '/' + this.getPSDName());alert(this.dir);
+		this.dir = Folder(this.output + '/' + this.getPSDName());
 		!this.dir.exists && this.dir.create();
 	},
 	parseLayers: function(layers, context){
