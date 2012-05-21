@@ -3,7 +3,7 @@
 //- Admin Home.
 //-
 //-	Author: hustcer
-//- Date: 2012-2-13 
+//- Date: 2012-05-11 
 //-
 
 .content
@@ -16,18 +16,24 @@
 	.upload-wraper
 		form(method="post", enctype="multipart/form-data", name="uploadForm", id="uploadForm", action="/upload", target="hiddenFrame", accept="text/plain, image/jpeg, image/png")
 			div.file-chooser
-				label.cabinet
-					input(type="file", name="upfile1", id="upfile1", required="true", class="file")
-				label.cabinet
-					input(type="file", name="upfile2", id="upfile2", required="true", class="file")
+				div.file-wrapper
+					label.cabinet
+						input(type="file", name="upfile1", id="upfile1", required="true", class="file")
+					span.fileName#fileName1
+				div.file-wrapper
+					label.cabinet
+						input(type="file", name="upfile2", id="upfile2", required="true", class="file")
+					span.fileName#fileName2
 				iframe.fd-hide(name='hiddenFrame', id="hidden-frame")
 			div.upload-div
 				input(type="submit", value="Upload", class="upload-btn commbtn")
+				span.message 
 
 	h2 3
 	.download-wraper
-		a.commbtn.preview-btn(href="javascript:;", target="_blank") View Output Html 
-		a.commbtn.download-btn(href="javascript:;") DownLoad Zip Ball
+		a.commbtn.preview-btn.disable-btn(href="javascript:;", target="_self") View Output Html
+		input(type='hidden', name='dirName', id='dirName') 
+		a.commbtn.download-btn.disable-btn(href="javascript:;") DownLoad Zip Ball
 
 script(src='/javascripts/psd2html-index-merge.js')
 
