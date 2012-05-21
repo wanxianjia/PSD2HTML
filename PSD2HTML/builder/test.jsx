@@ -1,5 +1,6 @@
 ﻿// @include "../lib/json2-min.jsx"
 // @include "../lib/psd.jsx"
+// @include "../lib/toHtml.jsx"
 
 alert(JSON.stringify(APP.OPTION)); //设置面板的设置结果
 var appOp = APP.OPTION;
@@ -18,4 +19,5 @@ if(appOp.image.extension === 'jpg'){
 }
 
 var data = psd.getTextLayersAndSlices(option);
+toHtml.init(data,APP.OPTION.builder);
 alert(JSON.stringify(data));
