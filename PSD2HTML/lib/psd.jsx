@@ -12,8 +12,8 @@ function PSD(option){
 	this.textLayers = [];        //存储所有的文本图层
 	this.layers = this.doc.layers;
 	this.option = {
-		exportImages: false,											//是否对每个图层导出图片
-		output: File($.fileName).parent.parent.parent + '/output/'		//输出目录
+		exportImages: false,		//是否导出图片
+		output: File($.fileName).parent.parent+'/output/'
 	}
 	if(option){
 		for(k in option){
@@ -27,6 +27,7 @@ function PSD(option){
 (function(){
 
 var index = -1,
+	sliceCount = 0;
 	slices = [],
 	textLayersInfo = [];
 
@@ -88,7 +89,7 @@ PSD.fn = PSD.prototype = {
 						child.width = layer.textItem.width.value;
 						child.height = layer.textItem.height.value;
 					}
-					var textItem = layer.textItem;$.writeln(textItem.position);
+					var textItem = layer.textItem;
 					child.textInfo = {
 						color:textItem.color.rgb.hexValue, 
 						contents:textItem.contents, 
@@ -177,11 +178,11 @@ PSD.fn = PSD.prototype = {
 		}
 		this.visibleTextLayers();
 	},
-	exportJSON: function(format){
+	exportJSON: function(data, format){
 		var f = new File(this.dir + "/json.txt");
 		f.encoding = format || 'UTF-8';
 		f.open('w', 'TEXT');
-		f.write(JSON.stringify(this.tree));
+		f.write(JSON.stringify(data || this.tree));
 		f.close();
 	},
 	getJSON: function(){
@@ -200,7 +201,7 @@ PSD.fn = PSD.prototype = {
 		}
 	},
 	/* 自动切片并导出图片 */
-	autoSliceAndExport: function(option){
+	autoSliceAndExport: function(options){
 		this.hiddenTextLayers();
 
 		var HEIGHT = 120,
@@ -208,18 +209,19 @@ PSD.fn = PSD.prototype = {
 			docWidth = this.doc.width.value,
 			docHeight = this.doc.height.value,
 			region = [],
-			index = 0,
-			y = 0, fy;
+			y = 0, fy,
+			defaultOptions = new ExportOptionsSaveForWeb();
 
-		if(!option){
-			option = new ExportOptionsSaveForWeb();
-			option.format = SaveDocumentType.JPEG;
-			option.quality = 60;
-		}
+		if(options){
+			defaultOptions = options;
+		}else{
+			defaultOptions.format = SaveDocumentType.JPEG;
+			defaultOptions.quality = 60;
 
-		var extension = 'jpg';
-		if(option.format == SaveDocumentType.PNG){
-			extension = 'png';
+			var extension = 'jpg';
+			if(defaultOptions.format == SaveDocumentType.PNG){
+				extension = 'png';
+			}
 		}
 
 		var slicesFolder = new Folder(this.dir + '/slices/');
@@ -227,6 +229,8 @@ PSD.fn = PSD.prototype = {
 		
 		try{
 			while(y < docHeight){
+				index++;
+
 				y = y + HEIGHT;
 				fy = y > docHeight ? docHeight : y;
 				region = [[0, y - HEIGHT], [docWidth, y - HEIGHT], [docWidth, fy], [0, fy]];
@@ -238,20 +242,24 @@ PSD.fn = PSD.prototype = {
 				newDoc.layers[newDoc.layers.length - 1].remove();
 				
 				var img = new File(slicesFolder + "/slice_" + index + "." + extension);
-				newDoc.exportDocument (img, ExportType.SAVEFORWEB, option);
+				options = defaultOptions;
+				newDoc.exportDocument (img, ExportType.SAVEFORWEB, options);
 				newDoc.close(SaveOptions.DONOTSAVECHANGES);
 
-				slices.push({index:index, name:'slice_'+index+'.'+extension, width: docWidth, height:(HEIGHT - y + fy)});
-				index++;
+				slices.push({index:index, type:"ArtLayer", visible:true, kind:"LayerKind.NORMAL", isBackgroundLayer:false,
+					name:'slice_'+index+'.'+extension, right: docWidth, top:y - HEIGHT, left:0, bottom:fy});
+				sliceCount++;
 			}
 		}catch(e){
 			// TODO
 		}
 		this.visibleTextLayers();
+		return slices;
 	},
 	getTextLayersAndSlices: function(option){
 		if(slices.length <= 0) this.autoSliceAndExport(option);
-		var data = {slices:slices, layers:textLayersInfo};
+		var data = {name: this.doc.name, imgCount:sliceCount, childs:slices.concat(textLayersInfo)};
+		//this.exportJSON(data);
 		return data;
 	},
 	/* 获取所有文本图层信息，return Array */
