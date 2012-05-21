@@ -17,42 +17,107 @@ app.bringToFront(); // bring top
 // $.level = 0;
 // debugger; // launch debugger on next line
 
-var builderFolder = Folder(File($.fileName).parent+'/PSD2HTML/builder');
-var builderFiles = builderFolder.getFiles ("*.jsx");
-var ui = "dialog { \
-		alignChildren: 'fill', \
-		pFiles: Panel { \
-			orientation: 'column', alignChildren:'left', \
-			text: '选择你想生成的HTML类型', \
-			g: Group { \
-				orientation: 'column', alignChildren:'left', \
-			}, \
-		}, \
-		gButtons: Group { \
-			orientation: 'row', alignment: 'right', \
-			okBtn: Button { text:'Ok', properties:{name:'ok'} }, \
-			cancelBtn: Button { text:'Cancel', properties:{name:'cancel'} } \
-		} \
-	}";
-	
-var win = new Window (ui);
-win.graphics.backgroundColor = win.graphics.newBrush (win.graphics.BrushType.THEME_COLOR, "appDialogBackground");
-win.cbFiles = [];
-for(var i = 0, l = builderFiles.length; i < l; i++){
-	var f = builderFiles[i];
-	win.cbFiles[i] = win.pFiles.g.add('checkbox', undefined, f.fsName.substring(builderFolder.fsName.length+1));
-}
+var APP = {};
 
-win.center();
-var ret = win.show();  // dialog display
+(function(){
+	APP.ui = 'dialog{\
+		text:"设置",\
+		option: Group{\
+			orientation:"column",\
+			builder: Panel{\
+				size: [284, 50],\
+				text: "请选择生成页面类型",\
+				a: Group{\
+					e: RadioButton{text:"EDM", data:"EDM"},\
+					l: RadioButton{text:"论坛帖", data:"BBS"},\
+					j: RadioButton{text:"静态页", data:"normal"}\
+				}\
+			},\
+			image: Group{\
+				alignChildren: "left",\
+				orientation: "column",\
+				a: Group{\
+					alignChildren: "left",\
+					t: StaticText{text:"图片格式："},\
+					jpg: RadioButton{text:"jpg", value:true},\
+					p8: RadioButton{text:"png-8"},\
+					p24: RadioButton{text:"png-24"}\
+				},\
+				q: Group{\
+					alignChildren: "left",\
+					t: StaticText{text:"图片质量："},\
+					s: EditText{ text:"60", preferredSize: [50, 20] }\
+				}\
+			},\
+			output: Group{\
+				orientation:"row",\
+				b: Button{text:"选择输出文件夹", properties:{name:"open"}, helpTip:"选择输出文件夹"},\
+				s: EditText  { text:"~/Documents", preferredSize:[180, 20], helpTip:"默认为我的文档"}\
+			}\
+		},\
+		buttons:Group{\
+			ok: Button{text:"确定",  properties:{name:"ok"}},\
+			cancel: Button{text:"取消",  properties:{name:"cancel"}}\
+		}\
+	}';
 
-if (1 == ret) {	// if  "Open" button clicked.
-	var cbs = win.cbFiles;
-	for (var i = 0; i < cbs.length; i++) {
-		var cb = cbs[i];
-		if (cb.value){ // open selected files
-			//app.open(File(app.path.toString() + "/" + sSamplesFolderName + "/" + cb.text));
-			$.evalFile(File(builderFolder + '/' + cb.text));
+	APP.win = new Window(APP.ui);
+	APP.OPTION = {
+		image:{
+			extension:'jpg',
+			quality:60,
+		},
+		output:'~/Documents'
+	};
+	// 选择文件夹事件
+	APP.win.option.output.b.onClick = function(){
+		var output = Folder.selectDialog ('选择输出文件夹','~/Documents');
+		if(output){
+			APP.win.option.output.s.text  = APP.OPTION.output = output.path;
 		}
 	}
-}
+
+	APP.win.option.image.a.addEventListener('click', function(e){
+		var target = e.target,
+			quality = this.parent.q;
+		switch(target.text){
+			case "jpg":
+				quality.show();
+				APP.OPTION.image.extension = 'jpg';
+				APP.OPTION.image.type = 'jpg';
+				break;
+			case "png-24":
+				quality.hide();
+				APP.OPTION.image.extension = 'png';
+				APP.OPTION.image.png8 = false;
+				break;
+			case "png-8":
+				quality.hide();
+				APP.OPTION.image.extension = 'png';
+				APP.OPTION.image.png8 = true;
+				break;
+		}
+	});
+	APP.win.buttons.ok.onClick = function(){
+		if(!APP.OPTION.output){
+			alert('请选择输出文件夹');
+		}else{
+			var radios = APP.win.option.builder.a.children;
+			for(var i = 0, l = radios.length; i < l; i++){
+				var radio = radios[i];
+				if(radio.value === true){
+					APP.OPTION.builder = radio.data;
+					break;
+				}
+			}
+			if(!APP.OPTION.builder){
+				alert('请选择生成器');
+			}else{
+				APP.OPTION.image.quality = APP.win.option.image.q.s.text;
+				$.evalFile(File($.fileName).parent+'/PSD2HTML/builder/test.jsx');
+			}
+		}
+	}
+	
+	APP.win.show();
+})();
