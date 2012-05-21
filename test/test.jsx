@@ -1,4 +1,4 @@
-﻿#target photoshop
+﻿#target photoshop xiaowm
 
 /**
 * @author: zhouquan.yezq
