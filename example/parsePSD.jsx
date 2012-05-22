@@ -1,4 +1,4 @@
-﻿// @include "../lib/psd.jsx"
+﻿// @include "../PSD2HTML/lib/psd.jsx"
 
 var psd = new PSD();
 psd.option.exportImages = false;
