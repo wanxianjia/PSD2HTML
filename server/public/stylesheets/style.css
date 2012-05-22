@@ -49,7 +49,8 @@ a {color: #00B7FF;}
 .download-wraper .download-btn{margin-left: 60px;}
 #uploadForm input{clear: both;display: block; margin: 8px 0;float: left;}
 
-.markdown,.markdown pre,.markdown code {font: 13px "Century Gothic", "Tahoma", "MicrosoftYaHei", "SimSun";}
+.markdown,.markdown pre,.markdown code,.markdown p,.markdown strong,.markdown em {font: 13px "Century Gothic", "Tahoma", "MicrosoftYaHei", "SimSun";}
+.markdown strong,.markdown em{font-weight: bold;}
 .markdown p{line-height: 22px;}
 .markdown h1{line-height: 44px;}
 .markdown h2{line-height: 44px;margin-bottom: 12px;background:none;border-bottom: 1px solid #9A9ACE;color:#333;}
