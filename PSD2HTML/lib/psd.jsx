@@ -92,10 +92,10 @@ PSD.fn = PSD.prototype = {
 					}
 					var textItem = layer.textItem;
 					child.textInfo = {
-						color:textItem.color.rgb.hexValue, 
+						color: textItem.color.rgb.hexValue, 
 						contents:textItem.contents, 
-						font:textItem.font, 
-						size:Math.round(textItem.size.value)
+						font: WEBFONTS.getWebFont(textItem.font), 
+						size: Math.round(textItem.size.value)
 					};
 
 					child.textInfo.textType = textItem.kind.toString();
