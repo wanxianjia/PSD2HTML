@@ -3,8 +3,8 @@ jQuery.namespace('PSD2HTML');
 jQuery(function($){
 
 	var dropBox = $('#drop-box'), 
-		cssBox = $('#css-box'), 
-		preBox = $('#pre-box');
+		cssBox 	= $('#css-box'), 
+		preBox 	= $('#pre-box');
 
 	var page = {
 		init: function(){
@@ -13,12 +13,12 @@ jQuery(function($){
 		},
 		html5test: function(){
 			if(!window.FileReader){
-				dropBox.html('请使用支持HTML5的浏览器！');
+				dropBox.html('请使用支持HTML5 文件拖拽功能的浏览器！');
 				return false;
 			}
 		},
 		imageSrc: '',				//PSD (DataUrl)
-		image: null,				
+		image 	: null,				
 		initDropEvent: function(){
 			var _this = this;
 
@@ -35,8 +35,8 @@ jQuery(function($){
 				
 				if(files.length === 0) return false;
 
-				for(var i = 0, l = files.length; i < l; i++){
-					var file = files[i];
+				for(var file, i = 0, l = files.length; i < l; i++){
+					file = files[i];
 					
 					_this.parser(file);
 				}
@@ -46,19 +46,19 @@ jQuery(function($){
 		},
 		/*
 		 * PARSE PSD
-		*/
+		 */
 		parser: function(file){
 			cssBox.html('<progress></proress>');
-			var _this = this;
-			var reader = new FileReader();
+			var _this 	 = this;
+			var reader 	 = new FileReader();
 			var fileType = file.type;
 			
 			switch(fileType){
 				case 'image/png':
 					reader.readAsDataURL(file);
 					var handler = function(f){
-						_this.imageSrc = f.target.result;
-						_this.image = new Image();
+						_this.imageSrc 	= f.target.result;
+						_this.image 	= new Image();
 						_this.image.src = _this.imageSrc;
 
 						_this.image.onload = function(){
@@ -82,13 +82,13 @@ jQuery(function($){
 			reader.onload = handler;
 		},
 		toHTML: function(){
-			var _this = this;
+			var _this 	= this;
 
-			var data = this.data;
+			var data 	= this.data;
 
 			if(data && data.childs){
 				var htmlArr = [], styleArr = [], layer;
-				_this.doc = document.createElement('div');
+				_this.doc   = document.createElement('div');
 				_this.doc.className = 'wrap';
 
 				// 构建HTML树
@@ -99,10 +99,10 @@ jQuery(function($){
 					for(var i = 0, layers = childs, l = layers.length; i < l; i++){
 						layer = layers[i];
 
-						var width = layer.right - layer.left,
-							height = layer.bottom - layer.top,
-							top = layer.top,
-							left = layer.left,
+						var width 	  = layer.right  - layer.left,
+							height 	  = layer.bottom - layer.top,
+							top 	  = layer.top,
+							left 	  = layer.left,
 							className = 'layer'+layer.index;						
 
 						var div = document.createElement('div');
@@ -116,9 +116,9 @@ jQuery(function($){
 								styleArr.push('.',className,'{font-family:',layer.textInfo.font,'; font-size:',layer.textInfo.size,'; color:',layer.textInfo.color,'; position:absolute; width:',width,'px; height:',height,'px; top:',top,'px; left:',left,'px;}');
 							}else{
 								// 利用canvas对每个图层生成png图片
-								var canvas = document.createElement('canvas');
-								canvas.width = width;
-								canvas.height = height;
+								var canvas 		= document.createElement('canvas');
+								canvas.width 	= width;
+								canvas.height 	= height;
 								var cvs = canvas.getContext('2d');
 								cvs.drawImage(_this.image, left, top, width, height, 0, 0, width, height);
 								var src = canvas.toDataURL('image/png');
@@ -167,6 +167,5 @@ jQuery(function($){
 	}
 
 	page.init();
-
 
 });
