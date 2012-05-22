@@ -25,21 +25,24 @@ a {color: #00B7FF;}
     -moz-opacity: 0;
     filter:progid:DXImageTransform.Microsoft.Alpha(opacity=0);
 }
+.ie-attention{width: 580px;margin: 120px auto;line-height: 30px;color: black;font-size: 14px;}
+.ie-attention em{font-weight: 700;color:#C40000;}
 
+.fademe{background:#eee!important;color:#999!important;}
 .commbtn{border:0;padding: 5px 12px;background: orange;cursor: pointer;font-weight: bold;color: #333;font-family: "Tahoma";font-size:12px;}
 .disable-btn{background: #DDD;color: #777;cursor: not-allowed;}
 .content{margin: 50px auto;width:900px;}
-.content .none-exist{color: #C40000;font-size: 13px;}
+.content .drop-box,.content .none-exist{color: #C40000;font-size: 13px;}
 .content h1,.content h2{font-size: 28px;margin: 10px 0px 30px;color: #6D79E1;font-weight: bold;font-family: "Tahoma";}
 .content h2{margin: 20px 0 0;background: #666;color: #FFF;font-size: 22px;width: 20px;padding: 0 12px;}
 
 .upload-wraper,.drop-box,.download-wraper{width: 100%;height: 160px;background-color: #eee;}
 .drop-box .tips{margin: 50px 200px;display: inline-block;font-size: 20px;color: #888;font-family: "Century Gothic";}
-.upload-wraper{margin: 0 0px 20px;height: 50px;padding:30px 50px 30px 200px;width:650px;}
+.upload-wraper{margin: 0 0px 20px;height: 50px;padding:30px 10px 30px 200px;width:690px;}
 .upload-wraper .fileName{float: left;width:120px;color:#666;margin-left:8px;overflow: hidden;}
 .download-wraper{padding:30px 200px;width:500px;height:30px;}
 .upload-wraper .file-chooser{width:230px;float:left;}
-.upload-wraper .upload-div{width:400px;float:left;}
+.upload-wraper .upload-div{width:440px;float:left;}
 .upload-wraper .upload-div .message{float: left;color:#C40000;margin: 10px;line-height: 24px;}
 .upload-wraper .upload-div .loading{margin: 3px 10px 3px 30px;}
 .download-wraper a:hover{text-decoration: none;color: #333;}

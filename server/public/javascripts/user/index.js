@@ -12,8 +12,6 @@ jQuery(function($){
 	var module 	= {
 		$uploadBtn 	: $('div.content .upload-btn'),
 		$upForm 	: $('#uploadForm'),
-		$upFile1 	: $('#upfile1'),
-		$upFile2 	: $('#upfile2'),
 		$upMessage  : $('span.message', this.$upForm),
 
 		init:function(){
@@ -45,6 +43,7 @@ jQuery(function($){
 						,	fileName = filePath.substring(filePath.lastIndexOf('\\') + 1);
 						$('#fileName' + (index + 1)).text(fileName);
 						module.$upMessage.text('');
+						$('div.content h2.toggle').addClass('fademe');
 						$('div.download-wraper a.commbtn').addClass('disable-btn').attr('href','javascript:;').attr('target','_self');
 					}
 				});
@@ -68,6 +67,7 @@ jQuery(function($){
 			}
 
 		}else{
+			$('div.content h2.fademe').removeClass('fademe');
 			$('div.download-wraper a.commbtn').removeClass('disable-btn');
 			module.$upMessage.text(msg.OUTPUT_SUCCESS);
 			$('div.content a.preview-btn').attr("href", "uploads/" + dirName + "/output.html").attr('target','_blank');
