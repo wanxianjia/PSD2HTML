@@ -55,14 +55,16 @@ var toHtml = {
                     title = 'title="'+item.title+'"';
                 }
                 if(item.kind == "LayerKind.NORMAL"){
-                        var div = new XML('<div style="margin:0px;padding:0px; width:'+item.width+'px;height:'+item.height+'px;overflow:hidden;"></div>');
-                       div.appendChild(new XML('<img src="slices/'+item.name+'" width="'+item.width+'" height="'+item.height+'" '+title+' border="0" style="margin:0px;padding:0px;"/>'));
+                        var  height = item.bottom - item.top,
+                               width = item.right - item.left;
+                        var div = new XML('<div style="margin:0px;padding:0px; width:'+width+'px;height:'+height+'px;overflow:hidden;"></div>');
+                       div.appendChild(new XML('<img src="slices/'+item.name+'" width="'+width+'" height="'+height+'" '+title+' border="0" style="margin:0px;padding:0px;"/>'));
                        edm.appendChild(div);
                 }else{
                       var style = [];                 
                      style.push('position:absolute');
                      style.push('left:'+item.left+'px');
-                     style.push('top:'+item.top+'px');
+                     style.push('top:'+(item.top-2)+'px');
                      style.push('margin:0');
                      style.push('padding:0');
                      //宽高   
@@ -73,7 +75,7 @@ var toHtml = {
                             style.push('font-weight:blod');
                      }
                      style.push('color:#'+textInfo.color);
-                     style.push('font-family:'+textInfo.font);
+                     style.push('font-family: \''+textInfo.font+'\' ');
                      if(textInfo.italic === true){
                             style.push('font-style:italic');
                      }
@@ -89,16 +91,23 @@ var toHtml = {
                                lineHeight = textInfo.size;
                             }
                      }
-                     style.push('line-height:'+lineHeight+'px');
+                 
                      style.push('font-size:'+fontSize+'px');
                      style.push('text-align:'+textInfo.textAlign+'');
-                     var textContent = item.textInfo.contents;
+                     var textContent = item.textInfo.contents.replace (/\\r\\n/g, "<br/>").replace (/\\n/g, "<br/>").replace (/\\r/g, "<br/>");
                      if(textInfo.textType == "TextType.PARAGRAPHTEXT"){
-                        style.push('width:'+(item.right - item.left)+'px');
-                        edm.appendChild(new XML('<p style="'+style.join(";")+'">'+item.textInfo.contents.replace ("\r", "<br/>")+'</p>'));
+                        style.push('line-height:'+lineHeight+'px');
+                        style.push('width:'+(item.right - item.left + 10)+'px');
+                        edm.appendChild(new XML('<p style="'+style.join(";")+'">'+textContent+'</p>'));
                      }else{
                         style.push('display:block');
-                        edm.appendChild(new XML('<span style="'+style.join(";")+'">'+item.textInfo.contents.replace ("\r", "<br/>")+'</span>'));
+                        if(item.textInfo.contents.indexOf("\r")>-1){
+                            style.push('line-height:'+lineHeight+'px');
+                            edm.appendChild(new XML('<span style="'+style.join(";")+'">'+textContent+'</span>'));
+                        }else{
+                            edm.appendChild(new XML('<span style="'+style.join(";")+'">'+textContent+'</span>'));
+                        }
+                        
                      }
                 }
         }
