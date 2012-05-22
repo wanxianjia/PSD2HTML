@@ -1,6 +1,6 @@
 body {
   padding: 50px;
-  font: 14px  "Century Gothic", "Tahoma", "MicrosoftYaHei", "SimSun";}
+  font: 14px  "Century Gothic", "Tahoma", "Microsoft YaHei", "SimSun";}
 
 a {color: #00B7FF;}
 
@@ -49,10 +49,11 @@ a {color: #00B7FF;}
 .download-wraper .download-btn{margin-left: 60px;}
 #uploadForm input{clear: both;display: block; margin: 8px 0;float: left;}
 
-.markdown,.markdown pre,.markdown code {font: 13px "Century Gothic", "Tahoma", "MicrosoftYaHei", "SimSun";}
+.markdown,.markdown pre,.markdown code,.markdown p,.markdown strong,.markdown em {font: 13px "Century Gothic", "Tahoma", "Microsoft YaHei", "SimSun";}
+.markdown strong,.markdown em{font-weight: bold;}
 .markdown p{line-height: 22px;}
 .markdown h1{line-height: 44px;}
-.markdown h2{line-height: 44px;margin-bottom: 12px;}
+.markdown h2{line-height: 44px;margin-bottom: 12px;background:none;border-bottom: 1px solid #9A9ACE;color:#333;}
 .markdown h3{line-height: 30px;font-weight:700;}
 .markdown pre{text-indent: 2em;color:#6D79E1;font-weight:bold!important;}
 .markdown ol{padding-left: 30px;list-style-type: decimal;}
