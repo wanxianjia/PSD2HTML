@@ -2,7 +2,7 @@
 // @include "../lib/psd.jsx"
 // @include "../lib/toHtml.jsx"
 
-alert(JSON.stringify(APP.OPTION)); //设置面板的设置结果
+//alert(JSON.stringify(APP.OPTION)); //设置面板的设置结果
 var appOp = APP.OPTION;
 
 var psd = new PSD({output:appOp.output});
@@ -19,5 +19,5 @@ if(appOp.image.extension === 'jpg'){
 }
 
 var data = psd.getTextLayersAndSlices(option);
-toHtml.init(data,APP.OPTION.builder);
-alert(JSON.stringify(data));
+toHtml.init(data,APP,psd);
+//alert(JSON.stringify(data));
