@@ -1,6 +1,6 @@
 body {
   padding: 50px;
-  font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;}
+  font: 14px  "Century Gothic", "Tahoma", "MicrosoftYaHei", "SimSun";}
 
 a {color: #00B7FF;}
 
@@ -34,8 +34,8 @@ a {color: #00B7FF;}
 .content{margin: 50px auto;width:900px;}
 .content .drop-box,.content .none-exist{color: #C40000;font-size: 13px;}
 .content h1,.content h2{font-size: 28px;margin: 10px 0px 30px;color: #6D79E1;font-weight: bold;font-family: "Tahoma";}
-.content h2{margin: 20px 0 0;background: #666;color: #FFF;font-size: 22px;width: 20px;padding: 0 12px;}
-
+.content h2{margin: 20px 0 0;background: #666;color: #FFF;font-size: 22px;padding: 0 12px;}
+.content .step{width: 20px;}
 .upload-wraper,.drop-box,.download-wraper{width: 100%;height: 160px;background-color: #eee;}
 .drop-box .tips{margin: 50px 200px;display: inline-block;font-size: 20px;color: #888;font-family: "Century Gothic";}
 .upload-wraper{margin: 0 0px 20px;height: 50px;padding:30px 10px 30px 200px;width:690px;}
@@ -48,4 +48,12 @@ a {color: #00B7FF;}
 .download-wraper a:hover{text-decoration: none;color: #333;}
 .download-wraper .download-btn{margin-left: 60px;}
 #uploadForm input{clear: both;display: block; margin: 8px 0;float: left;}
+
+.markdown,.markdown pre,.markdown code {font: 13px "Century Gothic", "Tahoma", "MicrosoftYaHei", "SimSun";}
+.markdown p{line-height: 22px;}
+.markdown h1{line-height: 44px;}
+.markdown h2{line-height: 44px;margin-bottom: 12px;}
+.markdown h3{line-height: 30px;font-weight:700;}
+.markdown pre{text-indent: 2em;color:#6D79E1;font-weight:bold!important;}
+.markdown ol{padding-left: 30px;list-style-type: decimal;}
 

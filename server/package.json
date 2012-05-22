@@ -1,17 +1,22 @@
 {
-    "name": "psd2html"
-  , "version": "0.0.1"
+    "name"    : "psd2html"
+  , "version" : "0.0.1"
   , "description": "Server Side App for Generating Html from Photoshop PSD Files."
   , "keywords": [
       "html",
       "psd",
       "canvas"
     ]
-  , "private": true
+  , "private" : true
   , "dependencies": {
-      "express": "2.5.8"
-    , "jade": ">= 0.0.1"
-    , "jsdom": ">= 0.2.14"
-    , "canvas": ">= 0.12.0"
-  }
+      "express" : "2.5.8"
+    , "jade"    : ">= 0.0.1"
+    , "jsdom"   : ">= 0.2.14"
+    , "canvas"  : ">= 0.12.0"
+    , "discount": ">= 0.2.3"
+  },
+    "repository":   {
+      "type":    "git",
+      "url":     "https://github.com/wanxianjia/PSD2HTML"
+    }
 }

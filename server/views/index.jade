@@ -8,11 +8,11 @@
 
 .content
 	h1= title
-	h2 1
+	h2.step 1
 	.drop-box#drop-box
 		span.tips Drop Files Here To See Preview...
 
-	h2 2
+	h2.step 2
 	.upload-wraper
 		form(method="post", enctype="multipart/form-data", name="uploadForm", id="uploadForm", action="/upload", target="hiddenFrame", accept="text/plain, image/jpeg, image/png")
 			div.file-chooser
@@ -29,7 +29,7 @@
 				input(type="submit", value="Upload", class="upload-btn commbtn")
 				span.message 
 
-	h2.fademe.toggle 3
+	h2.step.fademe.toggle 3
 	.download-wraper
 		a.commbtn.preview-btn.disable-btn(href="javascript:;", target="_self") View Output Html
 		input(type='hidden', name='dirName', id='dirName') 
