@@ -106,7 +106,7 @@ PSD.fn = PSD.prototype = {
 					if(!textItem.useAutoLeading){
 						child.textInfo.lineHeight = Math.round(textItem.leading.value);
 					}else{
-						child.textInfo.lineHeight = textItem.autoLeadingAmount / 100;
+						child.textInfo.lineHeight = Math.round(textItem.autoLeadingAmount) + '%';
 					}
 					// text justification
 					switch(textItem.justification){
@@ -156,7 +156,7 @@ PSD.fn = PSD.prototype = {
 		var options = new ExportOptionsSaveForWeb();
 		options.format = SaveDocumentType.PNG;
 		options.PNG8 = false;
-		this.doc.exportDocument (img, ExportType.SAVEFORWEB, options);
+		this.doc.exportDocument (img, ExportType.SAVEFORWEB, options);$.writeln(img.length);
 		this.visibleTextLayers();
 		//this.visibleTextLayers();
 	},
@@ -212,19 +212,17 @@ PSD.fn = PSD.prototype = {
 			docWidth = this.doc.width.value,
 			docHeight = this.doc.height.value,
 			region = [],
-			y = 0, fy,
-			defaultOptions = new ExportOptionsSaveForWeb();
+			y = 0, fy;
+			
 
-		if(options){
-			defaultOptions = options;
-		}else{
-			defaultOptions.format = SaveDocumentType.JPEG;
-			defaultOptions.quality = 60;
-
-			var extension = 'jpg';
-			if(defaultOptions.format == SaveDocumentType.PNG){
-				extension = 'png';
-			}
+		if(!options){
+			options = new ExportOptionsSaveForWeb();
+			options.format = SaveDocumentType.JPEG;
+			options.quality = 60;
+		}
+		var extension = 'jpg';
+		if(options.format == SaveDocumentType.PNG){
+			extension = 'png';
 		}
 
 		var slicesFolder = new Folder(this.dir + '/slices/');
@@ -245,7 +243,6 @@ PSD.fn = PSD.prototype = {
 				newDoc.layers[newDoc.layers.length - 1].remove();
 				
 				var img = new File(slicesFolder + "/slice_" + index + "." + extension);
-				options = defaultOptions;
 				newDoc.exportDocument (img, ExportType.SAVEFORWEB, options);
 				newDoc.close(SaveOptions.DONOTSAVECHANGES);
 
