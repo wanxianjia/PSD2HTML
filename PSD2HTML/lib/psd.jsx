@@ -1,4 +1,5 @@
 // @include "json2-min.jsx"
+// @include "web-fonts.jsx"
 
 //setting for app preferences
 app.preferences.rulerUnits = Units.PIXELS;
@@ -27,9 +28,9 @@ function PSD(option){
 (function(){
 
 var index = -1,
-	sliceCount = 0;
-	slices = [],
-	textLayersInfo = [];
+	sliceCount = 0,
+	textLayersInfo = [],
+	slices = [];
 
 PSD.fn = PSD.prototype = {
 	_init: function(){
@@ -128,9 +129,11 @@ PSD.fn = PSD.prototype = {
 							child.textInfo.textAlign = 'left';
 
 					}
-					//layer.visible = false;
-					this.textLayers.push(layer);
-					textLayersInfo.push(child);
+					
+					if(WEBFONTS.indexOf(textItem.font) >= 0){
+						this.textLayers.push(layer);
+						textLayersInfo.push(child);
+					}
 				}else{
 					this.tree.imgCount++;
 					if(this.option.exportImages){
