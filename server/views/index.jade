@@ -29,11 +29,12 @@
 				input(type="submit", value="Upload", class="upload-btn commbtn")
 				span.message 
 
-	h2 3
+	h2.fademe.toggle 3
 	.download-wraper
 		a.commbtn.preview-btn.disable-btn(href="javascript:;", target="_self") View Output Html
 		input(type='hidden', name='dirName', id='dirName') 
 		a.commbtn.download-btn.disable-btn(href="javascript:;") DownLoad Zip Ball
 
-script(src='/javascripts/psd2html-index-merge.js')
+include includes/footer	
+script(src='/javascripts/user/psd2html-index-merge.js')
 

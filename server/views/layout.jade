@@ -4,4 +4,9 @@ html
     title= title
     link(rel='stylesheet', href='/stylesheets/style.css')
     link(rel='stylesheet', href='/stylesheets/fdev-float.css')
+    // if lte IE 8
+      script(src='/javascripts/lib/module/html5.js')
+
   body!= body
+  // if lt IE 8
+    script(src='../javascripts/user/ie-attention.js')
