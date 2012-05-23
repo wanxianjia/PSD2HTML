@@ -18,6 +18,11 @@ if(appOp.image.extension === 'jpg'){
 	options.PNG8 = appOp.image.png8;
 }
 
-var data = psd.getTextLayersAndSlices(option);
+var data = null;
+if(APP.OPTION.builder != "normal"){
+    data = psd.getTextLayersAndSlices(option,psd.getHeight());
+}else{
+   data = psd.getTextLayersAndSlices(option);
+}
 toHtml.init(data,APP,psd);
 //alert(JSON.stringify(data));
