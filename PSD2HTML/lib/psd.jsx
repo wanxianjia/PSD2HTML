@@ -61,12 +61,27 @@ PSD.fn = PSD.prototype = {
 	getPSDName: function(){
 		return this.doc.name.substr (0, this.doc.name.length - 4);
 	},
+	getEffects: function(){
+	    var ref = new ActionReference();
+		var effects = [];
+	    ref.putEnumerated(charIDToTypeID("Lyr "), charIDToTypeID("Ordn"), charIDToTypeID("Trgt"));
+
+	    var desc = executeActionGet(ref);
+	    if (desc.hasKey( stringIDToTypeID('layerEffects'))){
+	        var effectDesc = desc.getObjectValue(stringIDToTypeID('layerEffects'));
+	        // first key is scale so skip and start with 1
+	        for ( var effect = 1; effect < effectDesc.count; effect++ ){
+	            effects.push(typeIDToStringID(effectDesc.getKey(effect )));
+	        }
+	    }
+	    return effects;
+	},
 	_getLayerInfo: function(layer, context){
 		index++;
 		context = context || this.tree;
 		
 		if(layer.typename === 'ArtLayer' && layer.visible === true){
-				
+			this.doc.activeLayer = layer;
 			/* get layer bounds, fix layer bounds */
 			var bounds = layer.bounds,
 				left = bounds[0].value,
@@ -82,6 +97,7 @@ PSD.fn = PSD.prototype = {
 				var kind = layer.kind.toString();
 				var child = {type:layer.typename, name:layer.name, visible:layer.visible, left:left, top:top, right:right, bottom:bottom, kind:kind}
 				child.isBackgroundLayer = layer.isBackgroundLayer;
+				//child.textureType = layer.TextureType;
 				child.index = index;
 
 				if(kind === 'LayerKind.TEXT'){
@@ -130,11 +146,12 @@ PSD.fn = PSD.prototype = {
 
 					}
 					
-					if(WEBFONTS.indexOf(textItem.font) >= 0){
+					if(WEBFONTS.indexOf(textItem.font) >= 0 && this.getEffects().length <= 0){
 						this.textLayers.push(layer);
 						textLayersInfo.push(child);
 					}
 				}else{
+					this.doc.activeLayer = layer;
 					this.tree.imgCount++;
 					if(this.option.exportImages){
 						this.exportImage(layer, index);
@@ -156,7 +173,8 @@ PSD.fn = PSD.prototype = {
 		var options = new ExportOptionsSaveForWeb();
 		options.format = SaveDocumentType.PNG;
 		options.PNG8 = false;
-		this.doc.exportDocument (img, ExportType.SAVEFORWEB, options);$.writeln(img.length);
+		this.doc.exportDocument (img, ExportType.SAVEFORWEB, options);
+		//$.writeln(img.length);
 		this.visibleTextLayers();
 		//this.visibleTextLayers();
 	},
