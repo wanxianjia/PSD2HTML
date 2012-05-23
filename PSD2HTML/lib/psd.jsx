@@ -204,10 +204,10 @@ PSD.fn = PSD.prototype = {
 		}
 	},
 	/* 自动切片并导出图片 */
-	autoSliceAndExport: function(options){
+	autoSliceAndExport: function(options, height){
 		this.hiddenTextLayers();
 
-		var HEIGHT = 120,
+		var HEIGHT = height || 120,
 			selection = this.doc.selection,
 			docWidth = this.doc.width.value,
 			docHeight = this.doc.height.value,
@@ -256,8 +256,8 @@ PSD.fn = PSD.prototype = {
 		this.visibleTextLayers();
 		return slices;
 	},
-	getTextLayersAndSlices: function(option){
-		if(slices.length <= 0) this.autoSliceAndExport(option);
+	getTextLayersAndSlices: function(option, height){
+		if(slices.length <= 0) this.autoSliceAndExport(option, height);
 		var data = {name: this.doc.name, imgCount:sliceCount, childs:slices.concat(textLayersInfo)};
 		//this.exportJSON(data);
 		return data;
