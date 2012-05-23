@@ -6,9 +6,9 @@ var toHtml = {
         this.setInitValue(data,APP,psd,callback);       
         this.setPageType(APP.OPTION.builder);
         
-        var emContent = this.getEDM2();
-        //IO.saveFile(psd.dir+"/"+this.pageName,emContent,this.encode);
-        IO.saveFile("C:\\Documents and Settings\\wuming.xiaowm\\Documents\\10wan\\edm.html",emContent,this.encode);
+        var emContent = this.getEDM();
+        IO.saveFile(psd.dir+"/"+this.pageName,emContent,this.encode);
+        //IO.saveFile("C:\\Documents and Settings\\wuming.xiaowm\\Documents\\10wan\\edm.html",emContent,this.encode);
         
         if(this._callback){this._callback();}
     	
@@ -75,7 +75,7 @@ var toHtml = {
          style.push('margin-bottom:0px;');
          return style;
     },
-    getEDM2:function(){
+    getEDM:function(){
         var   d = this.data.childs.reverse(),
                 len = d.length-1,
                 html = new XML('<html xmlns="http://www.w3.org/1999/xhtml"></html>');
@@ -118,33 +118,27 @@ var toHtml = {
         
          return '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">\n'+html.toXMLString();
     },
-    //获取EMD HTML代码
-    getEDM:function(data){
-        var d = this.data;
-        if(typeof(data)!='undefined'){
-                d = data;
-        }
-        var edm = new XML('<div style="position:relative;width:'+this.width+'px;height:'+this.height+'px;margin:0px;padding:0px;"></div>'),
-               len = d.childs.length;
+    
+    getPage:function(data){
+       var content = new XML('<div style="position:relative;width:'+this.width+'px;height:'+this.height+'px;margin:0px;padding:0px;"></div>'),
+               len = this.data.childs.length;
         
         for(var i=0;i<len;i++){
-                var item = d.childs[i],
+                var item = this.data.childs[i],
                         title = "";
                 //title
                 if(typeof(item.title)  != 'undefined'){
                     title = 'title="'+item.title+'"';
                 }
                 if(item.kind == "LayerKind.NORMAL"){
-                        var  height = item.bottom - item.top,
-                               width = item.right - item.left;
-                        var div = new XML('<div style="margin:0px;padding:0px; width:'+width+'px;height:'+height+'px;overflow:hidden;"></div>');
-                       div.appendChild(new XML('<img src="slices/'+item.name+'" width="'+width+'" height="'+height+'" '+title+' border="0" style="margin:0px;padding:0px;"/>'));
-                       edm.appendChild(div);
+                        var div = new XML('<div style="margin:0px;padding:0px; width:'+item.width+'px;height:'+item.height+'px;overflow:hidden;"></div>');
+                       div.appendChild(new XML('<img src="slices/'+item.name+'" width="'+item.width+'" height="'+item.height+'" '+title+' border="0" style="margin:0px;padding:0px;"/>'));
+                       content.appendChild(div);
                 }else{
                       var style = [];                 
                      style.push('position:absolute');
                      style.push('left:'+item.left+'px');
-                     style.push('top:'+(item.top-2)+'px');
+                     style.push('top:'+item.top+'px');
                      style.push('margin:0');
                      style.push('padding:0');
                      //宽高   
@@ -155,7 +149,7 @@ var toHtml = {
                             style.push('font-weight:blod');
                      }
                      style.push('color:#'+textInfo.color);
-                     style.push('font-family: \''+textInfo.font+'\' ');
+                     style.push('font-family:'+textInfo.font);
                      if(textInfo.italic === true){
                             style.push('font-style:italic');
                      }
@@ -171,23 +165,16 @@ var toHtml = {
                                lineHeight = textInfo.size;
                             }
                      }
-                 
+                     style.push('line-height:'+lineHeight+'px');
                      style.push('font-size:'+fontSize+'px');
                      style.push('text-align:'+textInfo.textAlign+'');
-                     var textContent = item.textInfo.contents.replace (/\\r\\n/g, "<br/>").replace (/\\n/g, "<br/>").replace (/\\r/g, "<br/>");
+                     var textContent = item.textInfo.contents;
                      if(textInfo.textType == "TextType.PARAGRAPHTEXT"){
-                        style.push('line-height:'+lineHeight+'px');
-                        style.push('width:'+(item.right - item.left + 10)+'px');
-                        edm.appendChild(new XML('<p style="'+style.join(";")+'">'+textContent+'</p>'));
+                        style.push('width:'+(item.right - item.left)+'px');
+                        content.appendChild(new XML('<p style="'+style.join(";")+'">'+item.textInfo.contents.replace ("\r", "<br/>")+'</p>'));
                      }else{
                         style.push('display:block');
-                        if(item.textInfo.contents.indexOf("\r")>-1){
-                            style.push('line-height:'+lineHeight+'px');
-                            edm.appendChild(new XML('<span style="'+style.join(";")+'">'+textContent+'</span>'));
-                        }else{
-                            edm.appendChild(new XML('<span style="'+style.join(";")+'">'+textContent+'</span>'));
-                        }
-                        
+                        content.appendChild(new XML('<span style="'+style.join(";")+'">'+item.textInfo.contents.replace ("\r", "<br/>")+'</span>'));
                      }
                 }
         }
@@ -196,10 +183,10 @@ var toHtml = {
         var head = new XML('<head></head>');
         html.appendChild(new XML('<link href="http://img.china.alibaba.com/favicon.ico" rel="shortcut icon" />'));
         head.appendChild(new XML('<meta http-equiv="Content-Type" content="text/html; charset='+this.encode+'" />'));
-        head.appendChild(new XML('<title>阿里巴巴EDM</title>'));
+        head.appendChild(new XML('<title>'+this.data.name+'</title>'));
         html.appendChild(head);
         var body = new XML('<body></body>');
-        body.appendChild(edm);
+        body.appendChild(content);
         html.appendChild(body);
         
         return html.toXMLString();
@@ -208,9 +195,6 @@ var toHtml = {
     //获取BBS HTML 代码
     getBSS:function(){
         
-    },
-    //获取普通网页HTML代码
-    getPage:function(){
-        
+    
     }
 }
