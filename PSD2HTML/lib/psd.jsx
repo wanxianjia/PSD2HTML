@@ -93,7 +93,7 @@ PSD.fn = PSD.prototype = {
 				bottom = bounds[3].value,
 				bottom = bottom < this.doc.height.value ? bottom : this.doc.height.value;
 
-			if(right < left || top < bottom) return;		
+			if(right <= left || top >= bottom) return;		
 
 			var kind = layer.kind.toString();
 			var child = {
