@@ -3,8 +3,7 @@ jQuery.namespace('PSD2HTML');
 jQuery(function($){
 
 	var dropBox = $('#drop-box'), 
-		cssBox 	= $('#css-box'), 
-		preBox 	= $('#pre-box');
+		cssBox 	= $('#css-box');
 
 	var page = {
 		init: function(){
@@ -90,6 +89,7 @@ jQuery(function($){
 				var htmlArr = [], styleArr = [], layer;
 				_this.doc   = document.createElement('div');
 				_this.doc.className = 'wrap';
+				styleArr.push('.wrap{margin:0 auto;} ');
 
 				// 构建HTML树
 				(function(childs, context){
@@ -103,7 +103,7 @@ jQuery(function($){
 							height 	  = layer.bottom - layer.top,
 							top 	  = layer.top,
 							left 	  = layer.left,
-							className = 'layer'+layer.index;						
+							className = 'layer' + layer.index;						
 
 						var div = document.createElement('div');
 						div.className = className;

@@ -56,5 +56,6 @@ a {color: #00B7FF;}
 .markdown h2{line-height: 44px;margin-bottom: 12px;background:none;border-bottom: 1px solid #9A9ACE;color:#333;}
 .markdown h3{line-height: 30px;font-weight:700;}
 .markdown pre{text-indent: 2em;color:#6D79E1;font-weight:bold!important;}
-.markdown ol{padding-left: 30px;list-style-type: decimal;}
+.markdown ul{padding-left: 30px;display: block;list-style-type: disc;line-height:24px;}
+.markdown ol{padding-left: 30px;list-style-type: decimal;line-height:24px;}
 

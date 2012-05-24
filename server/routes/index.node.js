@@ -157,6 +157,7 @@ _toHTML = function(data, image, resourceDir, window, res){
 		var counter = 0,  imgCount = data.imgCount;
 		_this.doc 	= document.createElement('div');
 		_this.doc.className = 'wrap';
+        styleArr.push('.wrap{margin:0 auto;} ');
 
 		// 构建HTML树
 		(function(childs, context){
