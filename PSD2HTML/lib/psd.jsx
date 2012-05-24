@@ -80,7 +80,7 @@ PSD.fn = PSD.prototype = {
 		index++;
 		context = context || this.tree;
 		
-		if(layer.typename === 'ArtLayer' && layer.visible === true){
+		if(layer.visible === true && layer.typename === 'ArtLayer'){
 			this.doc.activeLayer = layer;
 			/* get layer bounds, fix layer bounds */
 			var bounds = layer.bounds,
@@ -95,10 +95,18 @@ PSD.fn = PSD.prototype = {
 
 			if(right > left && bottom > top){
 				var kind = layer.kind.toString();
-				var child = {type:layer.typename, name:layer.name, visible:layer.visible, left:left, top:top, right:right, bottom:bottom, kind:kind}
-				child.isBackgroundLayer = layer.isBackgroundLayer;
-				//child.textureType = layer.TextureType;
-				child.index = index;
+				var child = {
+					type: layer.typename, 
+					name: layer.name, 
+					visible: layer.visible, 
+					left: left, 
+					top: top, 
+					right: right, 
+					bottom: bottom, 
+					kind: kind,
+					isBackgroundLayer: layer.isBackgroundLayer,
+					index: index
+				}
 
 				if(kind === 'LayerKind.TEXT'){
 
@@ -111,13 +119,12 @@ PSD.fn = PSD.prototype = {
 						color: textItem.color.rgb.hexValue, 
 						contents:textItem.contents, 
 						font: WEBFONTS.getWebFont(textItem.font), 
-						size: Math.round(textItem.size.value)
+						size: Math.round(textItem.size.value),
+						textType: textItem.kind.toString(),
+						bold: textItem.fauxBold,
+						italic: textItem.fauxItalic,
+						indent: Math.round(textItem.firstLineIndent.value)
 					};
-
-					child.textInfo.textType = textItem.kind.toString();
-					child.textInfo.bold = textItem.fauxBold;
-					child.textInfo.italic = textItem.fauxItalic;
-					child.textInfo.indent = Math.round(textItem.firstLineIndent.value);
 					// line height
 					if(!textItem.useAutoLeading){
 						child.textInfo.lineHeight = Math.round(textItem.leading.value);
@@ -145,7 +152,7 @@ PSD.fn = PSD.prototype = {
 							child.textInfo.textAlign = 'left';
 
 					}
-					
+					// 字体在web字体中并且不具有特性的文本图层
 					if(WEBFONTS.indexOf(textItem.font) >= 0 && this.getEffects().length <= 0){
 						this.textLayers.push(layer);
 						textLayersInfo.push(child);
@@ -160,7 +167,7 @@ PSD.fn = PSD.prototype = {
 	            context.childs.push(child);
 			}
 			
-		}else if(layer.typename == 'LayerSet' && layer.visible === true){
+		}else if(layer.visible === true && layer.typename === 'LayerSet'){
 				
 			var o = {type:layer.typename, name:layer.name, index:index, childs:[]};
 			context.childs.push(o);
