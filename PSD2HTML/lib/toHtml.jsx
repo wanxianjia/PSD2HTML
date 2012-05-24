@@ -43,7 +43,7 @@ var toHtml = {
     getCss:function(item){
         var style = [];
          style.push('padding:0px');
-         style.push('index:'+item.index);
+         style.push('z-index:'+item.index);
          var textInfo = item.textInfo;
          if(typeof(textInfo) == 'undefined' && typeof(item.link) != 'undefined'){
                 //有链接无文本
@@ -145,7 +145,7 @@ var toHtml = {
         head.appendChild(new XML('<link href="http://style.china.alibaba.com/css/lib/fdev-v4/reset/reset.css" rel="stylesheet" type="text/css" />'));
         head.appendChild(new XML('<link href="http://style.china.alibaba.com/css/sys/universal/masthead/standard-v4-min.css" rel="stylesheet" type="text/css" />'));
         head.appendChild(new XML('<link rel="stylesheet" href="http://style.china.alibaba.com/css/sys/universal/footer/standard-v0.css"/>'));
-        head.appendChild(new XML('<style type="text/css">.absolute{position:absolute;}.psd2html{position:absolute;margin:0px;padding:0px;left:50%;}.psd2html_bg{margin:0px auto;padding:0px;overflow:hidden;background-position:center top;background-repeat:no-repeat;}.page_doc{position:relative;}</style>'));
+        //head.appendChild(new XML('<style type="text/css"></style>'));
         head.appendChild(new XML('<title>'+this.data.name+'</title>'));
         html.appendChild(head);
         var body = new XML('<body></body>');
@@ -160,6 +160,7 @@ var toHtml = {
         doc.appendChild(content);
         
         
+        var styleCSS = ['.absolute{position:absolute;}.psd2html{position:absolute;margin:0px;padding:0px;left:50%;}.psd2html_bg{margin:0px auto;padding:0px;overflow:hidden;background-position:center top;background-repeat:no-repeat;}.page_doc{position:relative;}'];
         
         for(var i=0;i<len;i++){
                 var item = this.data.childs[i];               
@@ -171,12 +172,14 @@ var toHtml = {
                         break;
                         case "LayerKind.TEXT":
                                 //文本图层
-                                content.appendChild(this.textLayer(item));
+                                content.appendChild(this.textLayer(item,i));
+                                //叠加CSS集合，因为join后最后的没有";"虽然不会错，但标准而言，还是手动加上
+                                styleCSS.push('.style'+i+'{'+this.getCss(item).join(";")+';}');
                         break;
                 }
-            
-             
-        }        
+        }
+        head.appendChild(new XML('<style type="text/css">'+styleCSS.join("")+'</style>'));
+    
         return '<!DOCTYPE html">\n'+this.formatHtml(html.toXMLString());
         
     },
@@ -193,33 +196,32 @@ var toHtml = {
         return html.replace (/~~~PSD2HTMLSpace~~~/g, "&nbsp;");
     },
     //文本层
-    textLayer:function(item){
-        var style = this.getCss(item),
-               elm = null;
+    textLayer:function(item,n){
+        var elm = null;
         if(typeof(item.textInfo) == 'undefined' && typeof(item.link) != 'undefined'){
                 //没有文本的空链接
-                elm = new XML('<a style="'+ style.join(";")+'" href="'+item.link.href+'" class="absolute">~~~PSD2HTMLSpace~~~</a>');
+                elm = new XML('<a class="style'+n+' absolute" href="'+item.link.href+'">~~~PSD2HTMLSpace~~~</a>');
         }else if(item.textInfo.textType == 'TextType.PARAGRAPHTEXT'){
                 //段落文本含有链接的
                 // typeof(item.link) != 'undefined'
-                var textObj = this.replaceNewline(item.textInfo.contents).resplit("<br/>"),
-                       div = new XML('<div style="'+style.join(";")+'" class="absolute"></div>');
-                       e = div;
+                var textObj = this.replaceNewline(item.textInfo.contents).split("<br/>"),
+                       elm = new XML('<div class="style'+n+' absolute"></div>');
+                       e = elm;
                        if(typeof(item.link) != 'undefined'){
                               e = new XML('<a href="'+item.link.href+'" class="absolute">~~~PSD2HTMLSpace~~~</a>');
-                              div.appendChild(e);
+                              elm.appendChild(e);
                        }
                 //循环段落
                 for(var i=0;i<textObj.length;i++){                        
-                       e.appendChild(new XML('<p>'+this.replaceNewline(textObj[j])+'</p>'));
+                       e.appendChild(new XML('<p>'+textObj[i]+'</p>'));
                 }
                 
         }else if(item.textInfo.textType == 'TextType.POINTTEXT' &&  typeof(item.link) != 'undefined'){
                 //单行有链接文本
-                elm = new XML('<a style="'+ style.join(";")+'" href="'+item.link.href+'" class="absolute">'+this.replaceNewline(item.textInfo.contents)+'</a>');
+                elm = new XML('<a class="style'+n+' absolute" href="'+item.link.href+'">'+this.replaceNewline(item.textInfo.contents)+'</a>');
         }else if(item.textInfo.textType == 'TextType.POINTTEXT'){
                 //单行文本
-                elm = new XML('<span style="'+ style.join(";")+'" class="absolute">'+this.replaceNewline(item.textInfo.contents)+'</span>');
+                elm = new XML('<span class="style'+n+' absolute">'+this.replaceNewline(item.textInfo.contents)+'</span>');
         }
         return elm;
     },
