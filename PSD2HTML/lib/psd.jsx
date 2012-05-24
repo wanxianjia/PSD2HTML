@@ -93,87 +93,94 @@ PSD.fn = PSD.prototype = {
 				bottom = bounds[3].value,
 				bottom = bottom < this.doc.height.value ? bottom : this.doc.height.value;
 
-			if(right > left && bottom > top){
-				var kind = layer.kind.toString();
-				var child = {
-					type:layer.typename, 
-					name:layer.name, 
-					visible:layer.visible, 
-					left:left, top:top, 
-					right:right, bottom:bottom, 
-					kind:kind,
-					isBackgroundLayer: layer.isBackgroundLayer,
-					index: index
-				}
+			if(right < left || top < bottom) return;		
 
-				if(kind === 'LayerKind.TEXT'){
-
-					if(layer.textItem.kind == TextType.PARAGRAPHTEXT){
-						child.width = layer.textItem.width.value;
-						child.height = layer.textItem.height.value;
-					}
-					var textItem = layer.textItem;
-
-					child.textInfo = {
-						color: textItem.color.rgb.hexValue, 
-						contents:textItem.contents, 
-						font: WEBFONTS.getWebFont(textItem.font), 
-						size: Math.round(textItem.size.value),
-						textType: textItem.kind.toString(),
-						bold: textItem.fauxBold,
-						italic: textItem.fauxItalic,
-						indent: Math.round(textItem.firstLineIndent.value)
-					};
-					// line height
-					if(!textItem.useAutoLeading){
-						child.textInfo.lineHeight = Math.round(textItem.leading.value);
-					}else{
-						child.textInfo.lineHeight = Math.round(textItem.autoLeadingAmount) + '%';
-					}
-					// text justification
-					switch(textItem.justification){
-						case 'Justification.LEFT':
-							child.textInfo.textAlign = 'left';
-							break;
-						case 'Justification.RIGHT':
-							child.textInfo.textAlign = 'right';
-							break;
-						case 'Justification.CENTER':
-							child.textInfo.textAlign = 'certer';
-							break;
-						case 'Justification.CENTERJUSTIFIED':
-						case 'Justification.FULLYJUSTIFIED':
-						case 'Justification.LEFTJUSTIFIED':
-						case 'Justification.RIGHTJUSTIFIED':
-							child.textInfo.textAlign = 'justify';
-							break;
-						default:
-							child.textInfo.textAlign = 'left';
-
-					}
-					// link
-					if(layer.name.search(/[aA]$|[aA]-/) === 0){
-						child.link = {href: '#'};
-					}
-					if(WEBFONTS.indexOf(textItem.font) >= 0 && this.getEffects().length <= 0){
-						this.textLayers.push(layer);
-						textLayersInfo.push(child);
-					}
-				}else{
-					// link
-					if(layer.name.search(/[aA]$|[aA]-/) === 0){
-						child.link = {href: '#'};
-						child.kind = 'LayerKind.TEXT';
-						textLayersInfo.push(child);
-					}
-
-					this.tree.imgCount++;
-					if(this.option.exportImages){
-						this.exportImage(layer, index);
-					}
-				}
-	            context.childs.push(child);
+			var kind = layer.kind.toString();
+			var child = {
+				type:layer.typename, 
+				name:layer.name, 
+				visible:layer.visible, 
+				left:left, top:top, 
+				right:right, bottom:bottom, 
+				kind:kind,
+				isBackgroundLayer: layer.isBackgroundLayer,
+				index: index
 			}
+
+			if(kind === 'LayerKind.TEXT'){
+				var textItem = layer.textItem;
+				// 此try catch实属无赖，当图层无文本时，无论textItem.font，textItem.contents都异常，无法作出判断，求解释。
+				try{
+					if(WEBFONTS.indexOf(textItem.font) < 0 || this.getEffects().length > 0) return;
+				}catch(e){
+					return;
+				}
+
+				if(layer.textItem.kind == TextType.PARAGRAPHTEXT){
+					child.width = layer.textItem.width.value;
+					child.height = layer.textItem.height.value;
+				}
+
+				child.textInfo = {
+					color: textItem.color.rgb.hexValue, 
+					contents:textItem.contents, 
+					font: WEBFONTS.getWebFont(textItem.font), 
+					size: Math.round(textItem.size.value),
+					textType: textItem.kind.toString(),
+					bold: textItem.fauxBold,
+					italic: textItem.fauxItalic,
+					indent: Math.round(textItem.firstLineIndent.value)
+				};
+				// line height
+				if(!textItem.useAutoLeading){
+					child.textInfo.lineHeight = Math.round(textItem.leading.value);
+				}else{
+					child.textInfo.lineHeight = Math.round(textItem.autoLeadingAmount) + '%';
+				}
+				// text justification
+				switch(textItem.justification){
+					case 'Justification.LEFT':
+						child.textInfo.textAlign = 'left';
+						break;
+					case 'Justification.RIGHT':
+						child.textInfo.textAlign = 'right';
+						break;
+					case 'Justification.CENTER':
+						child.textInfo.textAlign = 'certer';
+						break;
+					case 'Justification.CENTERJUSTIFIED':
+					case 'Justification.FULLYJUSTIFIED':
+					case 'Justification.LEFTJUSTIFIED':
+					case 'Justification.RIGHTJUSTIFIED':
+						child.textInfo.textAlign = 'justify';
+						break;
+					default:
+						child.textInfo.textAlign = 'left';
+
+				}
+				
+				this.textLayers.push(layer);
+				textLayersInfo.push(child);
+				// link
+				if(layer.name.search(/[aA]$|[aA]-/) === 0){
+					child.link = {href: '#'};
+					child.textInfo = undefined;
+					textLayersInfo.push(child);
+				}
+			}else{
+				// link
+				if(layer.name.search(/[aA]$|[aA]-/) === 0){
+					child.link = {href: '#'};
+					child.kind = 'LayerKind.TEXT';
+					textLayersInfo.push(child);
+				}
+
+				this.tree.imgCount++;
+				if(this.option.exportImages){
+					this.exportImage(layer, index);
+				}
+			}
+            context.childs.push(child);
 			
 		}else if(layer.typename == 'LayerSet' && layer.visible === true){
 				
