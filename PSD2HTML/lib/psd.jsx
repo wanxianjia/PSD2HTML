@@ -111,7 +111,14 @@ PSD.fn = PSD.prototype = {
 				var textItem = layer.textItem;
 				// 此try catch实属无赖，当图层无文本时，无论textItem.font，textItem.contents都异常，无法作出判断，求解释。
 				try{
-					if(WEBFONTS.indexOf(textItem.font) < 0 || this.getEffects().length > 0) return;
+					if(WEBFONTS.indexOf(textItem.font) < 0 || this.getEffects().length > 0){
+						if(layer.name.search(/[aA]$|[aA]-/) === 0){
+							child.link = {href: '#'};
+							child.textInfo = undefined;
+							textLayersInfo.push(child);
+						}
+						return;
+					}
 				}catch(e){
 					return;
 				}
@@ -158,15 +165,14 @@ PSD.fn = PSD.prototype = {
 						child.textInfo.textAlign = 'left';
 
 				}
-				
-				this.textLayers.push(layer);
-				textLayersInfo.push(child);
 				// link
 				if(layer.name.search(/[aA]$|[aA]-/) === 0){
 					child.link = {href: '#'};
-					child.textInfo = undefined;
-					textLayersInfo.push(child);
 				}
+			
+				this.textLayers.push(layer);
+				textLayersInfo.push(child);
+				
 			}else{
 				// link
 				if(layer.name.search(/[aA]$|[aA]-/) === 0){
