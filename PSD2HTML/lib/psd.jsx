@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 // @include "json2-min.jsx"
 // @include "web-fonts.jsx"
 
@@ -585,4 +584,3 @@ PSD.fn = PSD.prototype = {
 }
 
 })();
->>>>>>> 0345318c6ca1a16aadc3a92761a9ec0952960ca5
