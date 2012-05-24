@@ -106,10 +106,6 @@ PSD.fn = PSD.prototype = {
 					index: index
 				}
 
-				if(layer.name.search(/[aA]$|[aA]-/) === 0){
-					child.link = {href: '#'};
-				}
-
 				if(kind === 'LayerKind.TEXT'){
 
 					if(layer.textItem.kind == TextType.PARAGRAPHTEXT){
@@ -155,12 +151,22 @@ PSD.fn = PSD.prototype = {
 							child.textInfo.textAlign = 'left';
 
 					}
-					
+					// link
+					if(layer.name.search(/[aA]$|[aA]-/) === 0){
+						child.link = {href: '#'};
+					}
 					if(WEBFONTS.indexOf(textItem.font) >= 0 && this.getEffects().length <= 0){
 						this.textLayers.push(layer);
 						textLayersInfo.push(child);
 					}
 				}else{
+					// link
+					if(layer.name.search(/[aA]$|[aA]-/) === 0){
+						child.link = {href: '#'};
+						child.kind = 'LayerKind.TEXT';
+						textLayersInfo.push(child);
+					}
+
 					this.tree.imgCount++;
 					if(this.option.exportImages){
 						this.exportImage(layer, index);
