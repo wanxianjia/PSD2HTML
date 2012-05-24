@@ -392,10 +392,20 @@ PSD.fn = PSD.prototype = {
 
 			if(right > left && bottom > top){
 				var kind = layer.kind.toString();
-				var child = {type:layer.typename, name:layer.name, visible:layer.visible, left:left, top:top, right:right, bottom:bottom, kind:kind}
-				child.isBackgroundLayer = layer.isBackgroundLayer;
-				//child.textureType = layer.TextureType;
-				child.index = index;
+				var child = {
+					type:layer.typename, 
+					name:layer.name, 
+					visible:layer.visible, 
+					left:left, top:top, 
+					right:right, bottom:bottom, 
+					kind:kind,
+					isBackgroundLayer: layer.isBackgroundLayer,
+					index: index
+				}
+
+				if(layer.name.search(/[aA]$|[aA]-/) === 0){
+					child.link = {href: '#'};
+				}
 
 				if(kind === 'LayerKind.TEXT'){
 
@@ -404,17 +414,17 @@ PSD.fn = PSD.prototype = {
 						child.height = layer.textItem.height.value;
 					}
 					var textItem = layer.textItem;
+
 					child.textInfo = {
 						color: textItem.color.rgb.hexValue, 
 						contents:textItem.contents, 
 						font: WEBFONTS.getWebFont(textItem.font), 
-						size: Math.round(textItem.size.value)
+						size: Math.round(textItem.size.value),
+						textType: textItem.kind.toString(),
+						bold: textItem.fauxBold,
+						italic: textItem.fauxItalic,
+						indent: Math.round(textItem.firstLineIndent.value)
 					};
-
-					child.textInfo.textType = textItem.kind.toString();
-					child.textInfo.bold = textItem.fauxBold;
-					child.textInfo.italic = textItem.fauxItalic;
-					child.textInfo.indent = Math.round(textItem.firstLineIndent.value);
 					// line height
 					if(!textItem.useAutoLeading){
 						child.textInfo.lineHeight = Math.round(textItem.leading.value);
@@ -448,7 +458,6 @@ PSD.fn = PSD.prototype = {
 						textLayersInfo.push(child);
 					}
 				}else{
-					this.doc.activeLayer = layer;
 					this.tree.imgCount++;
 					if(this.option.exportImages){
 						this.exportImage(layer, index);
