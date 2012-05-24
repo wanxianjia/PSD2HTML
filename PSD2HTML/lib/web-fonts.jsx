@@ -3,7 +3,7 @@
 'Lucida Console', 'Garamond', ' MS Sans Serif', 'MS Serif', 'Palatino Linotype', 'Symbol', '宋体','新宋体', '微软雅黑', '黑体', '楷体',
 '幼圆', '仿宋', 'MicrosoftYaHei', 'SimSun','NSimSun', 'AdobeSongStd-Light', 'SimHei', 'FZLTZHK--GBK1-0', 'FZLTHJW--GB1-0', 'FZZHJW--GB1-0'];
 
-WEBFONTS.webFont = {microsoftyahei:'Microsoft YaHei', 'fzltzhk--gbk1-0':'Microsoft YaHei', 'fzlthjw--gbk1-0':'Microsoft YaHei', 'fzzhjw--gbk1-0':'Microsoft YaHei'};
+WEBFONTS.webFont = {microsoftyahei:'Microsoft YaHei', 'fzltzhk--gbk1-0':'Microsoft YaHei', 'fzlthjw--gb1-0':'Microsoft YaHei', 'fzzhjw--gb1-0':'Microsoft YaHei'};
 
 WEBFONTS.getWebFont = function(font){
 	return WEBFONTS.webFont[font.toLowerCase()] || font;
