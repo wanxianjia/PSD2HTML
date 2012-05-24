@@ -39,10 +39,23 @@ var toHtml = {
         this.encode = "gb2312";
         this.pageName = psd.doc.name.split(".")[0]+".html";
     },
-    getFontCss:function(item){
+    //获取CSS
+    getCss:function(item){
         var style = [];
-         style.push('padding:0');
+         style.push('padding:0px');
+         style.push('index:'+item.index);
          var textInfo = item.textInfo;
+         if(typeof(textInfo) == 'undefined' && typeof(item.link) != 'undefined'){
+                //有链接无文本
+                style.push('width:'+(item.right - item.left)+'px');
+                style.push('height:'+(item.bottom - item.top)+'px');
+                style.push('top:'+item.top+'px');
+                style.push('left:'+item.left+'px');                   
+                style.push('text-decoration:none');                   
+                return style;
+         }
+         style.push('top:'+(item.top-3)+'px');
+         style.push('left:'+(item.left+2)+'px');   
          if(textInfo.bold === true){
                 style.push('font-weight:blod');
          }
@@ -51,18 +64,10 @@ var toHtml = {
          if(textInfo.italic === true){
                 style.push('font-style:italic');
          }
-         style.push('text-indent:'+textInfo.indent+'px');
+         if(textInfo.indent !='0'){
+                style.push('text-indent:'+textInfo.indent+'px');
+         }
          var fontSize = textInfo.size;
-         /*if(typeof(lineHeight) == "string" && lineHeight.indexOf("%")>-1){
-                lineHeight = lineHeight +"%";
-         }else if(lineHeight<fontSize){
-                if(fontSize<14){
-                    lineHeight = 14 + "px";
-                }else{
-                   lineHeight = textInfo.size + "px";
-                }
-         }   
-         style.push('line-height:'+lineHeight);*/
         
          if(textInfo.textType == "TextType.PARAGRAPHTEXT"){
                 var lineHeight = textInfo.lineHeight;
@@ -79,14 +84,13 @@ var toHtml = {
                 style.push('width:'+item.width+'px');
                 style.push('height:'+item.height+'px');
          }
-         style.push('top:'+(item.top-3)+'px');
-         style.push('left:'+(item.left+2)+'px');
          style.push('font-size:'+fontSize+'px');
          style.push('text-align:'+textInfo.textAlign+'');
          style.push('margin-right:0px');
          style.push('margin-bottom:0px');
          return style;
     },
+    //EDM 代码
     getEDM:function(){
         var   d = this.data.childs.reverse(),
                 len = d.length-1,
@@ -109,11 +113,11 @@ var toHtml = {
         body.appendChild(table);
         html.appendChild(body);
          
-         for(var i=0;i<len;i++){
+        for(var i=0;i<len;i++){
                 var item = d[i],
                        prevItem = d[i-1];
                 if(item.kind != "LayerKind.NORMAL"){      
-                     var style = this.getFontCss(item);   
+                     var style = this.getCss(item);   
                     style.push('width:'+(item.right - item.left)+'px');
                     style.push('height:'+(item.bottom - item.top)+'px');
                     //style.push("float:left;");
@@ -130,9 +134,9 @@ var toHtml = {
                  }
          }
             
-         return this.formatHhtml('<!DOCTYPE html">\n'+html.toXMLString());
+         return this.formatHtml('<!DOCTYPE html">\n'+html.toXMLString());
     },
-    
+    //网页代码
     getPage:function(data){
         var html = new XML('<html xmlns="http://www.w3.org/1999/xhtml"></html>');
         var head = new XML('<head></head>');
@@ -154,51 +158,70 @@ var toHtml = {
        var content = new XML('<div class="psd2html" style="height:'+this.height+'px;margin-left:-'+parseInt(this.width/2)+'px;width:'+this.width+'px"></div>'),
                len = this.data.childs.length;
         doc.appendChild(content);
+        
+        
+        
         for(var i=0;i<len;i++){
-                var item = this.data.childs[i],
-                        title = "";
-                //title
-                if(typeof(item.title)  != 'undefined'){
-                    title = 'title="'+item.title+'"';
+                var item = this.data.childs[i];               
+                switch(item.kind){
+                        case "LayerKind.NORMAL" :
+                                //普通图层
+                                var bgImg = new XML('<div class="psd2html_bg" style="height:'+(item.bottom-item.top)+'px;background-image:url(slices/'+item.name+');">~~~PSD2HTMLSpace~~~</div>');
+                                doc.appendChild(bgImg);
+                        break;
+                        case "LayerKind.TEXT":
+                                //文本图层
+                                content.appendChild(this.textLayer(item));
+                        break;
                 }
-                if(item.kind == "LayerKind.NORMAL"){
-                    var bgImg = new XML('<div class="psd2html_bg" style="height:'+(item.bottom-item.top)+'px;background-image:url(slices/'+item.name+');">~~~tempToHtmlline~~~</div>');
-                    doc.appendChild(bgImg);
-                }else if(item.kind == 'LayerKind.TEXT'){
-                    var style = this.getFontCss(item);                         
-                    var  textInfo = item.textInfo,
-                            textContent = this.replaceNewline(item.textInfo.contents);
-                    if(textInfo.textType == 'TextType.PARAGRAPHTEXT'){
-                            if(textContent.indexOf("<br/>")>-1){
-                                    var obj = textContent.split("<br/>");
-                                    var div = new XML('<div style="'+style.join(";")+'" class="absolute"></div>');
-                                    for(var j=0;j<obj.length;j++){
-                                             div.appendChild(new XML('<p>'+obj[j]+'</p>'));
-                                    }
-                                    content.appendChild(div);
-                            }else{
-                                content.appendChild(new XML('<p style="'+style.join(";")+'" class="absolute">'+textContent+'</p>'));
-                            }
-                            
-                    }else{
-                            style.push('display:block');
-                            //如果文案前面是<br/>，就删除
-                            if(textContent.substring(0,5) == "<br/>"){
-                                    textContent = textContent.substring(5,textContent.length);
-                            }
-                            content.appendChild(new XML('<span style="'+style.join(";")+'" class="absolute">'+textContent+'</span>'));
-                    }
-                }
+            
+             
         }        
-        return this.formatHhtml('<!DOCTYPE html">\n'+html.toXMLString());
+        return '<!DOCTYPE html">\n'+this.formatHtml(html.toXMLString());
         
     },
     //替换换行符
     replaceNewline:function(str){
-            return str.replace (/\r\n/g, "<br/>").replace (/\n/g, "<br/>").replace (/\r/g, "<br/>").replace (/\s/g, "~~~tempToHtmlline~~~");
+            str = str.replace (/\r\n/g, "<br/>").replace (/\n/g, "<br/>").replace (/\r/g, "<br/>").replace (/\s/g, "~~~PSD2HTMLSpace~~~");
+            if(str.substring(0,5) == "<br/>"){
+                    str = str.substring(5,str.length);
+            }
+            return str;
     },
-    formatHhtml:function(html){
-        return html.replace (/~~~tempToHtmlline~~~/g, "&nbsp;");
+    //格式化HTML代码
+    formatHtml:function(html){
+        return html.replace (/~~~PSD2HTMLSpace~~~/g, "&nbsp;");
+    },
+    //文本层
+    textLayer:function(item){
+        var style = this.getCss(item),
+               elm = null;
+        if(typeof(item.textInfo) == 'undefined' && typeof(item.link) != 'undefined'){
+                //没有文本的空链接
+                elm = new XML('<a style="'+ style.join(";")+'" href="'+item.link.href+'" class="absolute">~~~PSD2HTMLSpace~~~</a>');
+        }else if(item.textInfo.textType == 'TextType.PARAGRAPHTEXT'){
+                //段落文本含有链接的
+                // typeof(item.link) != 'undefined'
+                var textObj = this.replaceNewline(item.textInfo.contents).resplit("<br/>"),
+                       div = new XML('<div style="'+style.join(";")+'" class="absolute"></div>');
+                       e = div;
+                       if(typeof(item.link) != 'undefined'){
+                              e = new XML('<a href="'+item.link.href+'" class="absolute">~~~PSD2HTMLSpace~~~</a>');
+                              div.appendChild(e);
+                       }
+                //循环段落
+                for(var i=0;i<textObj.length;i++){                        
+                       e.appendChild(new XML('<p>'+this.replaceNewline(textObj[j])+'</p>'));
+                }
+                
+        }else if(item.textInfo.textType == 'TextType.POINTTEXT' &&  typeof(item.link) != 'undefined'){
+                //单行有链接文本
+                elm = new XML('<a style="'+ style.join(";")+'" href="'+item.link.href+'" class="absolute">'+this.replaceNewline(item.textInfo.contents)+'</a>');
+        }else if(item.textInfo.textType == 'TextType.POINTTEXT'){
+                //单行文本
+                elm = new XML('<span style="'+ style.join(";")+'" class="absolute">'+this.replaceNewline(item.textInfo.contents)+'</span>');
+        }
+        return elm;
     },
     //获取BBS HTML 代码
     getBSS:function(){
