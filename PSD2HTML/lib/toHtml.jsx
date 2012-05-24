@@ -52,17 +52,35 @@ var toHtml = {
                 style.push('font-style:italic');
          }
          style.push('text-indent:'+textInfo.indent+'px');
-         var lineHeight = textInfo.lineHeight,
-                fontSize = textInfo.size;
-         if(typeof(lineHeight) == "string" && lineHeight.indexOf("%")>-1){
+         var fontSize = textInfo.size;
+         /*if(typeof(lineHeight) == "string" && lineHeight.indexOf("%")>-1){
                 lineHeight = lineHeight +"%";
          }else if(lineHeight<fontSize){
                 if(fontSize<14){
-                    lineHeight = 14;
+                    lineHeight = 14 + "px";
                 }else{
-                   lineHeight = textInfo.size;
+                   lineHeight = textInfo.size + "px";
                 }
-         }     
+         }   
+         style.push('line-height:'+lineHeight);*/
+        
+         if(textInfo.textType == "TextType.PARAGRAPHTEXT"){
+                var lineHeight = textInfo.lineHeight;
+                if(typeof(lineHeight) == "string" && lineHeight.indexOf("%")>-1){
+                        lineHeight = textInfo.lineHeight;
+                }else if(lineHeight < 14){
+                        lineHeight = '14px';
+                }else if(lineHeight < fontSize){
+                         lineHeight = fontSize+'px';   
+                }else{
+                        lineHeight = lineHeight +"px";
+                }
+                style.push('line-height:'+lineHeight);
+                style.push('width:'+(item.right - item.left)+'px');
+                style.push('height:'+(item.bottom - item.top)+'px');
+         }
+         style.push('top:'+(item.top-3)+'px');
+         style.push('left:'+(item.left+2)+'px');
          style.push('font-size:'+fontSize+'px');
          style.push('text-align:'+textInfo.textAlign+'');
          style.push('margin-right:0px');
@@ -112,13 +130,30 @@ var toHtml = {
                  }
          }
             
-         return '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">\n'+html.toXMLString();
+         return this.formatHhtml('<!DOCTYPE html">\n'+html.toXMLString());
     },
     
     getPage:function(data){
-       var content = new XML('<div style="position:relative;width:'+this.width+'px;height:'+this.height+'px;margin:0px auto;padding:0px;"></div>'),
-               len = this.data.childs.length;
+        var html = new XML('<html xmlns="http://www.w3.org/1999/xhtml"></html>');
+        var head = new XML('<head></head>');
+        head.appendChild(new XML('<link href="http://img.china.alibaba.com/favicon.ico" rel="shortcut icon" />'));
+        head.appendChild(new XML('<meta http-equiv="Content-Type" content="text/html; charset='+this.encode+'" />'));
+        head.appendChild(new XML('<link href="http://style.china.alibaba.com/css/lib/fdev-v4/reset/reset.css" rel="stylesheet" type="text/css" />'));
+        head.appendChild(new XML('<link href="http://style.china.alibaba.com/css/sys/universal/masthead/standard-v4-min.css" rel="stylesheet" type="text/css" />'));
+        head.appendChild(new XML('<link rel="stylesheet" href="http://style.china.alibaba.com/css/sys/universal/footer/standard-v0.css"/>'));
+        head.appendChild(new XML('<style type="text/css">.absolute{position:absolute;}.psd2html{position:absolute;margin:0px;padding:0px;left:50%;}.psd2html_bg{margin:0px auto;padding:0px;overflow:hidden;background-position:center top;background-repeat:no-repeat;}.page_doc{position:relative;}</style>'));
+        head.appendChild(new XML('<title>'+this.data.name+'</title>'));
+        html.appendChild(head);
+        var body = new XML('<body></body>');
+        body.appendChild('#parse("$pageInfo.header")');
+        html.appendChild(body);
+        var doc = new XML('<div id="doc" class="page_doc"></div>');
+        body.appendChild(doc);
+        body.appendChild('#parse("$pageInfo.footer")');
         
+       var content = new XML('<div class="psd2html" style="height:'+this.height+'px;margin-left:-'+parseInt(this.width/2)+'px;width:'+this.width+'px"></div>'),
+               len = this.data.childs.length;
+        doc.appendChild(content);
         for(var i=0;i<len;i++){
                 var item = this.data.childs[i],
                         title = "";
@@ -127,46 +162,29 @@ var toHtml = {
                     title = 'title="'+item.title+'"';
                 }
                 if(item.kind == "LayerKind.NORMAL"){
-                    var div = new XML('<div style="margin:0px;padding:0px;width:'+(item.right-item.left)+'px;height:'+(item.bottom-item.top)+'px;overflow:hidden;background:url(slices/'+item.name+') top center;">~~~tempToHtml~~~</div>');
-                    content.appendChild(div);
+                    var bgImg = new XML('<div class="psd2html_bg" style="height:'+(item.bottom-item.top)+'px;background-image:url(slices/'+item.name+');">~~~tempToHtmlline~~~</div>');
+                    doc.appendChild(bgImg);
                 }else if(item.kind == 'LayerKind.TEXT'){
-                    var style = this.getFontCss(item);      
-                    style.push('top:'+(item.top-2)+'px');
-                    style.push('left:'+(item.left+2)+'px');
-                    
+                    var style = this.getFontCss(item);                         
                     var  textInfo = item.textInfo,
                             textContent = this.replaceNewline(item.textInfo.contents);
                     if(textInfo.textType == 'TextType.PARAGRAPHTEXT'){
-                            style.push('width:'+(item.right - item.left +10)+'px');
                             content.appendChild(new XML('<p style="'+style.join(";")+'" class="absolute">'+textContent+'</p>'));
                     }else{
                             style.push('display:block');
                             content.appendChild(new XML('<span style="'+style.join(";")+'" class="absolute">'+textContent+'</span>'));
                     }
                 }
-        }
-        
-        var html = new XML('<html xmlns="http://www.w3.org/1999/xhtml"></html>');
-        var head = new XML('<head></head>');
-        head.appendChild(new XML('<link href="http://img.china.alibaba.com/favicon.ico" rel="shortcut icon" />'));
-        head.appendChild(new XML('<meta http-equiv="Content-Type" content="text/html; charset='+this.encode+'" />'));
-        head.appendChild(new XML('<link href="http://style.china.alibaba.com/fdevlib/css/fdev-v3/reset/reset-min.css" rel="stylesheet" type="text/css" />'));
-        head.appendChild(new XML('<style type="text/css">.absolute{position:absolute;}</style>'));
-        head.appendChild(new XML('<title>'+this.data.name+'</title>'));
-        html.appendChild(head);
-        var body = new XML('<body></body>');
-        body.appendChild(content);
-        html.appendChild(body);
-        
-        return this.formatHhtml('<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">\n'+html.toXMLString());
+        }        
+        return this.formatHhtml('<!DOCTYPE html">\n'+html.toXMLString());
         
     },
     //替换换行符
     replaceNewline:function(str){
-            return str.replace (/\r\n/g, "<br/>").replace (/\n/g, "<br/>").replace (/\r/g, "<br/>");
+            return str.replace (/\r\n/g, "<br/>").replace (/\n/g, "<br/>").replace (/\r/g, "<br/>").replace (/\s/g, "~~~tempToHtmlline~~~");
     },
     formatHhtml:function(html){
-        return html.replace (/~~~tempToHtml~~~/g, "<br/>");
+        return html.replace (/~~~tempToHtmlline~~~/g, "&nbsp;");
     },
     //获取BBS HTML 代码
     getBSS:function(){
