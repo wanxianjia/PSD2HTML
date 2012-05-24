@@ -76,8 +76,8 @@ var toHtml = {
                         lineHeight = lineHeight +"px";
                 }
                 style.push('line-height:'+lineHeight);
-                style.push('width:'+(item.right - item.left)+'px');
-                style.push('height:'+(item.bottom - item.top)+'px');
+                style.push('width:'+item.width+'px');
+                style.push('height:'+item.height+'px');
          }
          style.push('top:'+(item.top-3)+'px');
          style.push('left:'+(item.left+2)+'px');
@@ -169,9 +169,23 @@ var toHtml = {
                     var  textInfo = item.textInfo,
                             textContent = this.replaceNewline(item.textInfo.contents);
                     if(textInfo.textType == 'TextType.PARAGRAPHTEXT'){
-                            content.appendChild(new XML('<p style="'+style.join(";")+'" class="absolute">'+textContent+'</p>'));
+                            if(textContent.indexOf("<br/>")>-1){
+                                    var obj = textContent.split("<br/>");
+                                    var div = new XML('<div style="'+style.join(";")+'" class="absolute"></div>');
+                                    for(var j=0;j<obj.length;j++){
+                                             div.appendChild(new XML('<p>'+obj[j]+'</p>'));
+                                    }
+                                    content.appendChild(div);
+                            }else{
+                                content.appendChild(new XML('<p style="'+style.join(";")+'" class="absolute">'+textContent+'</p>'));
+                            }
+                            
                     }else{
                             style.push('display:block');
+                            //如果文案前面是<br/>，就删除
+                            if(textContent.substring(0,5) == "<br/>"){
+                                    textContent = textContent.substring(5,textContent.length);
+                            }
                             content.appendChild(new XML('<span style="'+style.join(";")+'" class="absolute">'+textContent+'</span>'));
                     }
                 }
