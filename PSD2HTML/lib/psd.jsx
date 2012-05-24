@@ -122,57 +122,58 @@ PSD.fn = PSD.prototype = {
 				}catch(e){
 					return;
 				}
+				try{
+					if(textItem.kind == TextType.PARAGRAPHTEXT){
+						child.width = layer.textItem.width.value;
+						child.height = layer.textItem.height.value;
+					}
 
-				if(layer.textItem.kind == TextType.PARAGRAPHTEXT){
-					child.width = layer.textItem.width.value;
-					child.height = layer.textItem.height.value;
-				}
+					child.textInfo = {
+						color: textItem.color.rgb.hexValue, 
+						contents:textItem.contents, 
+						font: WEBFONTS.getWebFont(textItem.font), 
+						size: Math.round(textItem.size.value),
+						textType: textItem.kind.toString(),
+						bold: textItem.fauxBold,
+						italic: textItem.fauxItalic,
+						indent: Math.round(textItem.firstLineIndent.value)
+					};
+					// line height
+					if(!textItem.useAutoLeading){
+						child.textInfo.lineHeight = Math.round(textItem.leading.value);
+					}else{
+						child.textInfo.lineHeight = Math.round(textItem.autoLeadingAmount) + '%';
+					}
+					// text justification
+					switch(textItem.justification){
+						case 'Justification.LEFT':
+							child.textInfo.textAlign = 'left';
+							break;
+						case 'Justification.RIGHT':
+							child.textInfo.textAlign = 'right';
+							break;
+						case 'Justification.CENTER':
+							child.textInfo.textAlign = 'certer';
+							break;
+						case 'Justification.CENTERJUSTIFIED':
+						case 'Justification.FULLYJUSTIFIED':
+						case 'Justification.LEFTJUSTIFIED':
+						case 'Justification.RIGHTJUSTIFIED':
+							child.textInfo.textAlign = 'justify';
+							break;
+						default:
+							child.textInfo.textAlign = 'left';
 
-				child.textInfo = {
-					color: textItem.color.rgb.hexValue, 
-					contents:textItem.contents, 
-					font: WEBFONTS.getWebFont(textItem.font), 
-					size: Math.round(textItem.size.value),
-					textType: textItem.kind.toString(),
-					bold: textItem.fauxBold,
-					italic: textItem.fauxItalic,
-					indent: Math.round(textItem.firstLineIndent.value)
-				};
-				// line height
-				if(!textItem.useAutoLeading){
-					child.textInfo.lineHeight = Math.round(textItem.leading.value);
-				}else{
-					child.textInfo.lineHeight = Math.round(textItem.autoLeadingAmount) + '%';
-				}
-				// text justification
-				switch(textItem.justification){
-					case 'Justification.LEFT':
-						child.textInfo.textAlign = 'left';
-						break;
-					case 'Justification.RIGHT':
-						child.textInfo.textAlign = 'right';
-						break;
-					case 'Justification.CENTER':
-						child.textInfo.textAlign = 'certer';
-						break;
-					case 'Justification.CENTERJUSTIFIED':
-					case 'Justification.FULLYJUSTIFIED':
-					case 'Justification.LEFTJUSTIFIED':
-					case 'Justification.RIGHTJUSTIFIED':
-						child.textInfo.textAlign = 'justify';
-						break;
-					default:
-						child.textInfo.textAlign = 'left';
-
-				}
-				// link
-				if(layer.name.search(/[aA]$|[aA]-/) === 0){
-					child.link = {href: '#'};
-				}
-			
-				this.textLayers.push(layer);
-				textLayersInfo.push(child);
+					}
+					// link
+					if(layer.name.search(/[aA]$|[aA]-/) === 0){
+						child.link = {href: '#'};
+					}
 				
+					this.textLayers.push(layer);
+					textLayersInfo.push(child);
+					
+				}catch(e){return;}
 			}else{
 				// link
 				if(layer.name.search(/[aA]$|[aA]-/) === 0){
