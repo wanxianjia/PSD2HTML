@@ -2,24 +2,27 @@
 #PSD to HTML功能需求文档(FRD)
 
 目录
-1. 项目概述	3
-1.1项目背景	3
-1.2主要解决方案	3
-1.3 适用范围	3
-1.4词汇表	3
-2．项目目标	3
-3．项目涉众	4
-4. 功能需求	5
-4.1业务图例	5
-4.2 功能列表	6
-4.2.1  PSD2HTML	7
-5．风险分析	8
-6．附录	8
+
+1.项目概述	3
+1.1.项目背景	3
+1.2.主要解决方案	3
+1.3. 适用范围	3
+1.4.词汇表	3
+2.项目目标	3
+3.项目涉众	4
+4.功能需求	5
+4.1.业务图例	5
+4.2.功能列表	6
+4.2.1.PSD2HTML	7
+5.风险分析	8
+6.附录	8
 
 
-版本		更新时间		更新内容			作者
-1.0.0	2012-5-18	初稿				单丹
-1.0.1	2012-5-24	1.3  适用范围 需求细化	单丹
+<table>
+<tr><td>版本	</td><td>更新时间</td><td>更新内容</td><td>作者</td></tr>
+<tr><td>1.0.0</td><td>2012-5-18</td><td>初稿</td><td>单丹</td></tr>
+<tr><td>1.0.1</td><td>2012-5-24</td><td>1.3  适用范围 需求细化</td><td>单丹</td></tr>
+</table>
 			
 ##1. 项目概述
 
@@ -74,7 +77,7 @@
 
 ###1.4词汇表
 
-词汇	解释
+1. 词汇解释
 
 	PSD2HTML：由PSD文件生成HTML页面的Photoshop插件
 	PSD：Photoshop文档，.psd是Adobe Photoshop软件默认的文件扩展名
@@ -159,21 +162,7 @@
 ##6．附录
 
 参考资料：
-http://www.adobe.com/devnet/Photoshop/scripting.html
-http://op.fangdeng.org/docs/mail-template.html
-http://www.chinaemail.com.cn/zixun/corp/201007/52176.html
 
-
-
-
-
-
-
- 
-
-
-
-图表 4-1 用例图
-
-
-
+	http://www.adobe.com/devnet/Photoshop/scripting.html
+	http://op.fangdeng.org/docs/mail-template.html
+	http://www.chinaemail.com.cn/zixun/corp/201007/52176.html
