@@ -112,12 +112,16 @@ var APP = {};
 			}
 			if(!APP.OPTION.builder){
 				alert('请选择生成器');
-			}else{
+			}else{               
+                  
 				APP.OPTION.image.quality = APP.win.option.image.q.s.text;
-				$.evalFile(File($.fileName).parent+'/PSD2HTML/builder/test.jsx');
+                  APP.win.hide();
+                  $.evalFile(File($.fileName).parent+'/PSD2HTML/lib/builder.jsx');
+                  alert("处理完成！");
+                  
 			}
 		}
-		APP.win.hide();
+		
 	}
 	
 	APP.win.show();
