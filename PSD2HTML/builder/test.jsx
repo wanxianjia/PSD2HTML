@@ -15,7 +15,7 @@ if(appOp.image.extension === 'jpg'){
 	option.format = SaveDocumentType.JPEG;
 }else if(appOp.image.extension === 'png'){
 	option.format = SaveDocumentType.PNG;
-	options.PNG8 = appOp.image.png8;
+	option.PNG8 = appOp.image.png8;
 }
 
 var data = null;
