@@ -1,0 +1,126 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+	<meta charset="GBK"/>
+	<title></title>
+	<style>
+		*{margin:0; padding:0;}
+		table{ border-spacing:0; border-collapse:collapse; table-layout:fixed;}
+		table, td{border:1px solid red; vertical-align: top;}
+		td{}
+	</style>
+</head>
+<body>
+<script type="text/javascript">
+// 文本图层信息模拟
+var es = [
+	{x:0, y:0, width:100, height:100},
+	{x:40, y:200, width:400, height:300},
+	{x:40, y:100, width:200, height:50}
+];
+// 数组去重
+function unique(arr){
+	var o = {}, a = [], it;
+	for (var i = 0, l = arr.length; i < l; i++) {
+		it = arr[i];
+		if(!o[it]) a.push(it);
+		o[it] = true;
+	}
+	return a;
+}
+// 生成表格（未合并单元格）
+function getcell(es){
+	var xset = [0, 800], yset = [0, 600], i = 0, l = es.length;
+
+	for(; i < l; i++){
+		var it = es[i];
+		xset.push(it.x);
+		yset.push(it.y);
+
+		var div = document.createElement('div');
+		div.style.position = 'absolute';
+		div.style.top = it.y + 'px';
+		div.style.left = it.x + 'px';
+		div.style.height = it.height + 'px';
+		div.style.width = it.width + 'px';
+		div.style.border = '1px solid #00f';
+		document.body.appendChild(div);
+	}
+	xset = unique(xset).sort(function(a,b){ return a - b;});
+	yset = unique(yset).sort(function(a,b){ return a - b;});
+
+	var arr = {rows:yset.length - 1, cols:xset.length - 1, cells:[]};
+
+	for(i = 0, l = yset.length; i < l; i++){
+		var y1 = yset[i], y2 = yset[i+1];
+		if(!y2) break;
+
+		for(var j = 0, l2 = xset.length; j < l2; j++){
+			var x1 = xset[j], x2 = xset[j+1];
+			if(!x2) break;
+
+			var data = {x:x1, y:y1, width:x2 - x1, height:y2 - y1};
+			arr.cells.push(data);
+		}
+	}
+	return arr; 
+}
+// 创建表格，根据文本图层信息合并单元格
+function createTable(){
+	var o = getcell(es);
+	var table = document.createElement('table');
+
+	for(var i = 0, cells = o.cells, l = cells.length; i < l; i++){
+		if(i % o.cols === 0){
+			var tr = document.createElement('tr');
+		}
+		var cell = cells[i];
+		if(cell.hasMerge) continue;
+		var td = document.createElement('td');
+		td.width = cell.width + 'px';
+		td.height = cell.height + 'px';
+
+		for(var j = 0, l2 = es.length; j < l2; j++){
+			var e = es[j];
+			if(e.x === cell.x && e.y === cell.y){
+				var div = document.createElement('div');
+				div.style.width = e.width + 'px';
+				div.style.height = e.height + 'px';
+				div.style.border = '1px solid green';
+
+				var m = 1;
+				(function(t){
+					// 横向合并
+					if(e.width > t.width && cells[i+1]){
+						m++;
+						t.width = t.width + cells[i+1].width;
+						td.width = t.width + 'px';
+						td.setAttribute('colspan', m);
+						cells[i+1].hasMerge = true;
+						arguments.callee(t);
+					}
+					// 纵向合并
+					if(e.height > t.height && cells[i+o.cols]){
+						m++;
+						t.height = t.height + cells[i+o.cols].height;
+						td.height = t.height + 'px';
+						td.setAttribute('rowspan', m);
+						cells[i+o.cols].hasMerge = true;
+						arguments.callee(t);
+					}
+				})(cell);
+				
+				td.appendChild(div);
+			}
+		}
+		
+		tr.appendChild(td);
+		table.appendChild(tr);
+	}
+
+	document.body.appendChild(table);
+}
+createTable();
+</script>
+</body>
+</html>
