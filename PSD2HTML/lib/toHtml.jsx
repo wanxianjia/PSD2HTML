@@ -17,7 +17,9 @@ var toHtml = {
     			emContent = this.getPage();
     		break;
     	}
+        //存储HTML文件
         IO.saveFile(psd.dir+"/"+this.pageName,emContent,this.encode);
+        //new File(psd.dir+"/"+this.pageName);
         
         if(this._callback){this._callback();}
     	
