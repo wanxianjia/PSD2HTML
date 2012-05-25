@@ -205,6 +205,7 @@ PSD.fn = PSD.prototype = {
 		this.doc.exportDocument (img, ExportType.SAVEFORWEB, options);
 		//$.writeln(img.length);
 		this.visibleTextLayers();
+		return img;
 		//this.visibleTextLayers();
 	},
 	exportImage: function(layer, index){
