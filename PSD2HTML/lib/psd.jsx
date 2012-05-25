@@ -297,6 +297,7 @@ PSD.fn = PSD.prototype = {
 					name:'slice_'+index+'.'+extension, right: docWidth, top:y - HEIGHT, left:0, bottom:fy});
 				sliceCount++;
 			}
+			selection.deselect();
 		}catch(e){
 			// TODO
 		}
