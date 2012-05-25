@@ -90,10 +90,12 @@ var toHtml = {
                 lineHeight = lineHeight +"px";
          }
          style.push('line-height:'+lineHeight);
-         //宽度
-         style.push('width:'+item.width+'px');
-         //高度
-         style.push('height:'+item.height+'px');
+         if(textInfo.textType == "TextType.PARAGRAPHTEXT"){
+             //宽度
+             style.push('width:'+item.width+'px');
+             //高度
+             style.push('height:'+item.height+'px');
+         }
          //文字大小
          style.push('font-size:'+fontSize+'px');
          //对齐
@@ -156,10 +158,9 @@ var toHtml = {
         var head = new XML('<head></head>');
         head.appendChild(new XML('<link href="http://img.china.alibaba.com/favicon.ico" rel="shortcut icon" />'));
         head.appendChild(new XML('<meta http-equiv="Content-Type" content="text/html; charset='+this.encode+'" />'));
-        head.appendChild(new XML('<link href="http://style.china.alibaba.com/css/lib/fdev-v4/reset/reset.css" rel="stylesheet" type="text/css" />'));
-        head.appendChild(new XML('<link href="http://style.china.alibaba.com/css/sys/universal/masthead/standard-v4-min.css" rel="stylesheet" type="text/css" />'));
-        head.appendChild(new XML('<link rel="stylesheet" href="http://style.china.alibaba.com/css/sys/universal/footer/standard-v0.css"/>'));
-        //head.appendChild(new XML('<style type="text/css"></style>'));
+        head.appendChild(new XML('<link href="http://static.c.aliimg.com/css/app/vas/psd2html/style.css" rel="stylesheet" type="text/css" />'));
+        var styleCss = new XML('<style type="text/css"></style>');
+        head.appendChild(styleCss);
         head.appendChild(new XML('<title>'+this.data.name+'</title>'));
         html.appendChild(head);
         var body = new XML('<body></body>');
@@ -174,7 +175,7 @@ var toHtml = {
         doc.appendChild(content);
         
         
-        var styleCSS = ['.absolute{position:absolute;}.psd2html{position:absolute;margin:0px;padding:0px;left:50%;}.psd2html_bg{margin:0px auto;padding:0px;overflow:hidden;background-position:center top;background-repeat:no-repeat;}.page_doc{position:relative;}.noDecoration{text-decoration:none}.noDecoration:hover{text-decoration:none}'];
+        var styleCSS = [];
         
         for(var i=0;i<len;i++){
                 var item = this.data.childs[i];               
@@ -183,17 +184,16 @@ var toHtml = {
                                 //普通图层
                                 var bgImg = new XML('<div class="psd2html_bg style'+i+'">~~~PSD2HTMLSpace~~~</div>');
                                 doc.appendChild(bgImg);
-                                styleCSS.push('.style'+i+'{height:'+(item.bottom-item.top)+'px;background-image:url(slices/'+item.name+');}');
+                                styleCss.appendChild(new XML('.style'+i+'{height:'+(item.bottom-item.top)+'px;background-image:url(slices/'+item.name+');}'));
                         break;
                         case "LayerKind.TEXT":
                                 //文本图层
                                 content.appendChild(this.textLayer(item,i));
                                 //叠加CSS集合，因为join后最后的没有";"虽然不会错，但标准而言，还是手动加上
-                                styleCSS.push('.style'+i+'{'+this.getCss(item).join(";")+';}');
+                                styleCss.appendChild(new XML('.style'+i+'{'+this.getCss(item).join(";")+';}'));
                         break;
                 }
         }
-        head.appendChild(new XML('<style type="text/css">'+styleCSS.join("")+'</style>'));
     
         return '<!DOCTYPE html">\n'+this.htmlDecode(html.toXMLString());
         
