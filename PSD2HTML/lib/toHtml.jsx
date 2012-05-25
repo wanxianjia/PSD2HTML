@@ -42,11 +42,10 @@ var toHtml = {
     //获取CSS
     getCss:function(item){
         var style = [];
-         style.push('padding:0px');
          style.push('z-index:'+item.index);
          var textInfo = item.textInfo;
+         //有链接无文本，这种比较特殊，因为他没有textInfo，优先return
          if(typeof(textInfo) == 'undefined' && typeof(item.link) != 'undefined'){
-                //有链接无文本
                 style.push('width:'+(item.right - item.left)+'px');
                 style.push('height:'+(item.bottom - item.top)+'px');
                 style.push('top:'+item.top+'px');
@@ -54,40 +53,55 @@ var toHtml = {
                 style.push('text-decoration:none');                   
                 return style;
          }
+         //定位
          style.push('top:'+(item.top-3)+'px');
          style.push('left:'+(item.left+2)+'px');   
+         //加粗
          if(textInfo.bold === true){
                 style.push('font-weight:blod');
          }
+         //颜色
          style.push('color:#'+textInfo.color);
+         //字体
          style.push('font-family:\''+textInfo.font+'\'');
+         //斜体
          if(textInfo.italic === true){
                 style.push('font-style:italic');
          }
+         //缩进
          if(textInfo.indent !='0'){
                 style.push('text-indent:'+textInfo.indent+'px');
          }
-         var fontSize = textInfo.size;
-        
-         if(textInfo.textType == "TextType.PARAGRAPHTEXT"){
-                var lineHeight = textInfo.lineHeight;
-                if(typeof(lineHeight) == "string" && lineHeight.indexOf("%")>-1){
-                        lineHeight = textInfo.lineHeight;
-                }else if(lineHeight < 14){
-                        lineHeight = '14px';
-                }else if(lineHeight < fontSize){
-                         lineHeight = fontSize+'px';   
-                }else{
-                        lineHeight = lineHeight +"px";
-                }
-                style.push('line-height:'+lineHeight);
-                style.push('width:'+item.width+'px');
-                style.push('height:'+item.height+'px');
+         //取文字大小
+         var fontSize = textInfo.size,        
+         //取行高
+         lineHeight = textInfo.lineHeight;
+         //如果行高为%
+         if(typeof(lineHeight) == "string" && lineHeight.indexOf("%")>-1){
+                lineHeight = textInfo.lineHeight;
+         //如果行高小于字体，并且字体小于14
+         }else if(lineHeight < fontSize && fontSize < 14){
+                lineHeight = '14px';
+         //如果行高小于字体
+         }else if(lineHeight < fontSize){
+                 lineHeight = fontSize+'px';   
+         //其他
+         }else{
+                lineHeight = lineHeight +"px";
          }
+         style.push('line-height:'+lineHeight);
+         //宽度
+         style.push('width:'+item.width+'px');
+         //高度
+         style.push('height:'+item.height+'px');
+         //文字大小
          style.push('font-size:'+fontSize+'px');
+         //对齐
          style.push('text-align:'+textInfo.textAlign+'');
+         //外边距
          style.push('margin-right:0px');
          style.push('margin-bottom:0px');
+         //返回
          return style;
     },
     //EDM 代码
@@ -128,13 +142,13 @@ var toHtml = {
                             style.push('margin-top:'+(item.top - prevItem.bottom)+'px');
                             style.push('margin-left:'+(item.left )+'px');
                      }
-                     var textContent = this.replaceNewline(item.textInfo.contents);
+                     var textContent = this.htmlEncode(item.textInfo.contents);
                      var span = new XML('<p style="'+style.join(";")+';">'+textContent+'</p>');
                      td.appendChild(span);
                  }
          }
             
-         return this.formatHtml('<!DOCTYPE html">\n'+html.toXMLString());
+         return '<!DOCTYPE html">\n'+this.htmlDecode(html.toXMLString());
     },
     //网页代码
     getPage:function(data){
@@ -160,15 +174,16 @@ var toHtml = {
         doc.appendChild(content);
         
         
-        var styleCSS = ['.absolute{position:absolute;}.psd2html{position:absolute;margin:0px;padding:0px;left:50%;}.psd2html_bg{margin:0px auto;padding:0px;overflow:hidden;background-position:center top;background-repeat:no-repeat;}.page_doc{position:relative;}'];
+        var styleCSS = ['.absolute{position:absolute;}.psd2html{position:absolute;margin:0px;padding:0px;left:50%;}.psd2html_bg{margin:0px auto;padding:0px;overflow:hidden;background-position:center top;background-repeat:no-repeat;}.page_doc{position:relative;}.noDecoration{text-decoration:none}.noDecoration:hover{text-decoration:none}'];
         
         for(var i=0;i<len;i++){
                 var item = this.data.childs[i];               
                 switch(item.kind){
                         case "LayerKind.NORMAL" :
                                 //普通图层
-                                var bgImg = new XML('<div class="psd2html_bg" style="height:'+(item.bottom-item.top)+'px;background-image:url(slices/'+item.name+');">~~~PSD2HTMLSpace~~~</div>');
+                                var bgImg = new XML('<div class="psd2html_bg style'+i+'">~~~PSD2HTMLSpace~~~</div>');
                                 doc.appendChild(bgImg);
+                                styleCSS.push('.style'+i+'{height:'+(item.bottom-item.top)+'px;background-image:url(slices/'+item.name+');}');
                         break;
                         case "LayerKind.TEXT":
                                 //文本图层
@@ -180,11 +195,11 @@ var toHtml = {
         }
         head.appendChild(new XML('<style type="text/css">'+styleCSS.join("")+'</style>'));
     
-        return '<!DOCTYPE html">\n'+this.formatHtml(html.toXMLString());
+        return '<!DOCTYPE html">\n'+this.htmlDecode(html.toXMLString());
         
     },
-    //替换换行符
-    replaceNewline:function(str){
+    //替换PS软件里的换行符和空格，转换成HTML标签
+    htmlEncode:function(str){
             str = str.replace (/\r\n/g, "<br/>").replace (/\n/g, "<br/>").replace (/\r/g, "<br/>").replace (/\s/g, "~~~PSD2HTMLSpace~~~");
             if(str.substring(0,5) == "<br/>"){
                     str = str.substring(5,str.length);
@@ -192,23 +207,23 @@ var toHtml = {
             return str;
     },
     //格式化HTML代码
-    formatHtml:function(html){
+    htmlDecode:function(html){
         return html.replace (/~~~PSD2HTMLSpace~~~/g, "&nbsp;");
     },
-    //文本层
+    //文本层，单独解析文本
     textLayer:function(item,n){
         var elm = null;
         if(typeof(item.textInfo) == 'undefined' && typeof(item.link) != 'undefined'){
                 //没有文本的空链接
-                elm = new XML('<a class="style'+n+' absolute" href="'+item.link.href+'">~~~PSD2HTMLSpace~~~</a>');
+                elm = new XML('<a class="style'+n+' absolute noDecoration" href="'+item.link.href+'">~~~PSD2HTMLSpace~~~</a>');
         }else if(item.textInfo.textType == 'TextType.PARAGRAPHTEXT'){
                 //段落文本含有链接的
                 // typeof(item.link) != 'undefined'
-                var textObj = this.replaceNewline(item.textInfo.contents).split("<br/>"),
+                var textObj = this.htmlEncode(item.textInfo.contents).split("<br/>"),
                        elm = new XML('<div class="style'+n+' absolute"></div>');
                        e = elm;
                        if(typeof(item.link) != 'undefined'){
-                              e = new XML('<a href="'+item.link.href+'" class="absolute">~~~PSD2HTMLSpace~~~</a>');
+                              e = new XML('<a href="'+item.link.href+'" class="absolute noDecoration">~~~PSD2HTMLSpace~~~</a>');
                               elm.appendChild(e);
                        }
                 //循环段落
@@ -218,10 +233,10 @@ var toHtml = {
                 
         }else if(item.textInfo.textType == 'TextType.POINTTEXT' &&  typeof(item.link) != 'undefined'){
                 //单行有链接文本
-                elm = new XML('<a class="style'+n+' absolute" href="'+item.link.href+'">'+this.replaceNewline(item.textInfo.contents)+'</a>');
+                elm = new XML('<a class="style'+n+' absolute" href="'+item.link.href+'">'+this.htmlEncode(item.textInfo.contents)+'</a>');
         }else if(item.textInfo.textType == 'TextType.POINTTEXT'){
                 //单行文本
-                elm = new XML('<span class="style'+n+' absolute">'+this.replaceNewline(item.textInfo.contents)+'</span>');
+                elm = new XML('<span class="style'+n+' absolute">'+this.htmlEncode(item.textInfo.contents)+'</span>');
         }
         return elm;
     },
