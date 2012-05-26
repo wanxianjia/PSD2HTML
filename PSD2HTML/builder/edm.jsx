@@ -1,4 +1,5 @@
 ﻿// @include "../lib/psd.jsx"
+// @include "../lib/json2-min.jsx"
 
 var psd = new PSD();
 psd.parseLayers();
@@ -57,7 +58,7 @@ function createTable(){
 		if(cell.hasMerge) continue;
 		
 		var td = new XML('<td width="'+cell.width+'" height="'+cell.height+'">wanxianjia</td>');
-
+		
 		for(var j = 0, l2 = textLayers.length; j < l2; j++){
 			var layer = textLayers[j];
 			if(layer.left === cell.x && layer.top === cell.y){
@@ -70,22 +71,31 @@ function createTable(){
 				style += 'color:#'+layer.textInfo.color+'; font-size:'+layer.textInfo.size+';';
 				var divs = new XML('<divs style="'+style+'">'+layer.textInfo.contents+'</divs>');
 
-				var m = 1;
+				var n = 1;
+				createTable.m = 1;
 				(function(t){
 					// 横向合并
-					if(layer.width > t.width && cells[i+1]){
-						m++;
+					var mergeColCell = cells[i+createTable.m];
+					
+					if(layer.width > t.width && !!mergeColCell){
+						createTable.m++;
 						t.width = t.width + cells[i+1].width;
-						td = new XML('<td width="'+t.width+'" height="'+t.height+'" colspan="'+m+'">wanxianjia</td>');
-						cells[i+1].hasMerge = true;
+						td.@width = t.width;
+						td.@colspan = createTable.m;
+						mergeColCell.hasMerge = true;
 						arguments.callee(t);
 					}
 					// 纵向合并
-					if(layer.height > t.height && cells[i+o.cols]){
-						m++;
+					if(layer.height > t.height){
+						n++;
 						t.height = t.height + cells[i+o.cols].height;
-						td = new XML('<td width="'+t.width+'" height="'+t.height+'" rowspan="'+m+'">wanxianjia</td>');
-						cells[i+o.cols].hasMerge = true;
+						td.@height = t.height;
+						td.@rowspan = n;
+						
+						var k = createTable.m;
+						while(k--){
+							if(!!cells[i+o.cols * (n - 1)+k]) cells[i+o.cols * (n - 1)+k].hasMerge = true;
+						}
 						arguments.callee(t);
 					}
 				})(cell);
@@ -93,14 +103,13 @@ function createTable(){
 				td.appendChild(divs);
 			}
 		}
-		
 		tr.appendChild(td);
 		
 	}
-	$.writeln(table.toXMLString().replace(/divs/g,'div'));
+
 	var f = new File(File($.fileName).parent + '/test.html');
 	f.open('w', 'TEXT');
-	f.write('<style>table,td{vertical-align:top;border-spacing:0; border-collapse:collapse;}</style>'+table.toXMLString().replace(/divs/g,'div').replace(/wanxianjia/g, ''));
+	f.write('<style>table,td{vertical-align:top;border-spacing:0; border-collapse:collapse;border:1px solid red;}</style>'+table.toXMLString().replace(/divs/g,'div').replace(/wanxianjia/g, ''));
 	f.close();
 }
 createTable();
