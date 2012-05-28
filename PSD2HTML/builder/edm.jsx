@@ -2,7 +2,13 @@
 // @include "../lib/json2-min.jsx"
 
 var psd = new PSD();
-psd.parseLayers();
+psd.parseLayers(null, null, function(layer){
+	try{
+		if(layer.kind.toString() !== 'LayerKind.TEXT' && !psd.linkReg.test(layer.name)) return true;
+	}catch(e){
+		return true;
+	}
+});
 var textLayers = psd.getTextLayers();
 // 数组去重
 function unique(arr){

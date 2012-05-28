@@ -50,7 +50,8 @@ PSD.fn = PSD.prototype = {
 		}
 		
 		for(var i = layers.length - 1; i >= 0; i--){
-			this._getLayerInfo(layers[i], context, skip);
+			var layer = layers[i];
+			this._getLayerInfo(layer, context, skip);
 		}
 	},
 	getWidth: function(){
@@ -79,10 +80,12 @@ PSD.fn = PSD.prototype = {
 	},
 	_getLayerInfo: function(layer, context, skip){
 		_index++;
+		
 		context = context || this.tree;
-		if(skip && skip(layer)) return;
 		
 		if(layer.typename === 'ArtLayer' && layer.visible === true){
+			if(skip && skip(layer)) return;
+			
 			this.doc.activeLayer = layer;
 			/* get layer bounds, fix layer bounds */
 			var bounds = layer.bounds,
@@ -113,7 +116,7 @@ PSD.fn = PSD.prototype = {
 				var textItem = layer.textItem;
 				// 此try catch实属无赖，当图层无文本时，无论textItem.font，textItem.contents都异常，无法作出判断，求解释。
 				try{
-					if(WEBFONTS.indexOf(textItem.font) < 0 || this.getEffects().length > 0){
+					if(WEBFONTS.indexOf(textItem.font) < 0 || this.getEffects().length > 0 || textItem.warpStyle !== WarpStyle.NONE){
 						if(this.linkReg.test(layer.name)){
 							child.link = {href: '#'};
 							child.textInfo = undefined;
@@ -168,7 +171,7 @@ PSD.fn = PSD.prototype = {
 
 					}
 					// link
-					if(layer.name.search(/[aA]$|[aA]-/) === 0){
+					if(this.linkReg.test(layer.name)){
 						child.link = {href: '#'};
 					}
 				
@@ -178,7 +181,7 @@ PSD.fn = PSD.prototype = {
 				}catch(e){return;}
 			}else{
 				// link
-				if(layer.name.search(/[aA]$|[aA]-/) === 0){
+				if(this.linkReg.test(layer.name)){
 					child.link = {href: '#'};
 					child.kind = 'LayerKind.TEXT';
 					_textLayersInfo.push(child);
