@@ -269,17 +269,44 @@ var toHtml = {
 		//定义表格
 		var table = new XML('<table width="'+this.width+'" border="0" cellspacing="0" cellpadding="0"></table>'),
 			tbody = new XML('<tbody></tbody>'),
-			tr = new XML('<tr background="slices/'+data[0].name+'" height="'+this.height+'"></tr>');
+			tr = new XML('<tr></tr>');
+			td = new XML('<td background="slices/'+data[0].name+'" height="'+this.height+'" valign="top"></td>');
+			tr.appendChild(td);
 			
 		//置入表格
 		tbody.appendChild(tr);
 		table.appendChild(tbody);
-		//遍历数据
-		for(var i=1;i<len;i++){
-			var item = data[i],
-				elm = this.textLayer(item);
-			tr.appendChild(elm);
+		
+		var index = [],
+			newData = {};
+		for(var i in data){
+			var key = data[i].top*0.1*1;
+			index.push(key);
+			newData[key] = data[i];
 		}
+		
+		for(var i in newData){
+			$.writeln(newData[i].top)
+		}
+		
+		//遍历数据
+		/*for(var i=1;i<3;i++){
+			var item = data[i],
+				elm = this.textLayer(item),
+				cssStyle = this.getCss(item);
+			cssStyle.push('margin-right:0px;');
+			cssStyle.push('margin-bottom:0px;');
+			cssStyle.push('display:inline-block;');
+			if(i == 1){
+				cssStyle.push('margin-top:' + item.top  + 'px');
+			}else{
+				cssStyle.push('margin-top:' + (item.top - data[i-1].bottom)  + 'px');
+			}
+			cssStyle.push('margin-left:' + item.left + 'px');
+			elm.@style = cssStyle.join(";")+";";
+			td.appendChild(elm);
+			
+		}*/
 		return this.htmlDecode(table.toXMLString());
 	}
 }
