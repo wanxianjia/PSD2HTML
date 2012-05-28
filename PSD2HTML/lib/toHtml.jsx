@@ -50,7 +50,7 @@ var toHtml = {
 	/**
 	 * 获取CSS
 	 */
-	getCss : function(item) {
+	getCss : function(item,overValue) {
 		var style = [];
 		style.push('z-index:' + item.index);
 		var textInfo = item.textInfo;
@@ -63,9 +63,12 @@ var toHtml = {
 			style.push('text-decoration:none');
 			return style;
 		}
+		if(typeof(overValue) == "undefined"){
+			overValue = 0;
+		}
 		//定位
 		style.push('top:' + (item.top - 3) + 'px');
-		style.push('left:' + (item.left + 2) + 'px');
+		style.push('left:' + (item.left + 2 - (overValue/2)) + 'px');
 		//加粗
 		if(textInfo.bold === true) {
 			style.push('font-weight:blod');
@@ -174,11 +177,13 @@ var toHtml = {
 		html.appendChild(body);
 		var doc = new XML('<div id="doc" class="page_doc"></div>');
 		body.appendChild(doc);
-		body.appendChild('#parse("$pageInfo.footer")');
 
-		var content = new XML('<div class="psd2html" style="height:' + this.height + 'px;margin-left:-' + parseInt(this.width / 2) + 'px;width:' + this.width + 'px"></div>'), 
+		var content = new XML('<div class="psd2html" style="height:' + this.height + 'px;width:952px;margin:0px auto -'+this.height+'px auto;"></div>'), 
 		len = this.data.childs.length;
 		doc.appendChild(content);
+		
+		//PSD的宽度-952的差值
+		var overValue = this.width - 952;
 
 		var styleCSS = [];
 
@@ -187,19 +192,19 @@ var toHtml = {
 			switch(item.kind) {
 				case "LayerKind.NORMAL" :
 					//普通图层
-					var bgImg = new XML('<div class="psd2html_bg style' + i + '">~~~PSD2HTMLSpace~~~</div>');
-					doc.appendChild(bgImg);
+					var bgImg = new XML('<div class="psd2html_bg style' + i + '">1~~~PSD2HTMLSpace~~~</div>');
+					body.appendChild(bgImg);
 					styleCss.appendChild(new XML('.style' + i + '{height:' + (item.bottom - item.top) + 'px;background-image:url(slices/' + item.name + ');}'));
 					break;
 				case "LayerKind.TEXT":
 					//文本图层
 					content.appendChild(this.textLayer(item, i));
 					//叠加CSS集合，因为join后最后的没有";"虽然不会错，但标准而言，还是手动加上
-					styleCss.appendChild(new XML('.style' + i + '{' + this.getCss(item).join(";") + ';}'));
+					styleCss.appendChild(new XML('.style' + i + '{' + this.getCss(item,overValue).join(";") + ';}'));
 					break;
 			}
 		}
-
+		body.appendChild('#parse("$pageInfo.footer")');
 		return '<!DOCTYPE html>\n' + this.htmlDecode(html.toXMLString());
 
 	},
