@@ -116,7 +116,7 @@ var APP = {};
                   
 				APP.OPTION.image.quality = APP.win.option.image.q.s.text;
                   APP.win.hide();
-                  $.evalFile(File($.fileName).parent+'/PSD2HTML/lib/builder.jsx');
+                  $.evalFile(File($.fileName).parent+'/PSD2HTML/builder/page.jsx');
                   alert("处理完成！");
                   
 			}

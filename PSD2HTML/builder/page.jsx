@@ -1,18 +1,12 @@
-﻿// @include "json2-min.jsx"
-// @include "psd.jsx"
-// @include "toHtml.jsx"
+﻿// @include "../lib/json2-min.jsx"
+// @include "../lib/psd.jsx"
+// @include "../lib/toHtml.jsx"
 
 //alert(JSON.stringify(APP.OPTION)); //设置面板的设置结果
 var appOp = APP.OPTION;
 
 var psd = new PSD({output:appOp.output});
-psd.parseLayers(null, null, function(layer){
-	try{
-		if(layer.kind.toString() !== 'LayerKind.TEXT' && !psd.linkReg.test(layer.name)) return true;
-	}catch(e){
-		return true;
-	}
-});
+psd.parseLayers();
 
 //图片输出设置
 var option = new ExportOptionsSaveForWeb();
