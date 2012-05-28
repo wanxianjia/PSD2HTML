@@ -6,7 +6,13 @@
 var appOp = APP.OPTION;
 
 var psd = new PSD({output:appOp.output});
-psd.parseLayers();
+psd.parseLayers(null, null, function(layer){
+	try{
+		if(layer.kind.toString() !== 'LayerKind.TEXT' && !psd.linkReg.test(layer.name)) return true;
+	}catch(e){
+		return true;
+	}
+});
 
 //图片输出设置
 var option = new ExportOptionsSaveForWeb();
