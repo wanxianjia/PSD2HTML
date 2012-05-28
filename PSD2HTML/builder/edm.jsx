@@ -3,11 +3,7 @@
 
 var psd = new PSD();
 psd.parseLayers(null, null, function(layer){
-	try{
-		if(layer.kind.toString() !== 'LayerKind.TEXT' && !psd.linkReg.test(layer.name)) return true;
-	}catch(e){
-		return true;
-	}
+	if(layer.kind != LayerKind.TEXT && !psd.linkReg.test(layer.name)) return true;
 });
 var textLayers = psd.getTextLayers();
 // 数组去重

@@ -84,7 +84,9 @@ PSD.fn = PSD.prototype = {
 		context = context || this.tree;
 		
 		if(layer.typename === 'ArtLayer' && layer.visible === true){
-			if(skip && skip(layer)) return;
+			try{
+				if(skip && skip(layer)) return;
+			}catch(e){}
 			
 			this.doc.activeLayer = layer;
 			/* get layer bounds, fix layer bounds */
