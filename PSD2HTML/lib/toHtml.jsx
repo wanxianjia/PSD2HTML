@@ -192,7 +192,7 @@ var toHtml = {
 			switch(item.kind) {
 				case "LayerKind.NORMAL" :
 					//普通图层
-					var bgImg = new XML('<div class="psd2html_bg style' + i + '">1~~~PSD2HTMLSpace~~~</div>');
+					var bgImg = new XML('<div class="psd2html_bg style' + i + '">~~~PSD2HTMLSpace~~~</div>');
 					body.appendChild(bgImg);
 					styleCss.appendChild(new XML('.style' + i + '{height:' + (item.bottom - item.top) + 'px;background-image:url(slices/' + item.name + ');}'));
 					break;
