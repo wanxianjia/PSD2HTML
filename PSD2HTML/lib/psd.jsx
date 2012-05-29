@@ -281,7 +281,7 @@ PSD.fn = PSD.prototype = {
 			if(size < 70000){
 				HEIGHT = this.getHeight();
 			}else{
-				HEIGHT = Math.round(this.getHeight() / Math.ceil(size / 100000));
+				HEIGHT = Math.round(this.getHeight() / Math.ceil(size / 70000));
 			}
 			testImg.remove();	//É¾³ý²âÊÔÍ¼Æ¬
 		}else{
