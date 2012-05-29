@@ -15,9 +15,10 @@ var option = new ExportOptionsSaveForWeb();
 
 if(appOp.image.extension === 'jpg'){
 	option.format = SaveDocumentType.JPEG;
+	option.quality = appOp.image.quality;
 }else if(appOp.image.extension === 'png'){
 	option.format = SaveDocumentType.PNG;
-	options.PNG8 = appOp.image.png8;
+	option.PNG8 = appOp.image.png8;
 }
 
 var data = null;
