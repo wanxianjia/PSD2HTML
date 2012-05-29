@@ -5,7 +5,7 @@ var psd = new PSD();
 psd.parseLayers(null, null, function(layer){
 	if(layer.kind != LayerKind.TEXT && !psd.linkReg.test(layer.name)) return true;
 });
-var textLayers = psd.getTextLayers();$.writeln(textLayers);
+var textLayers = psd.getTextLayers();
 // 数组去重
 function unique(arr){
 	var o = {}, a = [], it;
