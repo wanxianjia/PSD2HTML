@@ -116,7 +116,7 @@ PSD.fn = PSD.prototype = {
 
 			if(kind === 'LayerKind.TEXT'){
 				var textItem = layer.textItem;
-				// 此try catch实属无赖，当图层无文本时，无论textItem.font，textItem.contents都异常，无法作出判断，求解释。
+				// 此try catch实属无赖，当图层无文本时，无论textItem.font，textItem.contents都异常，无法作出判断。
 				try{
 					if(WEBFONTS.indexOf(textItem.font) < 0 || this.getEffects().length > 0 || textItem.warpStyle !== WarpStyle.NONE){
 						if(this.linkReg.test(layer.name)){
