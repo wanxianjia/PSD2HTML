@@ -143,7 +143,8 @@ PSD.fn = PSD.prototype = {
 						textType: textItem.kind.toString(),
 						bold: textItem.fauxBold,
 						italic: textItem.fauxItalic,
-						indent: Math.round(textItem.firstLineIndent.value)
+						indent: Math.round(textItem.firstLineIndent.value),
+						textRange: this.getTextRange()
 					};
 					// line height
 					if(!textItem.useAutoLeading){
@@ -336,6 +337,34 @@ PSD.fn = PSD.prototype = {
 	/* 获取所有文本图层信息，return Array */
 	getTextLayers: function(){
 		return _textLayersInfo;
+	},
+	getTextRange: function(){
+		var desc = (function(){
+			var ref = new ActionReference();
+			ref.putEnumerated(charIDToTypeID("Lyr "), charIDToTypeID("Ordn"), charIDToTypeID("Trgt"));
+			return executeActionGet(ref);
+		})();
+		
+		var list =  desc.getObjectValue(charIDToTypeID("Txt "));
+        var tsr =  list.getList(charIDToTypeID("Txtt"));
+        var info = [];
+        for(var i = 0, l = tsr.count;i < l; i++){
+			var tsr0 =  tsr.getObjectValue(i) ;
+			var from = tsr0.getInteger(charIDToTypeID("From"));
+			var to = tsr0.getInteger(charIDToTypeID("T   "));
+			var range = [from, to];
+			var textStyle = tsr0.getObjectValue(charIDToTypeID("TxtS"));
+			var font = textStyle.getString(charIDToTypeID("FntN" )); 
+			var size = textStyle.getDouble(charIDToTypeID("Sz  " ));
+			var color = textStyle.getObjectValue(charIDToTypeID('Clr ')); 
+			var textColor = new SolidColor;
+			
+			textColor.rgb.red = color.getDouble(charIDToTypeID('Rd  '));
+			textColor.rgb.green = color.getDouble(charIDToTypeID('Grn '));
+			textColor.rgb.blue = color.getDouble(charIDToTypeID('Bl  '));
+			info.push({range:range, font:font, size:size, color:textColor.rgb.hexValue});
+		}
+        return info;
 	}
 }
 
