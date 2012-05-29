@@ -27,4 +27,5 @@ if(APP.OPTION.builder != "normal"){
    data = psd.getTextLayersAndSlices(option);
 }
 toHtml.init(data,APP,psd);
+psd = null;
 //alert(JSON.stringify(data));

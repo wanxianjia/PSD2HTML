@@ -200,7 +200,7 @@ PSD.fn = PSD.prototype = {
 				
 			var o = {type:layer.typename, name:layer.name, index:_index, childs:[]};
 			context.childs.push(o);
-			this.parseLayers(layer.layers, o);
+			this.parseLayers(layer.layers, o, skip);
 		}
 	},
 	exportPng: function(){
@@ -261,15 +261,7 @@ PSD.fn = PSD.prototype = {
 	/* 自动切片并导出图片 */
 	autoSliceAndExport: function(options, height){
 		this.hiddenTextLayers();
-
-		var HEIGHT = height || 120,
-			selection = this.doc.selection,
-			docWidth = this.doc.width.value,
-			docHeight = this.doc.height.value,
-			region = [],
-			y = 0, fy;
-			
-
+		
 		if(!options){
 			options = new ExportOptionsSaveForWeb();
 			options.format = SaveDocumentType.JPEG;
@@ -279,6 +271,29 @@ PSD.fn = PSD.prototype = {
 		if(options.format == SaveDocumentType.PNG){
 			extension = 'png';
 		}
+		
+		if(!height){
+			// 生成测试图片，以便计算每个切片的高度
+			var testImg = File(this.dir + '/' + 'img.tmp.' + extension);
+			this.doc.exportDocument (testImg, ExportType.SAVEFORWEB, options);
+			var size = testImg.length, HEIGHT = 120;
+			
+			if(size < 70000){
+				HEIGHT = this.getHeight();
+			}else{
+				HEIGHT = Math.round(this.getHeight() / Math.ceil(size / 100000));
+			}
+			testImg.remove();	//删除测试图片
+		}else{
+			var HEIGHT = height;
+		}
+		
+		var	selection = this.doc.selection,
+			docWidth = this.doc.width.value,
+			docHeight = this.doc.height.value,
+			region = [],
+			y = 0, fy;
+			
 
 		var slicesFolder = new Folder(this.dir + '/slices/');
 		!slicesFolder.exists && slicesFolder.create();
