@@ -359,12 +359,13 @@ PSD.fn = PSD.prototype = {
 			var font = textStyle.getString(charIDToTypeID("FntN" )); 
 			var size = textStyle.getDouble(charIDToTypeID("Sz  " ));
 			var color = textStyle.getObjectValue(charIDToTypeID('Clr ')); 
+			var underline = textStyle.getObjectValue(charIDToTypeID('Undl'));
 			var textColor = new SolidColor;
 			
 			textColor.rgb.red = color.getDouble(charIDToTypeID('Rd  '));
 			textColor.rgb.green = color.getDouble(charIDToTypeID('Grn '));
 			textColor.rgb.blue = color.getDouble(charIDToTypeID('Bl  '));
-			info.push({range:range, font:font, size:size, color:textColor.rgb.hexValue});
+			info.push({range:range, font:font, size:size, color:textColor.rgb.hexValue, underline:underline});
 		}
         return info;
 	}
