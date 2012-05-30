@@ -81,6 +81,9 @@ var toHtml = {
 		if(textInfo.italic === true) {
 			style.push('font-style:italic');
 		}
+		if(textInfo.underline === true){
+			style.push('text-decoration:underline');
+		}
 		//缩进
 		if(textInfo.indent != '0') {
 			style.push('text-indent:' + textInfo.indent + 'px');

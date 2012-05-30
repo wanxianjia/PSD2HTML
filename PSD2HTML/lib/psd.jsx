@@ -144,6 +144,7 @@ PSD.fn = PSD.prototype = {
 						bold: textItem.fauxBold,
 						italic: textItem.fauxItalic,
 						indent: Math.round(textItem.firstLineIndent.value),
+						underline: textItem.underline == UnderlineType.UNDERLINEOFF ? false : true,
 						textRange: this.getTextRange()
 					};
 					// line height
@@ -348,6 +349,7 @@ PSD.fn = PSD.prototype = {
 		var list =  desc.getObjectValue(charIDToTypeID("Txt "));
         var tsr =  list.getList(charIDToTypeID("Txtt"));
         var info = [];
+		
         for(var i = 0, l = tsr.count;i < l; i++){
 			var tsr0 =  tsr.getObjectValue(i) ;
 			var from = tsr0.getInteger(charIDToTypeID("From"));
