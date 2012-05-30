@@ -10,6 +10,10 @@
 @description PS中所有打开的文档  
 @type Documents
 
+##### linkReg
+>
+@description 链接规则正则  
+
 ##### output  
 >
 @description 输出文件夹  
@@ -32,8 +36,12 @@
 ##### parseLayers
 >
 @description 解析所有图层，其他需要用的图层信息的方法都依赖该方法（即必须先调用该方法后才会产生图层信息）  
-@param Layers   
-@param Object
+@param Layers 默认值：this.activeDocument.layers  
+@param Object 默认值：this.tree  
+@param Function 默认值：function(layer){}，设置跳过对当前图层的解析条件，return true即跳过。  
+
+##### getEffects
+@description 获取activeLayer的样式  
 
 ##### getWidth
 >
@@ -73,7 +81,9 @@
 
 ##### autoSliceAndExport
 >
-@description 自动对PSD文件切片并导出切片
+@description 自动对PSD文件切片并导出切片  
+@param Object 导出配置，默认值：SaveDocumentType.JPEG   
+@param Number 切片高度，默认值：根据算法自动计算高度  
 
 ##### getTextLayers
 >
@@ -82,4 +92,9 @@
 
 ##### getTextLayersAndSlices
 @description 获取所有文本图层信息和切片信息  
-@return Object
+@param Object 导出配置，默认值：SaveDocumentType.JPEG   
+@param Number 切片高度，默认值：根据算法自动计算高度  
+@return Object  
+
+##### getTextRange
+@description 获取activeLayer的text range信息  
