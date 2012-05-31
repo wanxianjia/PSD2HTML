@@ -112,10 +112,10 @@ jQuery(function($){
 							//if(layer.isBackgroundLayer) continue;
 
 							if(layer.kind === 'LayerKind.TEXT'){
-								styleArr.push('.',className);
+								styleArr.push('.',className,'{');
 								if(layer.textInfo){
 									div.innerHTML = layer.textInfo.contents;
-									styleArr.push('{font-family:',layer.textInfo.font,'; font-size:',layer.textInfo.size,'; color:',layer.textInfo.color,';');
+									styleArr.push('font-family:',layer.textInfo.font,'; font-size:',layer.textInfo.size,'; color:',layer.textInfo.color,';');
 								}
 								styleArr.push('position:absolute; width:',width,'px; height:',height,'px; top:',top,'px; left:',left,'px;}');
 							}else{
