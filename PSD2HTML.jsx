@@ -24,13 +24,14 @@ var APP = {};
 		text:"设置",\
 		option: Group{\
 			orientation:"column",\
+			alignChildren: "left",\
 			builder: Panel{\
-				size: [284, 50],\
 				text: "请选择生成页面类型",\
 				a: Group{\
-					e: RadioButton{text:"EDM", data:"EDM"},\
-					l: RadioButton{text:"论坛帖", data:"BBS"},\
-					j: RadioButton{text:"静态页", data:"normal", value:true}\
+					j: RadioButton{text:"静态页", helpTip:"Normal page", data:"normal", value:true}\
+					e: RadioButton{text:"EDM", helpTip:"EDM", data:"EDM"},\
+					l: RadioButton{text:"论坛帖", helpTip:"Editor code", data:"BBS"},\
+					i: RadioButton{text:"Import JSON and Image", data:"file"}\
 				}\
 			},\
 			image: Group{\
@@ -45,7 +46,7 @@ var APP = {};
 				},\
 				q: Group{\
 					alignChildren: "left",\
-					t: StaticText{text:"图片质量："},\
+					t: StaticText{text:"图片质量：", helpTip:"Image quality"},\
 					s: EditText{ text:"60", preferredSize: [50, 20] }\
 				}\
 			},\
@@ -73,7 +74,7 @@ var APP = {};
 	APP.win.option.output.b.onClick = function(){
 		var output = Folder.selectDialog ('选择输出文件夹','~/Documents');
 		if(output){
-			APP.win.option.output.s.text  = APP.OPTION.output = output.path;
+			APP.win.option.output.s.text  = APP.OPTION.output = output;
 		}
 	}
 
@@ -112,13 +113,28 @@ var APP = {};
 			}
 			if(!APP.OPTION.builder){
 				alert('请选择生成器');
-			}else{               
+			}else{
                   
 				APP.OPTION.image.quality = APP.win.option.image.q.s.text;
-                  APP.win.hide();
-                  $.evalFile(File($.fileName).parent+'/PSD2HTML/builder/page.jsx');
-                  alert("处理完成！");
-                  
+				APP.win.close();
+				APP.win = new Window('palette{\
+					g: Group{\
+						tx: StaticText{text:"Running..."},\
+					}\
+				}');
+				APP.win.center();
+				APP.win.show();
+				
+				if(APP.OPTION.builder === 'normal'){
+					$.evalFile(File($.fileName).parent+'/PSD2HTML/builder/page.jsx');
+				}else if(APP.OPTION.builder === 'BBS' || APP.OPTION.builder === 'EDM'){
+					alert('该功能暂未开放！');
+					return;
+				}else if(APP.OPTION.builder === 'file'){
+					$.evalFile(File($.fileName).parent+'/PSD2HTML/builder/importFile.jsx');
+				}
+				APP.win.close();
+				alert("处理完成！");
 			}
 		}
 		
