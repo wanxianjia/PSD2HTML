@@ -112,8 +112,12 @@ jQuery(function($){
 							//if(layer.isBackgroundLayer) continue;
 
 							if(layer.kind === 'LayerKind.TEXT'){
-								div.innerHTML = layer.textInfo.contents;
-								styleArr.push('.',className,'{font-family:',layer.textInfo.font,'; font-size:',layer.textInfo.size,'; color:',layer.textInfo.color,'; position:absolute; width:',width,'px; height:',height,'px; top:',top,'px; left:',left,'px;}');
+								styleArr.push('.',className);
+								if(layer.textInfo){
+									div.innerHTML = layer.textInfo.contents;
+									styleArr.push('{font-family:',layer.textInfo.font,'; font-size:',layer.textInfo.size,'; color:',layer.textInfo.color,';');
+								}
+								styleArr.push('position:absolute; width:',width,'px; height:',height,'px; top:',top,'px; left:',left,'px;}');
 							}else{
 								// 利用canvas对每个图层生成png图片
 								var canvas 		= document.createElement('canvas');
