@@ -358,8 +358,7 @@ PSD.fn = PSD.prototype = {
 			var textStyle = tsr0.getObjectValue(charIDToTypeID("TxtS"));
 			var font = textStyle.getString(charIDToTypeID("FntN" )); 
 			var size = textStyle.getDouble(charIDToTypeID("Sz  " ));
-			var color = textStyle.getObjectValue(charIDToTypeID('Clr ')); 
-			var underline = textStyle.getObjectValue(charIDToTypeID('Undl'));
+			var color = textStyle.getObjectValue(charIDToTypeID('Clr '));
 			var textColor = new SolidColor;
 			
 			textColor.rgb.red = color.getDouble(charIDToTypeID('Rd  '));
