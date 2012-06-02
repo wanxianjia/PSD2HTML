@@ -10,7 +10,7 @@ Theoretically, it will work after you have ran `npm install -d` command successf
 Generally speaking, following these 3 steps will work：
 
 ## For Mac Users：
-### Install Canvas Dependency
+### 1. Install Canvas Dependency
 As cairo, pnglib and jpglib have already been installed in Mac OS and that giflib is not a must, you can skip this step.<br/>
 BTW: if you want to use node-canvas to process gif images, you should install gif lib by running:
 
@@ -18,14 +18,14 @@ BTW: if you want to use node-canvas to process gif images, you should install gi
 
 For more infomation about brew, visit: http://mxcl.github.com/homebrew/
 
-### Use npm to install other modules automatically
+### 2. Use npm to install other modules automatically
 Update git repository, change to server dir and run:
 
     npm install -d
 
 After executing this command successfully, all the required modules will be installed to server/node_modules directory. It may cost a long time the first time.
 
-### Starting the App.
+### 3. Starting the App.
 Run:<br/>
 
 		node app.js
@@ -33,13 +33,13 @@ Run:<br/>
 After staring the app successfully, visit: http://localhost:7777 in your browser, that's it!
 
 ## For Ubuntu Users
-### Install Canvas Dependency(Ubuntu 12.04)
-1. Install cairo<br/>
+### 1. Install Canvas Dependency(Ubuntu 12.04)
+- Install cairo<br/>
 Run:<br/>
 
 	sudo apt-get install libcairo2-dev
 
-2. Install png、jpg、gif Libraries
+- Install png、jpg、gif Libraries
 
     sudo apt-get install libpng12-dev<br/>
     sudo apt-get install libjpeg-dev<br/>
@@ -47,10 +47,10 @@ Run:<br/>
 
 **NOTICE:** Although node-canvas can be installed if you skip the 2nd step, you will get a error when calling canvas.createJPEGStream method. This case, you should following the 2nd step and reinstall node-canvas to get certain image type been supported.
 
-### Use npm to install other modules automatically
+### 2. Use npm to install other modules automatically
     Follow the 2nd Step For Mac Users.
 
-### Starting the App.
+### 3. Starting the App.
     Follow the 3rd Step For Mac Users.
 
 ## For Windows Users
