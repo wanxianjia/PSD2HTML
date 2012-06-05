@@ -364,7 +364,7 @@ PSD.fn = PSD.prototype = {
 			textColor.rgb.red = color.getDouble(charIDToTypeID('Rd  '));
 			textColor.rgb.green = color.getDouble(charIDToTypeID('Grn '));
 			textColor.rgb.blue = color.getDouble(charIDToTypeID('Bl  '));
-			info.push({range:range, font:font, size:size, color:textColor.rgb.hexValue, underline:underline});
+			info.push({range:range, font:font, size:size, color:textColor.rgb.hexValue});
 		}
         return info;
 	}
