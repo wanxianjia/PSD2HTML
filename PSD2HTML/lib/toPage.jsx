@@ -1,6 +1,6 @@
 // @include "io.jsx"
 
-function toPage(data, APP, psd, callback){
+function toPage(data, APP, psd,option){
 	//数据源
 	this.data = data;
 	//APP object
@@ -13,8 +13,14 @@ function toPage(data, APP, psd, callback){
 	this.height = psd.getHeight();
 	//空格临时占用符
 	this.space = '~~~PSD2HTMLSpace~~~';
+	
 	//文件编码
-	this.encode = "gb2312";
+	if(typeof(option) != 'undefined' && typeof(option.encode) != 'undefined'){
+		this.encode = option.encode;
+	}else{
+		this.encode = "gb2312";
+	}
+	
 	//文件保存路径
 	this.filePath = psd.dir + "/" + psd.doc.name.split(".")[0] + ".html";
 	//生成模版
@@ -26,15 +32,15 @@ function toPage(data, APP, psd, callback){
 			this.getBSS();
 			break;
 		default:
-			this.parsePage();
+			this.parseSimplePage();
 			break;
 	}	
 	//存储文件 
 	this.saveFile();
 	
 	//如果有回调
-	if(callback) {
-		callback();
+	if(typeof(option) != 'undefined' && typeof(option.callback) != 'undefined'){
+		option.callback();
 	}
 };
 
@@ -103,6 +109,73 @@ toPage.prototype.parsePage = function(){
 	//设置全局的网页HTML代码内容
 	this.htmlContent = '<!DOCTYPE html>\n' + this.formatHtml(html.toXMLString());
 };
+
+/**
+ * 解析其他简单网页 
+ */
+toPage.prototype.parseSimplePage = function(){
+	//设置表格
+	var table = new XML('<table width="'+this.width+'" border="0" cellspacing="0" cellpadding="0"></table>'),
+		tbody = new XML('<tbody></tbody>'),
+		tr = {},
+		td = {};
+	//设置表格的背景
+	table['@background'] = 'slices/' + this.data.childs[0].name;
+	//tbody归位
+	table.appendChild(tbody);
+	
+	var len = this.data.childs.length;
+	//给出完整的表格
+	/*for(var row=1;row<len;row++){
+		tr[row] = new XML('<tr></tr>');
+		for(var col=0;col<len;col++){
+			td[row+"_"+col] = new XML('<td align="left" valign="top"></td>');
+			tr[row].appendChild(td[row+"_"+col]);
+		}
+		tbody.appendChild(tr[row]);
+	}*/
+	
+	//数据源从低到高排序
+	var dataMap = {},
+		dataIndex = [],
+		newData = [];
+	for(var i=1;i<len;i++){
+		var item = this.data.childs[i],
+			key = item.top * i;//避免相同的key
+			
+		dataIndex.push(key);
+		dataMap[key] = item;
+		
+	}
+	//dataIndex排序
+	dataIndex.sort(function(a,b){return a-b});
+	
+	for(var i in dataIndex){
+		var key = dataIndex[i];
+		newData.push(dataMap[key]);
+	}
+	
+	var col = {};
+	for(var i=0;i<len;i++){
+		var data = newData;
+		col[i] = new XML('<td align="left" valign="top">'+i+'</td>');
+		if(i==0){
+			col[i]['@width'] = data[1].left;
+			col[i]['@height'] = data[1].top;
+		}else{
+			var item = data[i];
+			col[i]['@width'] = item.right - item.left;
+			col[i]['@height'] = item.bottom - item.top;
+			$.writeln(item.textInfo)
+			$.writeln(item.textInfo.contents)
+		}
+		tbody.appendChild(col[i]);
+	}
+	
+	
+	this.htmlContent = table.toXMLString();
+};
+
 /**
  * 获取文本元素
  * @param {Object} item
@@ -226,6 +299,7 @@ toPage.prototype.setTextCss = function(item,n,overValue){
 		style.push('margin-right:0px');
 		style.push('margin-bottom:0px');
 	}
+	return style;
 	this.styleCss.appendChild('.style'+n+'{'+style.join(";")+';}');
 };
 /**
