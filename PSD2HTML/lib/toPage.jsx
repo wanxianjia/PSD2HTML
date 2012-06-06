@@ -13,6 +13,7 @@ function toPage(data, APP, psd,option){
 	this.height = psd.getHeight();
 	//空格临时占用符
 	this.space = '~~~PSD2HTMLSpace~~~';
+	this.trTempStr = '~~~td~~~';
 	//样式集合
 	this.styleCss = new XML('<style type="text/css"></style>');
 	
@@ -119,7 +120,8 @@ toPage.prototype.parseSimplePage = function(){
 	var table = new XML('<table width="'+this.width+'" border="0" cellspacing="0" cellpadding="0"></table>'),
 		tbody = new XML('<tbody></tbody>'),
 		tr = {},
-		td = {};
+		td = {},
+		exclude = {};
 	//设置表格的背景
 	table['@background'] = 'slices/' + this.data.childs[0].name;
 	//tbody归位
@@ -146,13 +148,23 @@ toPage.prototype.parseSimplePage = function(){
 		top = 0,
 		left = 0,
 		removeRow = [],
-		removeCol = [];
+		remove = [];
 		
 	for(var col=-1;col<len;col++){
+		var width = 0,height = 0;
 		//每个tr
 		tr[col] = new XML('<tr></tr>');
+		
+		if(col == -1){
+			//第一行
+			height = colData[0]['top'];
+		}else{
+			//非第一行
+			height = col < len-1 ? colData[col+1]['top'] - colData[col]['top'] : this.height - colData[col]['top'];
+		}
+		
+		left = 0;	
 		for(var row=-1;row<len;row++){
-			var width = 0,height = 0;
 			//每个td
 			if(typeof(td[col]) == 'undefined'){
 				td[col] = {};
@@ -167,15 +179,6 @@ toPage.prototype.parseSimplePage = function(){
 				//非第一列
 				width = row < len-1 ? rowData[row+1]['left'] - rowData[row]['left'] : this.width - rowData[row]['left'];
 			}	
-			if(col == -1){
-				//第一行
-				height = colData[0]['top'];
-			}else{
-				//非第一行
-				height = col < len-1 ? colData[col+1]['top'] - colData[col]['top'] : this.height - colData[col]['top'];
-			}
-			top += height;			
-			left += width;	
 			
 			//第一行设置宽度
 			if(col == -1){
@@ -198,38 +201,47 @@ toPage.prototype.parseSimplePage = function(){
 			
 			
 			if(row > -1 && col > -1){
-				if(rowData[row]['top'] >= top && rowData[col]['left'] >= left){
-					text = this.getTextElement(rowData[row],0);
-				}
+				
 			}
+			//文本显示的表格
+			if(row > -1 && col > -1 && colData[col]['top'] == rowData[row]['top']){
+				text = this.getTextElement(colData[col],0);
+				text['@style'] = this.setTextCss(colData[col],0).join(";");
+				removeRow.push({
+					left:colData[col]['left'],
+					right:colData[col]['right'],
+					top:colData[col]['top'],
+					bottom:colData[col]['bottom']
+				});
+				exclude[row+"_"+col] = true;
+			}
+					
+			
 			td[col][row].appendChild(text);
-			
-			
-			//要合并哪一行/列，合并多少？
-			if(col>-1 && row>-1 && col<len-1 && row<len-1 && rowData[row]['right'] - rowData[row]['left'] > width){
-				//td[col][row]['@colspan']= 2;
-			}
-			
-			
-			/*if(col>-1 && row>-1 && col<len-1 && row<len-1){
-				$.writeln(rowData[row].name+'--'+(rowData[row+1]['left'] - rowData[row]['left']) +'=========='+width);
-			}*/
-			
-			
-			
+			left += width;	
 			tr[col].appendChild(td[col][row]);
 		}
+		top += height;	
 		tbody.appendChild(tr[col]);
 	}
 	
-	//要合并哪一行/列
-	/*for(var i=0;i<rowData.length;i++){
-		if(rowData[i]['right'] - rowData[i]['left'] >box[-1][i]['width']){
-			td[1][i]['@colspan']=2;
-			td[1][i+1] = new XML('<span>1</span>');
-		}
-	}*/
 	
+	//要合并那些呢？
+	var merge = {};
+	for(var c=1;c<len;c++){
+		for(var r=1;r<len;r++){
+			for(var d=0;d<removeRow.length;d++){
+				if((rowData[r]['left'] > removeRow[d]['left'] && rowData[r]['right'] <= removeRow[d]['right']) || (colData[c]['top'] > removeRow[d]['top'] && colData[c]['bottom'] > removeRow[d]['bottom'])){
+					if(typeof(exclude[c+'_'+r]) == 'undefined'){
+						td[c][r].setLocalName(this.trTempStr);
+					}else{
+						td[c][r]['@rowspan'] = r+1;
+						td[c][r]['@colspan'] = c+1;
+					}
+				}
+			}
+		}
+	}
 	
 	this.htmlContent = this.formatHtml(table.toXMLString());
 };
@@ -377,6 +389,14 @@ toPage.prototype.replaceNewlineAndSpace = function(str){
  * @param {Object} str
  */
 toPage.prototype.formatHtml = function(str){
+	var html = [],
+		obj = str.split('\n');
+	for(var i=0;i<obj.length;i++){
+		if(obj[i].indexOf(this.trTempStr) == -1){
+			html.push(obj[i]);
+		}
+	}
+	str = html.join("\n");
 	return str.replace(new RegExp(this.space, 'g'), "&nbsp;");
 };
 
