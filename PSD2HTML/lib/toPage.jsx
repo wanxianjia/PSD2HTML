@@ -13,6 +13,8 @@ function toPage(data, APP, psd,option){
 	this.height = psd.getHeight();
 	//空格临时占用符
 	this.space = '~~~PSD2HTMLSpace~~~';
+	//样式集合
+	this.styleCss = new XML('<style type="text/css"></style>');
 	
 	//文件编码
 	if(typeof(option) != 'undefined' && typeof(option.encode) != 'undefined'){
@@ -63,7 +65,6 @@ toPage.prototype.parsePage = function(){
 		pageContent = new XML('<div class="psd2html page"></div>'), 
 		len = this.data.childs.length;
 	
-	this.styleCss = new XML('<style type="text/css"></style>');
 	//设置content的样式
 	this.styleCss.appendChild(new XML('.page{height:' + this.height + 'px;width:952px;margin:0px auto -'+this.height+'px auto;}'));
 	//网页依赖的CSS文件	
@@ -124,57 +125,118 @@ toPage.prototype.parseSimplePage = function(){
 	//tbody归位
 	table.appendChild(tbody);
 	
-	var len = this.data.childs.length;
-	//给出完整的表格
-	/*for(var row=1;row<len;row++){
-		tr[row] = new XML('<tr></tr>');
-		for(var col=0;col<len;col++){
-			td[row+"_"+col] = new XML('<td align="left" valign="top"></td>');
-			tr[row].appendChild(td[row+"_"+col]);
+	//数组排序
+	var colData = [],
+		rowData = [],
+		len = 0;
+	for(var i=1;i<this.data.childs.length;i++){
+		len++;
+		colData.push(this.data.childs[i]);
+		rowData.push(this.data.childs[i]);
+	}
+	colData.sortObjectWith('top','asc');
+	rowData.sortObjectWith('left','asc');
+	
+		//tr集合
+	var tr = {},
+		//td集合
+		td = {},
+		//每个盒子的集合，用于记录每个td的宽高
+		box = {},
+		top = 0,
+		left = 0,
+		removeRow = [],
+		removeCol = [];
+		
+	for(var col=-1;col<len;col++){
+		//每个tr
+		tr[col] = new XML('<tr></tr>');
+		for(var row=-1;row<len;row++){
+			var width = 0,height = 0;
+			//每个td
+			if(typeof(td[col]) == 'undefined'){
+				td[col] = {};
+			}
+			
+			td[col][row] = new XML('<td align="left" valign="top"></td>');
+
+			if(row == -1){
+				//第一列
+				width = rowData[0]['left'];
+			}else{
+				//非第一列
+				width = row < len-1 ? rowData[row+1]['left'] - rowData[row]['left'] : this.width - rowData[row]['left'];
+			}	
+			if(col == -1){
+				//第一行
+				height = colData[0]['top'];
+			}else{
+				//非第一行
+				height = col < len-1 ? colData[col+1]['top'] - colData[col]['top'] : this.height - colData[col]['top'];
+			}
+			top += height;			
+			left += width;	
+			
+			//第一行设置宽度
+			if(col == -1){
+				td[-1][row]['@width'] = width;
+			}
+			//第一列设置高度
+			if(row == -1){
+				td[col][-1]['@height'] = height;
+			}
+			
+			if(typeof(box[col]) == 'undefined'){
+				box[col] = {};
+			}
+			box[col][row] = {
+				width:width,
+				height:height
+			};
+			
+			var text = this.space;
+			
+			
+			if(row > -1 && col > -1){
+				if(rowData[row]['top'] >= top && rowData[col]['left'] >= left){
+					text = this.getTextElement(rowData[row],0);
+				}
+			}
+			td[col][row].appendChild(text);
+			
+			
+			//要合并哪一行/列，合并多少？
+			if(col>-1 && row>-1 && col<len-1 && row<len-1 && rowData[row]['right'] - rowData[row]['left'] > width){
+				//td[col][row]['@colspan']= 2;
+			}
+			
+			
+			/*if(col>-1 && row>-1 && col<len-1 && row<len-1){
+				$.writeln(rowData[row].name+'--'+(rowData[row+1]['left'] - rowData[row]['left']) +'=========='+width);
+			}*/
+			
+			
+			
+			tr[col].appendChild(td[col][row]);
 		}
-		tbody.appendChild(tr[row]);
+		tbody.appendChild(tr[col]);
+	}
+	
+	//要合并哪一行/列
+	/*for(var i=0;i<rowData.length;i++){
+		if(rowData[i]['right'] - rowData[i]['left'] >box[-1][i]['width']){
+			td[1][i]['@colspan']=2;
+			td[1][i+1] = new XML('<span>1</span>');
+		}
 	}*/
 	
-	//数据源从低到高排序
-	var dataMap = {},
-		dataIndex = [],
-		newData = [];
-	for(var i=1;i<len;i++){
-		var item = this.data.childs[i],
-			key = item.top * i;//避免相同的key
-			
-		dataIndex.push(key);
-		dataMap[key] = item;
-		
-	}
-	//dataIndex排序
-	dataIndex.sort(function(a,b){return a-b});
 	
-	for(var i in dataIndex){
-		var key = dataIndex[i];
-		newData.push(dataMap[key]);
-	}
-	
-	var col = {};
-	for(var i=0;i<len;i++){
-		var data = newData;
-		col[i] = new XML('<td align="left" valign="top">'+i+'</td>');
-		if(i==0){
-			col[i]['@width'] = data[1].left;
-			col[i]['@height'] = data[1].top;
-		}else{
-			var item = data[i];
-			col[i]['@width'] = item.right - item.left;
-			col[i]['@height'] = item.bottom - item.top;
-			$.writeln(item.textInfo)
-			$.writeln(item.textInfo.contents)
-		}
-		tbody.appendChild(col[i]);
-	}
-	
-	
-	this.htmlContent = table.toXMLString();
+	this.htmlContent = this.formatHtml(table.toXMLString());
 };
+
+toPage.prototype.getTdSpan = function(data,width){
+	
+}
 
 /**
  * 获取文本元素
@@ -194,7 +256,7 @@ toPage.prototype.getTextElement = function(item,n,overValue){
 	var element = elm;
 	//有链接
 	if(typeof(item.link) != 'undefined'){
-		element = new XML('<a href="'+item.link.href+'"></a>');
+		element = new XML('<a href="'+item.link.href+'">1</a>');
 		elm.appendChild(element);
 	}
 	
@@ -203,10 +265,10 @@ toPage.prototype.getTextElement = function(item,n,overValue){
 		var text = item.textInfo.contents,
 			newText = [],
 			style= [];
-		for(var i in item.textInfo.textRange){
+		for(var i=0;i<item.textInfo.textRange.length;i++){
 			var each = item.textInfo.textRange[i],
-				className = 'style'+n+'_'+i,
-				span = new XML('<span class="'+className+'">'+this.replaceNewlineAndSpace(text.substring(each.range[0],each.range[1]))+'</span>');
+				className = 'style'+n+'_'+i;
+				var span = new XML('<span class="'+className+'">'+this.replaceNewlineAndSpace(text.substring(each.range[0],each.range[1]))+'</span>');
 			this.styleCss.appendChild("."+className+'{font-family:\''+each.font+'\';color:#'+each.color+';font-size:'+each.size+'px;}');
 			elm.appendChild(span);
 		}
@@ -316,4 +378,36 @@ toPage.prototype.replaceNewlineAndSpace = function(str){
  */
 toPage.prototype.formatHtml = function(str){
 	return str.replace(new RegExp(this.space, 'g'), "&nbsp;");
+};
+
+/**
+ * 数组排序 
+ * @param {Object} key
+ * @param {Object} t
+ * @param {Object} fix
+ */
+Array.prototype.sortObjectWith = function(key, t, fix) {
+	if (!this.length) {
+		return this;
+	}// 空数组
+	t = t === 'des' ? 'des' : 'asc';
+	// ascending or descending sorting, 默认 升序
+	fix = Object.prototype.toString.apply(fix) === '[object Function]' ? fix : function(key) {
+		return key;
+	};
+	switch( Object.prototype.toString.apply( fix.call({},this[0][key]) ) ) {
+		case '[object Number]':
+			return this.sort(function(a, b) {
+				return t === 'asc' ? (fix.call({}, a[key]) - fix.call({}, b[key]) ) : (fix.call({}, b[key]) - fix.call({}, a[key]));
+			});
+		case '[object String]':
+			return this.sort(function(a, b) {
+				return t === 'asc' ? fix.call({}, a[key]).localeCompare(fix.call({}, b[key])) : fix.call({}, b[key]).localeCompare(fix.call({}, a[key]));
+			});
+		default:
+			return this;
+		// 关键字不是数字也不是字符串, 无法排序
+	}
 }
+
+
