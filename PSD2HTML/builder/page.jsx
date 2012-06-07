@@ -1,6 +1,6 @@
 ﻿// @include "../lib/json2-min.jsx"
 // @include "../lib/psd.jsx"
-// @include "../lib/toHtml.jsx"
+// @include "../lib/toPage.jsx"
 
 //alert(JSON.stringify(APP.OPTION)); //设置面板的设置结果
 var appOp = APP.OPTION;
@@ -27,6 +27,7 @@ if(APP.OPTION.builder != "normal"){
 }else{
    data = psd.getTextLayersAndSlices(option);
 }
-toHtml.init(data,APP,psd);
+//IO.saveFile("D:\\home\\a.js", JSON.stringify(data), "gb2312");
+new toPage(data,APP,psd);
 psd = null;
 //alert(JSON.stringify(data));
