@@ -1,4 +1,5 @@
 // @include "io.jsx"
+// @include "json2-min.jsx"
 
 function toPage(data, APP, psd,option){
 	//数据源
@@ -17,6 +18,8 @@ function toPage(data, APP, psd,option){
 	//样式集合
 	this.styleCss = new XML('<style type="text/css"></style>');
 	
+	this.textLayers = psd.getTextLayers();
+	
 	//文件编码
 	if(typeof(option) != 'undefined' && typeof(option.encode) != 'undefined'){
 		this.encode = option.encode;
@@ -27,17 +30,22 @@ function toPage(data, APP, psd,option){
 	//文件保存路径
 	this.filePath = psd.dir + "/" + psd.doc.name.split(".")[0] + ".html";
 	//生成模版
-	switch(APP.OPTION.builder) {
+	/*switch(APP.OPTION.builder) {
 		case "EDM":
+			this.type = "edm";
 			this.getEDM();
 			break;
 		case "BBS":
+			this.type = "bss";
 			this.getBSS();
 			break;
 		default:
-			this.parseSimplePage();
+			this.type = "edm";
+			this.createTable();
 			break;
-	}	
+	}*/
+	this.type = "edm";
+	this.createTable();	
 	//存储文件 
 	this.saveFile();
 	
@@ -122,20 +130,28 @@ toPage.prototype.parseSimplePage = function(){
 		tr = {},
 		td = {},
 		exclude = {};
-	//设置表格的背景
-	table['@background'] = 'slices/' + this.data.childs[0].name;
 	//tbody归位
 	table.appendChild(tbody);
 	
-	//数组排序
+	
 	var colData = [],
 		rowData = [],
-		len = 0;
-	for(var i=1;i<this.data.childs.length;i++){
-		len++;
-		colData.push(this.data.childs[i]);
-		rowData.push(this.data.childs[i]);
+		len = 0,
+		bgImg = '';
+	//筛选有效数据
+	for(var i=0;i<this.data.childs.length;i++){
+		if(this.data.childs[i]['kind'] == 'LayerKind.NORMAL'){
+			bgImg = this.data.childs[i]['name']
+		}else{
+			len++;
+			colData.push(this.data.childs[i]);
+			rowData.push(this.data.childs[i]);
+		}
 	}
+	
+	//设置表格的背景
+	table['@background'] = 'slices/' + bgImg;
+	//数组排序
 	colData.sortObjectWith('top','asc');
 	rowData.sortObjectWith('left','asc');
 	
@@ -213,7 +229,7 @@ toPage.prototype.parseSimplePage = function(){
 					top:colData[col]['top'],
 					bottom:colData[col]['bottom']
 				});
-				exclude[row+"_"+col] = true;
+				exclude[col+"_"+row] = true;
 			}
 					
 			
@@ -228,27 +244,130 @@ toPage.prototype.parseSimplePage = function(){
 	
 	//要合并那些呢？
 	var merge = {};
-	for(var c=1;c<len;c++){
-		for(var r=1;r<len;r++){
+	for(var c=0;c<len;c++){
+		for(var r=0;r<len;r++){
 			for(var d=0;d<removeRow.length;d++){
 				if((rowData[r]['left'] > removeRow[d]['left'] && rowData[r]['right'] <= removeRow[d]['right']) || (colData[c]['top'] > removeRow[d]['top'] && colData[c]['bottom'] > removeRow[d]['bottom'])){
-					if(typeof(exclude[c+'_'+r]) == 'undefined'){
-						td[c][r].setLocalName(this.trTempStr);
-					}else{
-						td[c][r]['@rowspan'] = r+1;
-						td[c][r]['@colspan'] = c+1;
-					}
+					td[c][r].setLocalName(this.trTempStr);
 				}
 			}
+			
 		}
 	}
 	
 	this.htmlContent = this.formatHtml(table.toXMLString());
 };
 
-toPage.prototype.getTdSpan = function(data,width){
+toPage.prototype.arrayUnique = function(arr){
+	var o = {}, a = [], it;
+	for (var i = 0, l = arr.length; i < l; i++) {
+		it = arr[i];
+		if(!o[it]) a.push(it);
+		o[it] = true;
+	}
+	return a;
+};
+toPage.prototype.getCellData = function(){
+	var xset = [0, this.width], yset = [0, this.height];
+
+	for(var i = 0, l = this.textLayers.length; i < l; i++){
+		var layer = this.textLayers[i];
+		xset.push(layer.left);
+		yset.push(layer.top);
+	}
+
+	xset = this.arrayUnique(xset).sort(function(a,b){ return a - b;});
+	yset = this.arrayUnique(yset).sort(function(a,b){ return a - b;});
 	
-}
+	var arr = {rows:yset.length - 1, cols:xset.length - 1, cells:[]};
+
+	for(i = 0, l = yset.length; i < l; i++){
+		var y1 = yset[i], y2 = yset[i+1];
+		if(!y2) break;
+
+		for(var j = 0, l2 = xset.length; j < l2; j++){
+			var x1 = xset[j], x2 = xset[j+1];
+			if(!x2) break;
+
+			var data = {x:x1, y:y1, width:x2 - x1, height:y2 - y1};
+			arr.cells.push(data);
+		}
+	}
+	return arr; 
+};
+toPage.prototype.m = 0;
+toPage.prototype.createTable = function(){
+	var bgImg = "";
+	//找出背景图片
+	for(var i=0;i<this.data.childs.length;i++){
+		if(this.data.childs[i]['kind'] == 'LayerKind.NORMAL'){
+			bgImg = this.data.childs[i]['name']
+		}
+	}
+	
+	var o = this.getCellData();
+
+	var table = new XML('<table background="slices/'+bgImg+'" width="'+this.width+'" border="0" cellspacing="0" cellpadding="0"></table>');
+
+	for(var i = 0, cells = o.cells, l = cells.length; i < l; i++){
+		if(i % o.cols === 0){
+			var tr = new XML('<tr></tr>');
+			table.appendChild(tr);
+		}
+		var cell = cells[i];
+		if(cell.hasMerge) continue;
+		
+		var td = new XML('<td width="'+cell.width+'" height="'+cell.height+'" align="left" valign="top">'+this.space+'</td>');
+		
+		for(var j = 0, l2 = this.textLayers.length; j < l2; j++){
+			var layer = this.textLayers[j];
+			if(layer.left === cell.x && layer.top === cell.y){
+				
+				layer.width = layer.right - layer.left;
+				layer.height = layer.bottom - layer.top;
+				
+				
+				var n = 1;
+				toPage.m = 1;
+				(function(t){
+					// 横向合并
+					var mergeColCell = cells[i+toPage.m];
+					
+					if(layer.width > t.width && !!mergeColCell){
+						toPage.m++;
+						t.width = t.width + cells[i+1].width;
+						td['@width'] = t.width;
+						td['@colspan'] = toPage.m;
+						$.writeln(mergeColCell);
+						mergeColCell.hasMerge = true;
+						arguments.callee(t);
+					}
+					// 纵向合并
+					if(layer.height > t.height){
+						n++;
+						t.height = t.height + cells[i+o.cols].height;
+						td['@height'] = t.height;
+						td['@rowspan'] = n;
+						
+						var k = toPage.m;
+						while(k--){
+							$.writeln('hasMerge--'+i+'-------------'+j)
+							if(!!cells[i+o.cols * (n - 1)+k]) cells[i+o.cols * (n - 1)+k].hasMerge = true;
+						}
+						arguments.callee(t);
+					}
+				})(cell);
+				
+				td.appendChild(this.getTextElement(layer,0));
+				td['@abc'] = i+'__'+j;
+				td['@style'] = this.setTextCss(layer,0).join(";")+';';
+			}
+		}
+		tr.appendChild(td);
+	}
+	
+	this.htmlContent = this.formatHtml(table.toXMLString());
+};
 
 /**
  * 获取文本元素
@@ -260,37 +379,54 @@ toPage.prototype.getTextElement = function(item,n,overValue){
 	if(typeof(item.textInfo) == 'undefined' && typeof (item.link) != 'undefined') {
 		//没有文本的空链接
 		elm = new XML('<a href="' + item.link.href + '">'+this.space+'</a>');
-		elm['@class'] = 'absolute style'+n;
-		this.setTextCss(item,n,overValue);
+		var style = this.setTextCss(item,n,overValue);
+		if(this.type == 'page'){
+			elm['@class'] = 'absolute style'+n;
+		}else{
+			style.push('display:inline-block');
+			elm['@style'] = style.join(';')+';';
+		}
 		return elm;
 	}
 	
 	var element = elm;
 	//有链接
 	if(typeof(item.link) != 'undefined'){
-		element = new XML('<a href="'+item.link.href+'">1</a>');
+		element = new XML('<a href="'+item.link.href+'"></a>');
 		elm.appendChild(element);
 	}
 	
-	//如果文本中含义字中属性
+	//如果文本中含有字中属性
 	if(typeof(item.textInfo.textRange) != 'undefined' && item.textInfo.textRange.length > 1){
 		var text = item.textInfo.contents,
 			newText = [],
 			style= [];
 		for(var i=0;i<item.textInfo.textRange.length;i++){
+			
 			var each = item.textInfo.textRange[i],
 				className = 'style'+n+'_'+i;
-				var span = new XML('<span class="'+className+'">'+this.replaceNewlineAndSpace(text.substring(each.range[0],each.range[1]))+'</span>');
-			this.styleCss.appendChild("."+className+'{font-family:\''+each.font+'\';color:#'+each.color+';font-size:'+each.size+'px;}');
-			elm.appendChild(span);
+			if(i>0 && each[0] == item.textInfo.textRange[i-1][0]){
+				
+			}else{
+				var span = new XML('<span class="'+className+'">'+this.replaceNewlineAndSpace(text.substring(each.range[0],each.range[1]))+'</span>'),
+				style = 'font-family:\''+each.font+'\';color:#'+each.color+';font-size:'+each.size+'px;';
+				//是网页样式写到全局的css中，如果不是，写到内联
+				if(this.type == 'page'){
+					this.styleCss.appendChild("."+className+'{'+style+'}');
+				}else{
+					span['@style'] = style;
+					element['@style'] = style;
+				}
+				element.appendChild(span);
+			}
 		}
 	}else{
-		elm.appendChild(new XML(this.replaceNewlineAndSpace(item.textInfo.contents)));
+		element.appendChild(new XML(this.replaceNewlineAndSpace(item.textInfo.contents)));
 	}
 	//设置css
 	this.setTextCss(item,n,overValue);
 	
-	return elm;
+	return element;
 };
 /**
  * 获取文本css 
@@ -305,8 +441,10 @@ toPage.prototype.setTextCss = function(item,n,overValue){
 	if(typeof(overValue.left) == "undefined"){
 		overValue.left = 0;
 	}	
-	//position left	
-	style.push('left:' + (item.left + 2 - (overValue.left/2)) + 'px');
+	if(this.type == 'page'){
+		//position left	
+		style.push('left:' + (item.left + 2 - (overValue.left/2)) + 'px');
+	}
 	
 	//有链接无文本，这种比较特殊，因为他没有textInfo，优先return
 	if( typeof (textInfo) == 'undefined' && typeof (item.link) != 'undefined') {
@@ -315,18 +453,12 @@ toPage.prototype.setTextCss = function(item,n,overValue){
 		style.push('top:' + item.top + 'px');
 		style.push('text-decoration:none');
 	}else{
-		//z-index
-		style.push('z-index:' + item.index);
-		//定位
-		style.push('top:' + (item.top - 3) + 'px');
 		//加粗
 		if(textInfo.bold === true) {
 			style.push('font-weight:blod');
 		}
 		//颜色
 		style.push('color:#' + textInfo.color);
-		//字体
-		style.push('font-family:\'' + textInfo.font + '\'');
 		//斜体
 		if(textInfo.italic === true) {
 			style.push('font-style:italic');
@@ -369,9 +501,18 @@ toPage.prototype.setTextCss = function(item,n,overValue){
 		style.push('font-size:' + fontSize + 'px');
 		//对齐
 		style.push('text-align:' + textInfo.textAlign + '');
-		//外边距
-		style.push('margin-right:0px');
-		style.push('margin-bottom:0px');
+		//非网页不需要这些样式
+		if(this.type == 'page'){
+			//字体
+			style.push('font-family:\'' + textInfo.font + '\'');
+			//外边距
+			style.push('margin-right:0px');
+			style.push('margin-bottom:0px');
+			//z-index
+			style.push('z-index:' + item.index);
+			//定位
+			style.push('top:' + (item.top - 3) + 'px');
+		}
 	}
 	return style;
 	this.styleCss.appendChild('.style'+n+'{'+style.join(";")+';}');
@@ -397,7 +538,12 @@ toPage.prototype.formatHtml = function(str){
 		}
 	}
 	str = html.join("\n");
-	return str.replace(new RegExp(this.space, 'g'), "&nbsp;");
+	if(this.type == 'page'){
+		str = str.replace(new RegExp(this.space, 'g'), "&nbsp;");
+	}else{
+		str = str.replace(new RegExp(this.space, 'g'), "");
+	}
+	return str;
 };
 
 /**
