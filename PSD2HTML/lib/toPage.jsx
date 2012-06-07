@@ -310,7 +310,7 @@ toPage.prototype.createTable = function(){
 	var table = new XML('<table background="slices/'+bgImg+'" width="'+this.width+'" border="0" cellspacing="0" cellpadding="0"></table>');
 
 	for(var i = 0, cells = o.cells, l = cells.length; i < l; i++){
-		if(i % o.cols === 0){
+		if(i % o.rows === 0){
 			var tr = new XML('<tr></tr>');
 			table.appendChild(tr);
 		}
@@ -321,6 +321,7 @@ toPage.prototype.createTable = function(){
 		
 		for(var j = 0, l2 = this.textLayers.length; j < l2; j++){
 			var layer = this.textLayers[j];
+			
 			if(layer.left === cell.x && layer.top === cell.y){
 				
 				layer.width = layer.right - layer.left;
@@ -334,12 +335,11 @@ toPage.prototype.createTable = function(){
 					var mergeColCell = cells[i+toPage.m];
 					
 					if(layer.width > t.width && !!mergeColCell){
+						cells[i+toPage.m].hasMerge = true;
 						toPage.m++;
-						t.width = t.width + cells[i+1].width;
+						t.width = t.width + mergeColCell.width;
 						td['@width'] = t.width;
 						td['@colspan'] = toPage.m;
-						$.writeln(mergeColCell);
-						mergeColCell.hasMerge = true;
 						arguments.callee(t);
 					}
 					// 纵向合并
@@ -351,7 +351,6 @@ toPage.prototype.createTable = function(){
 						
 						var k = toPage.m;
 						while(k--){
-							$.writeln('hasMerge--'+i+'-------------'+j)
 							if(!!cells[i+o.cols * (n - 1)+k]) cells[i+o.cols * (n - 1)+k].hasMerge = true;
 						}
 						arguments.callee(t);
