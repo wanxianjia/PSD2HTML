@@ -124,15 +124,12 @@ var APP = {};
 				}');
 				APP.win.center();
 				APP.win.show();
-				
-				if(APP.OPTION.builder === 'normal'){
-					$.evalFile(File($.fileName).parent+'/PSD2HTML/builder/page.jsx');
-				}else if(APP.OPTION.builder === 'BBS' || APP.OPTION.builder === 'EDM'){
-					alert('该功能暂未开放！');
-					return;
-				}else if(APP.OPTION.builder === 'file'){
+				if(APP.OPTION.builder === 'file'){
 					$.evalFile(File($.fileName).parent+'/PSD2HTML/builder/importFile.jsx');
-				}
+				}else{
+                     $.writeln(111)
+                      $.evalFile(File($.fileName).parent+'/PSD2HTML/builder/page.jsx');
+                  }
 				APP.win.close();
 				alert("处理完成！");
 			}

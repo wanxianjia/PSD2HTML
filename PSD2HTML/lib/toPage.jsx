@@ -1,5 +1,4 @@
 // @include "io.jsx"
-// @include "json2-min.jsx"
 
 function toPage(data, APP, psd,option){
 	//数据源
@@ -30,22 +29,20 @@ function toPage(data, APP, psd,option){
 	//文件保存路径
 	this.filePath = psd.dir + "/" + psd.doc.name.split(".")[0] + ".html";
 	//生成模版
-	/*switch(APP.OPTION.builder) {
+	switch(APP.OPTION.builder) {
 		case "EDM":
 			this.type = "edm";
-			this.getEDM();
+			this.getEdmPage();
 			break;
 		case "BBS":
 			this.type = "bss";
-			this.getBSS();
+			this.getBbsPage();
 			break;
 		default:
-			this.type = "edm";
-			this.createTable();
+			this.type = "page";
+			this.getPage();
 			break;
-	}*/
-	this.type = "edm";
-	this.createTable();	
+	}
 	//存储文件 
 	this.saveFile();
 	
@@ -63,9 +60,9 @@ toPage.prototype.saveFile = function(){
 };
 
 /**
- * 解析网页  
+ * 网页  
  */
-toPage.prototype.parsePage = function(){
+toPage.prototype.getPage = function(){
 	var html = new XML('<html xmlns="http://www.w3.org/1999/xhtml"></html>'),
 		head = new XML('<head></head>'),
 		title = new XML('<title>' + this.data.name + '</title>'),
@@ -74,6 +71,7 @@ toPage.prototype.parsePage = function(){
 		pageContent = new XML('<div class="psd2html page"></div>'), 
 		len = this.data.childs.length;
 	
+	head.appendChild(new XML('<meta name="builder" content="by psdToHtml,version 1.0" />'));
 	//设置content的样式
 	this.styleCss.appendChild(new XML('.page{height:' + this.height + 'px;width:952px;margin:0px auto -'+this.height+'px auto;}'));
 	//网页依赖的CSS文件	
@@ -121,143 +119,33 @@ toPage.prototype.parsePage = function(){
 };
 
 /**
- * 解析其他简单网页 
+ * edm 
  */
-toPage.prototype.parseSimplePage = function(){
-	//设置表格
-	var table = new XML('<table width="'+this.width+'" border="0" cellspacing="0" cellpadding="0"></table>'),
-		tbody = new XML('<tbody></tbody>'),
-		tr = {},
-		td = {},
-		exclude = {};
-	//tbody归位
-	table.appendChild(tbody);
+toPage.prototype.getEdmPage = function(){
+	var html = new XML('<html xmlns="http://www.w3.org/1999/xhtml"></html>'),
+		head = new XML('<head></head>'),
+		title = new XML('<title>' + this.data.name + '</title>'),
+		body = new XML('<body></body>');
 	
-	
-	var colData = [],
-		rowData = [],
-		len = 0,
-		bgImg = '';
-	//筛选有效数据
-	for(var i=0;i<this.data.childs.length;i++){
-		if(this.data.childs[i]['kind'] == 'LayerKind.NORMAL'){
-			bgImg = this.data.childs[i]['name']
-		}else{
-			len++;
-			colData.push(this.data.childs[i]);
-			rowData.push(this.data.childs[i]);
-		}
-	}
-	
-	//设置表格的背景
-	table['@background'] = 'slices/' + bgImg;
-	//数组排序
-	colData.sortObjectWith('top','asc');
-	rowData.sortObjectWith('left','asc');
-	
-		//tr集合
-	var tr = {},
-		//td集合
-		td = {},
-		//每个盒子的集合，用于记录每个td的宽高
-		box = {},
-		top = 0,
-		left = 0,
-		removeRow = [],
-		remove = [];
-		
-	for(var col=-1;col<len;col++){
-		var width = 0,height = 0;
-		//每个tr
-		tr[col] = new XML('<tr></tr>');
-		
-		if(col == -1){
-			//第一行
-			height = colData[0]['top'];
-		}else{
-			//非第一行
-			height = col < len-1 ? colData[col+1]['top'] - colData[col]['top'] : this.height - colData[col]['top'];
-		}
-		
-		left = 0;	
-		for(var row=-1;row<len;row++){
-			//每个td
-			if(typeof(td[col]) == 'undefined'){
-				td[col] = {};
-			}
-			
-			td[col][row] = new XML('<td align="left" valign="top"></td>');
-
-			if(row == -1){
-				//第一列
-				width = rowData[0]['left'];
-			}else{
-				//非第一列
-				width = row < len-1 ? rowData[row+1]['left'] - rowData[row]['left'] : this.width - rowData[row]['left'];
-			}	
-			
-			//第一行设置宽度
-			if(col == -1){
-				td[-1][row]['@width'] = width;
-			}
-			//第一列设置高度
-			if(row == -1){
-				td[col][-1]['@height'] = height;
-			}
-			
-			if(typeof(box[col]) == 'undefined'){
-				box[col] = {};
-			}
-			box[col][row] = {
-				width:width,
-				height:height
-			};
-			
-			var text = this.space;
-			
-			
-			if(row > -1 && col > -1){
-				
-			}
-			//文本显示的表格
-			if(row > -1 && col > -1 && colData[col]['top'] == rowData[row]['top']){
-				text = this.getTextElement(colData[col],0);
-				text['@style'] = this.setTextCss(colData[col],0).join(";");
-				removeRow.push({
-					left:colData[col]['left'],
-					right:colData[col]['right'],
-					top:colData[col]['top'],
-					bottom:colData[col]['bottom']
-				});
-				exclude[col+"_"+row] = true;
-			}
-					
-			
-			td[col][row].appendChild(text);
-			left += width;	
-			tr[col].appendChild(td[col][row]);
-		}
-		top += height;	
-		tbody.appendChild(tr[col]);
-	}
-	
-	
-	//要合并那些呢？
-	var merge = {};
-	for(var c=0;c<len;c++){
-		for(var r=0;r<len;r++){
-			for(var d=0;d<removeRow.length;d++){
-				if((rowData[r]['left'] > removeRow[d]['left'] && rowData[r]['right'] <= removeRow[d]['right']) || (colData[c]['top'] > removeRow[d]['top'] && colData[c]['bottom'] > removeRow[d]['bottom'])){
-					td[c][r].setLocalName(this.trTempStr);
-				}
-			}
-			
-		}
-	}
-	
-	this.htmlContent = this.formatHtml(table.toXMLString());
+	body.appendChild(this.parseSimplePage());
+	head.appendChild(title);
+	html.appendChild(head);
+	html.appendChild(body);
+	//设置全局的网页HTML代码内容
+	this.htmlContent = '<!DOCTYPE html>\n' + this.formatHtml(html.toXMLString());	
 };
 
+/**
+ * 帖子 
+ */
+toPage.prototype.getBbsPage = function(){
+	//设置全局的网页HTML代码内容
+	this.htmlContent = this.formatHtml(this.parseSimplePage().toXMLString());
+};
+
+/**
+ * 解析数组 
+ */
 toPage.prototype.arrayUnique = function(arr){
 	var o = {}, a = [], it;
 	for (var i = 0, l = arr.length; i < l; i++) {
@@ -267,6 +155,10 @@ toPage.prototype.arrayUnique = function(arr){
 	}
 	return a;
 };
+
+/**
+ * 获取所有单元格信息 
+ */
 toPage.prototype.getCellData = function(){
 	var xset = [0, this.width], yset = [0, this.height];
 
@@ -295,8 +187,13 @@ toPage.prototype.getCellData = function(){
 	}
 	return arr; 
 };
+
 toPage.prototype.m = 0;
-toPage.prototype.createTable = function(){
+
+/**
+ * 创建表格 
+ */
+toPage.prototype.parseSimplePage = function(){
 	var bgImg = "";
 	//找出背景图片
 	for(var i=0;i<this.data.childs.length;i++){
@@ -357,15 +254,17 @@ toPage.prototype.createTable = function(){
 					}
 				})(cell);
 				
-				td.appendChild(this.getTextElement(layer,0));
-				td['@abc'] = i+'__'+j;
-				td['@style'] = this.setTextCss(layer,0).join(";")+';';
+				
+				var div = new XML('<DIV></DIV>');
+				div['@style'] = this.setTextCss(layer,0).join(";")+';';
+				div.appendChild(this.getTextElement(layer,0));
+				td.appendChild(div);
 			}
 		}
 		tr.appendChild(td);
 	}
 	
-	this.htmlContent = this.formatHtml(table.toXMLString());
+	return table;
 };
 
 /**
@@ -404,11 +303,11 @@ toPage.prototype.getTextElement = function(item,n,overValue){
 			
 			var each = item.textInfo.textRange[i],
 				className = 'style'+n+'_'+i;
-			if(i>0 && each[0] == item.textInfo.textRange[i-1][0]){
+			if(i>0 && each['range'][0] == item.textInfo.textRange[i-1]['range'][0]){
 				
 			}else{
 				var span = new XML('<span class="'+className+'">'+this.replaceNewlineAndSpace(text.substring(each.range[0],each.range[1]))+'</span>'),
-				style = 'font-family:\''+each.font+'\';color:#'+each.color+';font-size:'+each.size+'px;';
+				style = 'font-family:\''+each.font+'\';color:#'+each.color+';font-size:'+each.size+'px;margin:0px;padding:0px;';
 				//是网页样式写到全局的css中，如果不是，写到内联
 				if(this.type == 'page'){
 					this.styleCss.appendChild("."+className+'{'+style+'}');
@@ -511,10 +410,13 @@ toPage.prototype.setTextCss = function(item,n,overValue){
 			style.push('z-index:' + item.index);
 			//定位
 			style.push('top:' + (item.top - 3) + 'px');
+		}else{
+			style.push('margin:0px');
+			style.push('padding:0px');
 		}
 	}
-	return style;
 	this.styleCss.appendChild('.style'+n+'{'+style.join(";")+';}');
+	return style;
 };
 /**
  * 替换换行符
@@ -544,35 +446,3 @@ toPage.prototype.formatHtml = function(str){
 	}
 	return str;
 };
-
-/**
- * 数组排序 
- * @param {Object} key
- * @param {Object} t
- * @param {Object} fix
- */
-Array.prototype.sortObjectWith = function(key, t, fix) {
-	if (!this.length) {
-		return this;
-	}// 空数组
-	t = t === 'des' ? 'des' : 'asc';
-	// ascending or descending sorting, 默认 升序
-	fix = Object.prototype.toString.apply(fix) === '[object Function]' ? fix : function(key) {
-		return key;
-	};
-	switch( Object.prototype.toString.apply( fix.call({},this[0][key]) ) ) {
-		case '[object Number]':
-			return this.sort(function(a, b) {
-				return t === 'asc' ? (fix.call({}, a[key]) - fix.call({}, b[key]) ) : (fix.call({}, b[key]) - fix.call({}, a[key]));
-			});
-		case '[object String]':
-			return this.sort(function(a, b) {
-				return t === 'asc' ? fix.call({}, a[key]).localeCompare(fix.call({}, b[key])) : fix.call({}, b[key]).localeCompare(fix.call({}, a[key]));
-			});
-		default:
-			return this;
-		// 关键字不是数字也不是字符串, 无法排序
-	}
-}
-
-

@@ -1,4 +1,4 @@
-﻿// @include "../lib/json2-min.jsx"
+// @include "../lib/json2-min.jsx"
 // @include "../lib/psd.jsx"
 // @include "../lib/toPage.jsx"
 
@@ -27,7 +27,5 @@ if(APP.OPTION.builder != "normal"){
 }else{
    data = psd.getTextLayersAndSlices(option);
 }
-//IO.saveFile("D:\\home\\a.js", JSON.stringify(data), "gb2312");
 new toPage(data,APP,psd);
 psd = null;
-//alert(JSON.stringify(data));

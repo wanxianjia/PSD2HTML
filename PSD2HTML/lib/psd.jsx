@@ -1,4 +1,4 @@
-ï»?// @include "json2-min.jsx"
+// @include "json2-min.jsx"
 // @include "web-fonts.jsx"
 
 //setting for app preferences
