@@ -215,7 +215,7 @@ toPage.prototype.parseSimplePage = function(){
 	var table = new XML('<table background="slices/'+bgImg+'" width="'+this.width+'" border="0" cellspacing="0" cellpadding="0"></table>');
 
 	for(var i = 0, cells = o.cells, l = cells.length; i < l; i++){
-		if(i % o.rows === 0){
+		if(i % o.cols === 0){
 			var tr = new XML('<tr></tr>');
 			table.appendChild(tr);
 		}
@@ -256,7 +256,7 @@ toPage.prototype.parseSimplePage = function(){
 						
 						var k = toPage.m;
 						while(k--){
-							if(!!cells[i+o.cols * (n - 1)+k]) cells[i+o.cols * (n - 1)+k].hasMerge = true;
+							if(!!cells[i + o.cols * (n - 1) + k]) cells[i + o.cols * (n - 1) + k].hasMerge = true;
 						}
 						arguments.callee(t);
 					}
