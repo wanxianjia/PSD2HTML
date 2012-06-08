@@ -1,4 +1,4 @@
-﻿/**
+/**
 * @author: wuming.xiaowm
 * @date : 5/18 2012
 * @description: 文件输入/输出

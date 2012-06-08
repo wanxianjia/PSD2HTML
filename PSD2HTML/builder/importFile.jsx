@@ -1,4 +1,4 @@
-﻿// @include "../lib/psd.jsx"
+// @include "../lib/psd.jsx" 
 
 var psd = new PSD({output:APP.OPTION.output});
 psd.option.exportImages = false;

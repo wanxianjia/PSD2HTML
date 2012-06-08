@@ -1,5 +1,5 @@
-﻿var JSON;
-if (!JSON) {
+var JSON;
+if (!JSON) { 
     JSON = {};
 }
 

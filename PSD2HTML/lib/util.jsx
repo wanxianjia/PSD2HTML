@@ -1,6 +1,6 @@
 /*
 * the util file, will contain all the util method
-*/
+*/ 
 
 String.prototype.trim = function() {
   return this.replace(/^[\s]+|[\s]+$/g, '');

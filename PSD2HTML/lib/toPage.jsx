@@ -5,7 +5,7 @@
  */
 
 
-function toPage(data, APP, psd,option){
+function toPage(data, APP, psd,option){ 
 	//数据源
 	this.data = data;
 	//APP object
