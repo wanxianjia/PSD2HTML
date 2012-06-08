@@ -3,6 +3,8 @@
 /**
  * 生成网页接口 
  */
+
+
 function toPage(data, APP, psd,option){
 	//数据源
 	this.data = data;
@@ -17,6 +19,7 @@ function toPage(data, APP, psd,option){
 	//空格临时占用符
 	this.space = '~~~PSD2HTMLSpace~~~';
 	this.trTempStr = '~~~td~~~';
+	this.emptyStr = '~~~emptyStr~~~';
 	//样式集合
 	this.styleCss = new XML('<style type="text/css"></style>');
 	
@@ -82,7 +85,7 @@ toPage.prototype.getPage = function(){
 	head.appendChild(new XML('<link href="http://img.china.alibaba.com/favicon.ico" rel="shortcut icon" />'));
 	head.appendChild(new XML('<meta http-equiv="Content-Type" content="text/html; charset=' + this.encode + '" />'));
 	head.appendChild(new XML('<link href="http://static.c.aliimg.com/css/app/vas/psd2html/style.css" rel="stylesheet" type="text/css" />'));
-	head.appendChild(new XML('<script src="http://static.c.aliimg.com/js/app/vas/psd2html/global-merge.js" type="text/javascript"></script>'));
+	head.appendChild(new XML('<script src="http://static.c.aliimg.com/js/app/vas/psd2html/global-merge.js" type="text/javascript">'+this.emptyStr+'</script>'));
 	//内联的CSS
 	head.appendChild(this.styleCss);
 	//网页标题
@@ -449,5 +452,5 @@ toPage.prototype.formatHtml = function(str){
 	}else{
 		str = str.replace(new RegExp(this.space, 'g'), "");
 	}
-	return str;
+	return str.replace(new RegExp(this.emptyStr, 'g'), "");
 };
