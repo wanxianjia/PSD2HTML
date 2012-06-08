@@ -1,5 +1,8 @@
 // @include "io.jsx"
 
+/**
+ * 生成网页接口 
+ */
 function toPage(data, APP, psd,option){
 	//数据源
 	this.data = data;
@@ -71,13 +74,15 @@ toPage.prototype.getPage = function(){
 		pageContent = new XML('<div class="psd2html page"></div>'), 
 		len = this.data.childs.length;
 	
+	//头信息
 	head.appendChild(new XML('<meta name="builder" content="by psdToHtml,version 1.0" />'));
 	//设置content的样式
 	this.styleCss.appendChild(new XML('.page{height:' + this.height + 'px;width:952px;margin:0px auto -'+this.height+'px auto;}'));
-	//网页依赖的CSS文件	
+	//网页依赖的CSS/js文件	
 	head.appendChild(new XML('<link href="http://img.china.alibaba.com/favicon.ico" rel="shortcut icon" />'));
 	head.appendChild(new XML('<meta http-equiv="Content-Type" content="text/html; charset=' + this.encode + '" />'));
 	head.appendChild(new XML('<link href="http://static.c.aliimg.com/css/app/vas/psd2html/style.css" rel="stylesheet" type="text/css" />'));
+	head.appendChild(new XML('<script src="http://static.c.aliimg.com/js/app/vas/psd2html/global-merge.js" type="text/javascript"></script>'));
 	//内联的CSS
 	head.appendChild(this.styleCss);
 	//网页标题
