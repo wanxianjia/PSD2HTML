@@ -3,7 +3,7 @@
 /*
 <javascriptresource> 
 <name>PSD TO HTML</name> 
-<about>https://github.com/wanxianjia/PSD2HTML</about> 
+<about>v1.0--https://github.com/wanxianjia/PSD2HTML</about> 
 <menu>help</menu> 
 <enableinfo>true</enableinfo> 
 </javascriptresource> 
