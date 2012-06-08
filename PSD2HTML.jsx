@@ -1,7 +1,9 @@
-﻿/*
+// @include "PSD2HTML/lib/i18n.jsx"
+
+/*
 <javascriptresource> 
 <name>PSD TO HTML</name> 
-<about>PSD TO HTML</about> 
+<about>https://github.com/wanxianjia/PSD2HTML</about> 
 <menu>help</menu> 
 <enableinfo>true</enableinfo> 
 </javascriptresource> 
@@ -17,21 +19,22 @@ app.bringToFront(); // bring top
 // $.level = 0;
 // debugger; // launch debugger on next line
 
-var APP = {};
+
+var APP = {version: '1.0'};
 
 (function(){
 	APP.ui = 'dialog{\
-		text:"设置",\
+		text:"'+i18n("setting")+'",\
 		option: Group{\
 			orientation:"column",\
 			alignChildren: "left",\
 			builder: Panel{\
-				text: "请选择生成页面类型",\
+				text: "'+i18n("selectPageType")+'",\
 				a: Group{\
-					j: RadioButton{text:"静态页", helpTip:"Normal page", data:"normal", value:true}\
-					e: RadioButton{text:"EDM", helpTip:"EDM", data:"EDM"},\
-					l: RadioButton{text:"论坛帖", helpTip:"Editor code", data:"BBS"},\
-					i: RadioButton{text:"Import JSON and Image", data:"file"}\
+					j: RadioButton{text:"'+i18n("staticPage")+'", helpTip:"Normal page", data:"normal", value:true}\
+					e: RadioButton{text:"'+i18n("edm")+'", helpTip:"EDM", data:"EDM"},\
+					l: RadioButton{text:"'+i18n("bbs")+'", helpTip:"Editor code", data:"BBS"},\
+					i: RadioButton{text:"Export JSON and Image", data:"file"}\
 				}\
 			},\
 			image: Group{\
@@ -39,26 +42,26 @@ var APP = {};
 				orientation: "column",\
 				a: Group{\
 					alignChildren: "left",\
-					t: StaticText{text:"图片格式："},\
+					t: StaticText{text:"'+i18n("imgFormat")+'"},\
 					jpg: RadioButton{text:"jpg", value:true},\
 					p8: RadioButton{text:"png-8"},\
 					p24: RadioButton{text:"png-24"}\
 				},\
 				q: Group{\
 					alignChildren: "left",\
-					t: StaticText{text:"图片质量：", helpTip:"Image quality"},\
+					t: StaticText{text:"'+i18n("imgQuality")+'", helpTip:"Image quality"},\
 					s: EditText{ text:"60", preferredSize: [50, 20] }\
 				}\
 			},\
 			output: Group{\
 				orientation:"row",\
-				b: Button{text:"选择输出文件夹", properties:{name:"open"}, helpTip:"选择输出文件夹"},\
-				s: EditText  { text:"~/Documents", preferredSize:[180, 20], helpTip:"默认为我的文档"}\
+				b: Button{text:"'+i18n("selectEmportFolder")+'", properties:{name:"open"}, helpTip:"'+i18n("selectEmportFolder")+'"},\
+				s: EditText  { text:"~/Documents", preferredSize:[180, 20], helpTip:"'+i18n("defaultToMyDocument")+'"}\
 			}\
 		},\
 		buttons:Group{\
-			ok: Button{text:"确定",  properties:{name:"ok"}},\
-			cancel: Button{text:"取消",  properties:{name:"cancel"}}\
+			ok: Button{text:"'+i18n("ok")+'",  properties:{name:"ok"}},\
+			cancel: Button{text:"'+i18n("cancel")+'",  properties:{name:"cancel"}}\
 		}\
 	}';
 
@@ -72,7 +75,7 @@ var APP = {};
 	};
 	// 选择文件夹事件
 	APP.win.option.output.b.onClick = function(){
-		var output = Folder.selectDialog ('选择输出文件夹','~/Documents');
+		var output = Folder.selectDialog (i18n("selectEmportFolder"),'~/Documents');
 		if(output){
 			APP.win.option.output.s.text  = APP.OPTION.output = output;
 		}
@@ -101,7 +104,7 @@ var APP = {};
 	});
 	APP.win.buttons.ok.onClick = function(){
 		if(!APP.OPTION.output){
-			alert('请选择输出文件夹');
+			alert(i18n("selectEmportFolder"));
 		}else{
 			var radios = APP.win.option.builder.a.children;
 			for(var i = 0, l = radios.length; i < l; i++){
@@ -112,14 +115,14 @@ var APP = {};
 				}
 			}
 			if(!APP.OPTION.builder){
-				alert('请选择生成器');
+				alert(i18n("selectPageType"));
 			}else{
                   
 				APP.OPTION.image.quality = APP.win.option.image.q.s.text;
 				APP.win.close();
 				APP.win = new Window('palette{\
 					g: Group{\
-						tx: StaticText{text:"Running..."},\
+						tx: StaticText{text:"'+i18n("running")+'"},\
 					}\
 				}');
 				APP.win.center();
@@ -127,11 +130,10 @@ var APP = {};
 				if(APP.OPTION.builder === 'file'){
 					$.evalFile(File($.fileName).parent+'/PSD2HTML/builder/importFile.jsx');
 				}else{
-                     $.writeln(111)
-                      $.evalFile(File($.fileName).parent+'/PSD2HTML/builder/page.jsx');
-                  }
+                    $.evalFile(File($.fileName).parent+'/PSD2HTML/builder/page.jsx');
+                }
 				APP.win.close();
-				alert("处理完成！");
+				alert(i18n("processDone"));
 			}
 		}
 		

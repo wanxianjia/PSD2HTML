@@ -10,11 +10,11 @@ function PSD(option){
 	this.doc = app.activeDocument;
 	this.docs = app.documents;
 	this.tree = {name:this.doc.name, imgCount:0, childs:[]};
-	this.textLayers = [];        //存储所有的文本图层
+	this.textLayers = [];        //瀛樺偍鎵€鏈夌殑鏂囨湰鍥惧眰
 	this.linkReg = /^[aA]$|^[aA]-/;
 	this.layers = this.doc.layers;
 	this.option = {
-		exportImages: false,		//�?否�?�出图片
+		exportImages: false,		//鏄?鍚﹀?煎嚭鍥剧墖
 		output: File($.fileName).parent.parent+'/output/'
 	}
 	if(option){
@@ -116,7 +116,7 @@ PSD.fn = PSD.prototype = {
 
 			if(kind === 'LayerKind.TEXT'){
 				var textItem = layer.textItem;
-				// 歡�try catch实属无赖，当图层无文�?时，无�?�textItem.font，textItem.contents都异常，无法作出判断�?
+				// 姝¤try catch瀹炲睘鏃犺禆锛屽綋鍥惧眰鏃犳枃鏈?鏃讹紝鏃犺?簍extItem.font锛宼extItem.contents閮藉紓甯革紝鏃犳硶浣滃嚭鍒ゆ柇銆?
 				try{
 					if(WEBFONTS.indexOf(textItem.font) < 0 || this.getEffects().length > 0 || textItem.warpStyle !== WarpStyle.NONE){
 						if(this.linkReg.test(layer.name)){
@@ -233,7 +233,7 @@ PSD.fn = PSD.prototype = {
 			options.format = SaveDocumentType.PNG;
 			newDoc.exportDocument (img, ExportType.SAVEFORWEB, options);
 			newDoc.close(SaveOptions.DONOTSAVECHANGES);
-		}catch(e){	//TODO �?前发现具有蒙层的图层无法执�?�layer.copy();
+		}catch(e){	//TODO 鐩?鍓嶅彂鐜板叿鏈夎挋灞傜殑鍥惧眰鏃犳硶鎵ц?宭ayer.copy();
 			alert(e+'#####'+layer.name);
 		}
 		this.visibleTextLayers();
@@ -260,7 +260,7 @@ PSD.fn = PSD.prototype = {
 			this.textLayers[i].visible = true;
 		}
 	},
-	/* �?动切片并导出图片 */
+	/* 鑷?鍔ㄥ垏鐗囧苟瀵煎嚭鍥剧墖 */
 	autoSliceAndExport: function(options, height){
 		this.hiddenTextLayers();
 		
@@ -275,7 +275,7 @@ PSD.fn = PSD.prototype = {
 		}
 		
 		if(!height){
-			// 生成测试图片，以便�?�算每个切片的高�?
+			// 鐢熸垚娴嬭瘯鍥剧墖锛屼互渚胯?＄畻姣忎釜鍒囩墖鐨勯珮搴?
 			var testImg = File(this.dir + '/' + 'img.tmp.' + extension);
 			this.doc.exportDocument (testImg, ExportType.SAVEFORWEB, options);
 			var size = testImg.length, HEIGHT = 120;
@@ -285,7 +285,7 @@ PSD.fn = PSD.prototype = {
 			}else{
 				HEIGHT = Math.round(this.getHeight() / Math.ceil(size / 70000));
 			}
-			testImg.remove();	//删除测试图片
+			testImg.remove();	//鍒犻櫎娴嬭瘯鍥剧墖
 		}else{
 			var HEIGHT = height;
 		}
@@ -335,7 +335,7 @@ PSD.fn = PSD.prototype = {
 		//this.exportJSON(data);
 		return data;
 	},
-	/* 获取所有文�?图层信息，return Array */
+	/* 鑾峰彇鎵€鏈夋枃鏈?鍥惧眰淇℃伅锛宺eturn Array */
 	getTextLayers: function(){
 		return _textLayersInfo;
 	},
