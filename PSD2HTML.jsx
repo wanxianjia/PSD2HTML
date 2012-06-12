@@ -1,6 +1,4 @@
-// @include "PSD2HTML/lib/i18n.jsx"
-
-/*
+ï»?/*
 <javascriptresource> 
 <name>PSD TO HTML</name> 
 <about>v1.0--https://github.com/wanxianjia/PSD2HTML</about> 
@@ -18,7 +16,7 @@ app.bringToFront(); // bring top
 // debug level: 0-2 (0:disable, 1:break on error, 2:break at beginning)
 // $.level = 0;
 // debugger; // launch debugger on next line
-
+// @include "PSD2HTML/lib/i18n.jsx"
 
 var APP = {version: '1.0'};
 
