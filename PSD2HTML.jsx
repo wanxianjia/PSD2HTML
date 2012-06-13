@@ -1,4 +1,4 @@
-ï»?/*
+/*
 <javascriptresource> 
 <name>PSD TO HTML</name> 
 <about>v1.0--https://github.com/wanxianjia/PSD2HTML</about> 
