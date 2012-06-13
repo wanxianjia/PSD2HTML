@@ -4,7 +4,7 @@
 <about>v1.0--https://github.com/wanxianjia/PSD2HTML</about> 
 <menu>help</menu> 
 <enableinfo>true</enableinfo> 
-</javascriptresource> 
+</javascriptresource>
 */
 
 // Settings
