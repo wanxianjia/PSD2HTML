@@ -109,6 +109,8 @@ PSD.fn = PSD.prototype = {
 				visible:layer.visible, 
 				left:left, top:top, 
 				right:right, bottom:bottom, 
+				width:right - left,
+				height:bottom - top,
 				kind:kind,
 				isBackgroundLayer: layer.isBackgroundLayer,
 				index: _index
@@ -145,7 +147,8 @@ PSD.fn = PSD.prototype = {
 						italic: textItem.fauxItalic,
 						indent: Math.round(textItem.firstLineIndent.value),
 						underline: textItem.underline == UnderlineType.UNDERLINEOFF ? false : true,
-						textRange: this.getTextRange()
+						textRange: this.getTextRange(),
+						position:{x: textItem.position[0].value, y: textItem.position[1].value}
 					};
 					// line height
 					if(!textItem.useAutoLeading){
