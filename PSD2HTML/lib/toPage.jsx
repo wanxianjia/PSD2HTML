@@ -1,21 +1,16 @@
 // @include "io.jsx"
-
 /**
  * 生成网页接口 
  */
 
 
-function toPage(data, APP, psd,option){ 
+function toPage(data,option){ 
 	//数据源
 	this.data = data;
-	//APP object
-	this.app = APP;
-	//psd object
-	this.psd = psd;
 	//psd的宽度
-	this.width = psd.getWidth();
+	this.width = option.width;
 	//psd的高度
-	this.height = psd.getHeight();
+	this.height = option.height;
 	//空格临时占用符
 	this.space = '~~~PSD2HTMLSpace~~~';
 	this.trTempStr = '~~~td~~~';
@@ -23,7 +18,7 @@ function toPage(data, APP, psd,option){
 	//样式集合
 	this.styleCss = new XML('<style type="text/css"></style>');
 	
-	this.textLayers = psd.getTextLayers();
+	this.textLayers = option.textLayers;
 	
 	//文件编码
 	if(typeof(option) != 'undefined' && typeof(option.encode) != 'undefined'){
@@ -33,7 +28,7 @@ function toPage(data, APP, psd,option){
 	}
 	
 	//文件保存路径
-	this.filePath = psd.dir + "/" + psd.doc.name.split(".")[0] + ".html";
+	this.filePath = option.path;
 	//生成模版
 	switch(APP.OPTION.builder) {
 		case "EDM":
@@ -102,7 +97,7 @@ toPage.prototype.getPage = function(){
 	
 	//PSD的差值，给CSS用的
 	var overValue = {
-		left : this.width < 952 ? 952 : this.width - 952
+		left : 0
 	};
 	
 	for(var i=0;i<len;i++){
@@ -116,6 +111,7 @@ toPage.prototype.getPage = function(){
 				break;
 			case "LayerKind.TEXT":
 				//文本图层
+				overValue['left'] = (this.width - 952) / 2;
 				pageContent.appendChild(this.getTextElement(item,i,overValue));
 				break;
 		}
@@ -199,7 +195,7 @@ toPage.prototype.getCellData = function(){
 toPage.prototype.m = 0;
 
 /**
- * 创建表格 
+ * 简单的网页
  */
 toPage.prototype.parseSimplePage = function(){
 	var bgImg = "";
@@ -222,10 +218,30 @@ toPage.prototype.parseSimplePage = function(){
 		var cell = cells[i];
 		if(cell.hasMerge) continue;
 		
-		var td = new XML('<td width="'+cell.width+'" height="'+cell.height+'" align="left" valign="top">'+this.space+'</td>');
+		var td = new XML('<td align="left" valign="top">'+this.space+'</td>');
 		
 		for(var j = 0, l2 = this.textLayers.length; j < l2; j++){
+			
 			var layer = this.textLayers[j];
+			
+			//第一列设置高度
+			if(i % o.cols === 0){
+				var overVal = 0;
+				if(j < l2-1 && typeof(layer['textInfo']) != 'undefined' && typeof(this.textLayers[j+1]['textInfo']) != 'undefined'){
+					var nextObj = this.textLayers[j+1]['textInfo'],
+						curObj = layer['textInfo'],
+						nextVal = nextObj['size']/nextObj['lineHeight']*nextObj['size'],
+						curVal = curObj['size']/curObj['lineHeight']*curObj['size'];
+					overVal = curVal - nextVal;
+				}
+				
+				
+				td['@height'] = cell.height - overVal;
+			}
+			//第一行设置宽度
+			if(i < o.cols ){
+				td['@width'] = cell.width;
+			}
 			
 			if(layer.left === cell.x && layer.top === cell.y){
 				
@@ -243,7 +259,6 @@ toPage.prototype.parseSimplePage = function(){
 						cells[i+toPage.m].hasMerge = true;
 						toPage.m++;
 						t.width = t.width + mergeColCell.width;
-						td['@width'] = t.width;
 						td['@colspan'] = toPage.m;
 						arguments.callee(t);
 					}
@@ -251,9 +266,8 @@ toPage.prototype.parseSimplePage = function(){
 					if(layer.height > t.height){
 						n++;
 						t.height = t.height + cells[i+o.cols].height;
-						td['@height'] = t.height;
+						//td['@height'] = t.height;
 						td['@rowspan'] = n;
-						
 						var k = toPage.m;
 						while(k--){
 							if(!!cells[i + o.cols * (n - 1) + k]) cells[i + o.cols * (n - 1) + k].hasMerge = true;
@@ -263,8 +277,12 @@ toPage.prototype.parseSimplePage = function(){
 				})(cell);
 				
 				
-				var div = new XML('<DIV></DIV>');
-				div['@style'] = this.setTextCss(layer,0).join(";")+';';
+				var div = new XML('<DIV></DIV>'),
+					style = this.setTextCss(layer,0);
+					style.push('margin:0px');
+					style.push('padding:0px');
+				
+				div['@style'] = style.join(";")+';';
 				div.appendChild(this.getTextElement(layer,0));
 				td.appendChild(div);
 			}
@@ -281,7 +299,6 @@ toPage.prototype.parseSimplePage = function(){
  */
 toPage.prototype.getTextElement = function(item,n,overValue){
 	var elm = new XML('<p class="absolute style'+n+'"></p>');
-	
 	if(typeof(item.textInfo) == 'undefined' && typeof (item.link) != 'undefined') {
 		//没有文本的空链接
 		elm = new XML('<a href="' + item.link.href + '">'+this.space+'</a>');
@@ -290,6 +307,8 @@ toPage.prototype.getTextElement = function(item,n,overValue){
 			elm['@class'] = 'absolute style'+n;
 		}else{
 			style.push('display:inline-block');
+			style.push('padding:0px');
+			style.push('margin:0px');
 			elm['@style'] = style.join(';')+';';
 		}
 		return elm;
@@ -315,7 +334,7 @@ toPage.prototype.getTextElement = function(item,n,overValue){
 				
 			}else{
 				var span = new XML('<span class="'+className+'">'+this.replaceNewlineAndSpace(text.substring(each.range[0],each.range[1]))+'</span>'),
-				style = 'font-family:\''+each.font+'\';color:#'+each.color+';font-size:'+each.size+'px;margin:0px;padding:0px;';
+				style = 'font-family:\''+each.font+'\';color:#'+each.color+';font-size:'+each.size+'px;margin:0px;padding:0px;vertical-align:top;';
 				//是网页样式写到全局的css中，如果不是，写到内联
 				if(this.type == 'page'){
 					this.styleCss.appendChild("."+className+'{'+style+'}');
@@ -327,6 +346,7 @@ toPage.prototype.getTextElement = function(item,n,overValue){
 			}
 		}
 	}else{
+		element['@style'] = 'margin:0px;padding:0px;';
 		element.appendChild(new XML(this.replaceNewlineAndSpace(item.textInfo.contents)));
 	}
 	//设置css
@@ -349,9 +369,9 @@ toPage.prototype.setTextCss = function(item,n,overValue){
 	}	
 	if(this.type == 'page'){
 		//position left	
-		style.push('left:' + (item.left + 2 - (overValue.left/2)) + 'px');
+		style.push('left:' + (item.left + 2 - overValue['left']) + 'px');
 	}
-	
+	$.writeln(style)
 	//有链接无文本，这种比较特殊，因为他没有textInfo，优先return
 	if( typeof (textInfo) == 'undefined' && typeof (item.link) != 'undefined') {
 		style.push('width:' + (item.right - item.left) + 'px');
@@ -399,7 +419,7 @@ toPage.prototype.setTextCss = function(item,n,overValue){
 			style.push('line-height:' + lineHeight);
 			
 			//宽度
-			style.push('width:' + item.width + 'px');
+			style.push('width:' + (item.width+5) + 'px');
 			//高度
 			style.push('height:' + item.height + 'px');
 		}
