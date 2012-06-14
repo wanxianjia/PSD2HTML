@@ -1,10 +1,14 @@
 // @include "io.jsx"
+// @include "psd.jsx"
 /**
  * 生成网页接口 
  */
 
-
 function toPage(data,option){ 
+	
+	//IO.saveFile('C:/Documents and Settings/wuming.xiaowm/Documents/edm04/a.js', JSON.stringify(data), 'gb1312');
+	//IO.saveFile('C:/Documents and Settings/wuming.xiaowm/Documents/edm04/b.js', JSON.stringify(option.textLayers), 'gb1312');
+	
 	//数据源
 	this.data = data;
 	//psd的宽度
@@ -30,7 +34,7 @@ function toPage(data,option){
 	//文件保存路径
 	this.filePath = option.path;
 	//生成模版
-	switch(APP.OPTION.builder) {
+	switch(option.builder) {
 		case "EDM":
 			this.type = "edm";
 			this.getEdmPage();
@@ -164,7 +168,8 @@ toPage.prototype.arrayUnique = function(arr){
  * 获取所有单元格信息 
  */
 toPage.prototype.getCellData = function(){
-	var xset = [0, this.width], yset = [0, this.height];
+	var xset = [0, this.width], 
+		yset = [0, this.height];
 
 	for(var i = 0, l = this.textLayers.length; i < l; i++){
 		var layer = this.textLayers[i];
@@ -185,7 +190,7 @@ toPage.prototype.getCellData = function(){
 			var x1 = xset[j], x2 = xset[j+1];
 			if(!x2) break;
 
-			var data = {x:x1, y:y1, width:x2 - x1, height:y2 - y1};
+			var data = {x:x1, y:y1, width:x2 - x1, height:y2 - y1,textInfo:null};
 			arr.cells.push(data);
 		}
 	}
@@ -202,12 +207,15 @@ toPage.prototype.parseSimplePage = function(){
 	//找出背景图片
 	for(var i=0;i<this.data.childs.length;i++){
 		if(this.data.childs[i]['kind'] == 'LayerKind.NORMAL'){
-			bgImg = this.data.childs[i]['name']
+			bgImg = this.data.childs[i]['name'];
+			break;
 		}
 	}
-	
+	$.writeln("---------------------");
 	var o = this.getCellData();
 
+	this.textLayers.sort(function(a,b){return a.top-b.top;});
+	
 	var table = new XML('<table background="slices/'+bgImg+'" width="'+this.width+'" border="0" cellspacing="0" cellpadding="0"></table>');
 
 	for(var i = 0, cells = o.cells, l = cells.length; i < l; i++){
@@ -227,16 +235,27 @@ toPage.prototype.parseSimplePage = function(){
 			//第一列设置高度
 			if(i % o.cols === 0){
 				var overVal = 0;
-				if(j < l2-1 && typeof(layer['textInfo']) != 'undefined' && typeof(this.textLayers[j+1]['textInfo']) != 'undefined'){
-					var nextObj = this.textLayers[j+1]['textInfo'],
-						curObj = layer['textInfo'],
+				if(j == 0){
+					var nextObj = this.textLayers[j]['textInfo'];
+					overVal = nextObj['size']/nextObj['lineHeight']*nextObj['size'];
+					//$.writeln(nextObj['contents'])
+				}else if(j < l2-1 && j > 0){
+					var nextObj = this.textLayers[j]['textInfo'],
+						curObj = this.textLayers[j-1]['textInfo'],
 						nextVal = nextObj['size']/nextObj['lineHeight']*nextObj['size'],
 						curVal = curObj['size']/curObj['lineHeight']*curObj['size'];
 					overVal = curVal - nextVal;
+					//$.writeln(nextObj['size']+'--'+nextObj['lineHeight']+'======'+curObj['size']+'---'+curObj['lineHeight']+'>>>'+overVal);
+					
+				}else if(j == l2-1){
+					var curObj = this.textLayers[j-1]['textInfo'],
+						nextVal = nextObj['size']/nextObj['lineHeight']*nextObj['size'],
+					overVal = nextVal;
 				}
-				
-				
-				td['@height'] = cell.height - overVal;
+				//$.writeln(cell.height +'---'+overVal +'==='+(cell.height - overVal))
+				if(td['@height'] == ''){
+					td['@height'] = cell.height;// - overVal;
+				}
 			}
 			//第一行设置宽度
 			if(i < o.cols ){
@@ -371,7 +390,6 @@ toPage.prototype.setTextCss = function(item,n,overValue){
 		//position left	
 		style.push('left:' + (item.left + 2 - overValue['left']) + 'px');
 	}
-	$.writeln(style)
 	//有链接无文本，这种比较特殊，因为他没有textInfo，优先return
 	if( typeof (textInfo) == 'undefined' && typeof (item.link) != 'undefined') {
 		style.push('width:' + (item.right - item.left) + 'px');
@@ -420,8 +438,10 @@ toPage.prototype.setTextCss = function(item,n,overValue){
 			
 			//宽度
 			style.push('width:' + (item.width+5) + 'px');
-			//高度
-			style.push('height:' + item.height + 'px');
+			if(this.type == "page"){
+				//高度
+				style.push('height:' + item.height + 'px');
+			}
 		}
 		//文字大小
 		style.push('font-size:' + fontSize + 'px');

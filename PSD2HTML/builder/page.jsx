@@ -32,6 +32,7 @@ new toPage(data,{
 	'height':psd.getHeight(),
 	'textLayers':psd.getTextLayers(),
 	'encode':"gb2312",
+	'builder':APP.OPTION.builder,
 	'path':psd.dir + "/" + psd.doc.name.split(".")[0] + ".html"
 });
 psd = null;
