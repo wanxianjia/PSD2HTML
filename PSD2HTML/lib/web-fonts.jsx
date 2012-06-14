@@ -11,7 +11,7 @@ WEBFONTS.getWebFont = function(font){
 
 WEBFONTS.indexOf = function(s){
 	for(var i = 0, l = WEBFONTS.length; i < l; i++){
-		if(WEBFONTS[i] === s) return i;
+		if(WEBFONTS[i].toLowerCase() === s.toLowerCase()) return i;
 	}
 	return -1;
 }
