@@ -376,7 +376,9 @@ toPage.prototype.getTextElement = function(item,n,overValue){
 			}
 		}
 	}else{
-		element['@style'] = 'margin:0px;padding:0px;';
+		if(this.type != "page"){
+			element['@style'] = 'margin:0px;padding:0px;';
+		}
 		element.appendChild(new XML(this.replaceNewlineAndSpace(item.textInfo.contents)));
 	}
 	//设置css
