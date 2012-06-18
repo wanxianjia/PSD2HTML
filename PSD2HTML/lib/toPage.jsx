@@ -348,6 +348,7 @@ toPage.prototype.getTextElement = function(item,n,overValue){
 	//有链接
 	if(typeof(item.link) != 'undefined'){
 		element = new XML('<a href="'+item.link.href+'"></a>');
+		element['@class'] = 'absolute style'+n;
 		elm.appendChild(element);
 	}
 	
@@ -410,9 +411,6 @@ toPage.prototype.setTextCss = function(item,n,overValue){
 		style.push('top:' + item.top + 'px');
 		style.push('text-decoration:none');
 	}else{
-		if(item.top == "463"){
-			$.writeln(textInfo.bold);
-		}
 		//加粗
 		if(textInfo.bold == true) {
 			style.push('font-weight:bold');
