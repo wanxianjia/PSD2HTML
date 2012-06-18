@@ -234,6 +234,35 @@ toPage.prototype.parseSimplePage = function(){
 				if(i % o.cols === 0){
 					var overVal = 0,
 						oneVal = 0;
+					//第一行
+					/*if(i == 0){
+						var nextObj = this.textLayers[j]['textInfo'];
+						overVal = nextObj['size']/nextObj['lineHeight']*nextObj['size'];
+						oneVal = overVal;
+						if(td['@height'] == ''){
+							td['@height'] = cell.height - Math.round(overVal);
+						}
+						
+					}else if(i<l-1 && j>0){
+						var curObj = this.textLayers[j-1]['textInfo'];
+						if(typeof(curObj) != "undefined"){
+							curVal = curObj['size']/curObj['lineHeight']*curObj['size'];
+							if(curVal != overVal){
+								overVal += overVal-curVal;
+							}
+							if(td['@height'] == ''){
+								td['@height'] = cell.height + Math.round(oneVal-curVal);
+							}
+						}else{
+							if(td['@height'] == ''){
+								td['@height'] = cell.height;
+							}
+						}
+					}else if(i == l-1){
+						if(td['@height'] == ''){
+							td['@height'] = cell.height + Math.round(overVal);
+						}
+					}*/
 					
 					td['@height'] = cell.height;
 				}
@@ -379,17 +408,20 @@ toPage.prototype.setTextCss = function(item,n,overValue){
 		style.push('top:' + item.top + 'px');
 		style.push('text-decoration:none');
 	}else{
+		if(item.top == "463"){
+			$.writeln(textInfo.bold);
+		}
 		//加粗
-		if(textInfo.bold === true) {
-			style.push('font-weight:blod');
+		if(textInfo.bold == true) {
+			style.push('font-weight:bold');
 		}
 		//颜色
 		style.push('color:#' + textInfo.color);
 		//斜体
-		if(textInfo.italic === true) {
+		if(textInfo.italic == true) {
 			style.push('font-style:italic');
 		}
-		if(textInfo.underline === true){
+		if(textInfo.underline == true){
 			style.push('text-decoration:underline');
 		}
 		//缩进
