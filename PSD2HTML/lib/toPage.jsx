@@ -1,5 +1,4 @@
 // @include "io.jsx"
-// @include "psd.jsx"
 /**
  * 生成网页接口 
  */
@@ -8,6 +7,7 @@ function toPage(data,option){
 	
 	//IO.saveFile('C:/Documents and Settings/wuming.xiaowm/Documents/edm04/a.js', JSON.stringify(data), 'gb1312');
 	//IO.saveFile('C:/Documents and Settings/wuming.xiaowm/Documents/edm04/b.js', JSON.stringify(option.textLayers), 'gb1312');
+	//return false;
 	
 	//数据源
 	this.data = data;
@@ -211,7 +211,6 @@ toPage.prototype.parseSimplePage = function(){
 			break;
 		}
 	}
-	$.writeln("---------------------");
 	var o = this.getCellData();
 
 	this.textLayers.sort(function(a,b){return a.top-b.top;});
@@ -227,35 +226,18 @@ toPage.prototype.parseSimplePage = function(){
 		if(cell.hasMerge) continue;
 		
 		var td = new XML('<td align="left" valign="top">'+this.space+'</td>');
-		
 		for(var j = 0, l2 = this.textLayers.length; j < l2; j++){
-			
 			var layer = this.textLayers[j];
-			
-			//第一列设置高度
-			if(i % o.cols === 0){
-				var overVal = 0;
-				if(j == 0){
-					var nextObj = this.textLayers[j]['textInfo'];
-					overVal = nextObj['size']/nextObj['lineHeight']*nextObj['size'];
-					//$.writeln(nextObj['contents'])
-				}else if(j < l2-1 && j > 0){
-					var nextObj = this.textLayers[j]['textInfo'],
-						curObj = this.textLayers[j-1]['textInfo'],
-						nextVal = nextObj['size']/nextObj['lineHeight']*nextObj['size'],
-						curVal = curObj['size']/curObj['lineHeight']*curObj['size'];
-					overVal = curVal - nextVal;
-					//$.writeln(nextObj['size']+'--'+nextObj['lineHeight']+'======'+curObj['size']+'---'+curObj['lineHeight']+'>>>'+overVal);
+			if(typeof(layer.textInfo) != 'undefined') {
+				
+				//第一列设置高度
+				if(i % o.cols === 0){
+					var overVal = 0,
+						oneVal = 0;
 					
-				}else if(j == l2-1){
-					var curObj = this.textLayers[j-1]['textInfo'],
-						nextVal = nextObj['size']/nextObj['lineHeight']*nextObj['size'],
-					overVal = nextVal;
+					td['@height'] = cell.height;
 				}
-				//$.writeln(cell.height +'---'+overVal +'==='+(cell.height - overVal))
-				if(td['@height'] == ''){
-					td['@height'] = cell.height;// - overVal;
-				}
+				
 			}
 			//第一行设置宽度
 			if(i < o.cols ){
