@@ -235,35 +235,6 @@ toPage.prototype.parseSimplePage = function(){
 					var overVal = 0,
 						oneVal = 0;
 					//第一行
-					/*if(i == 0){
-						var nextObj = this.textLayers[j]['textInfo'];
-						overVal = nextObj['size']/nextObj['lineHeight']*nextObj['size'];
-						oneVal = overVal;
-						if(td['@height'] == ''){
-							td['@height'] = cell.height - Math.round(overVal);
-						}
-						
-					}else if(i<l-1 && j>0){
-						var curObj = this.textLayers[j-1]['textInfo'];
-						if(typeof(curObj) != "undefined"){
-							curVal = curObj['size']/curObj['lineHeight']*curObj['size'];
-							if(curVal != overVal){
-								overVal += overVal-curVal;
-							}
-							if(td['@height'] == ''){
-								td['@height'] = cell.height + Math.round(oneVal-curVal);
-							}
-						}else{
-							if(td['@height'] == ''){
-								td['@height'] = cell.height;
-							}
-						}
-					}else if(i == l-1){
-						if(td['@height'] == ''){
-							td['@height'] = cell.height + Math.round(overVal);
-						}
-					}*/
-					
 					td['@height'] = cell.height;
 				}
 				
