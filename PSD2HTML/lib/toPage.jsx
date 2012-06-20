@@ -225,7 +225,7 @@ toPage.prototype.parseSimplePage = function(){
 		var cell = cells[i];
 		if(cell.hasMerge) continue;
 		
-		var td = new XML('<td align="left" valign="top">'+this.space+'</td>');
+		var td = new XML('<td align="left" valign="top" height="'+this.height+'">'+this.space+'</td>');
 		for(var j = 0, l2 = this.textLayers.length; j < l2; j++){
 			var layer = this.textLayers[j];
 			if(typeof(layer.textInfo) != 'undefined') {
