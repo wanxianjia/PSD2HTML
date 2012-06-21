@@ -1,4 +1,4 @@
-// @include "json2-min.jsx"
+﻿// @include "json2-min.jsx"
 // @include "web-fonts.jsx"
 
 //setting for app preferences
@@ -10,8 +10,9 @@ function PSD(option){
 	this.doc = app.activeDocument;
 	this.docs = app.documents;
 	this.tree = {name:this.doc.name, width:this.doc.width.value, height:this.doc.height.value, imgCount:0, childs:[]};
-	this.textLayers = [];        //存储所有的文本图层
+	this.contentLayers = [];        //存储所有的文本图层
 	this.linkReg = /^[aA]$|^[aA]-/;
+	this.imgReg = /img/;
 	this.layers = this.doc.layers;
 	this.option = {
 		exportImages: false,		//是否对每个图层到处图层
@@ -30,8 +31,25 @@ function PSD(option){
 
 var _index = -1,
 	_sliceCount = 0,
-	_textLayersInfo = [],
-	_slices = [];
+	_content = [],
+	_slices = [],
+	_exportConfig = new ExportOptionsSaveForWeb(),
+	// get image extension from export configuration
+	_getExtension = function(op){
+		switch(op.format){
+			case SaveDocumentType.JPEG:
+				return 'jpg';
+			case SaveDocumentType.PNG:
+				return 'png';
+				
+			default:
+				return 'gif';
+		}
+	};
+	
+	_exportConfig.format = SaveDocumentType.JPEG;
+	_exportConfig.quality = 60;
+	
 
 PSD.fn = PSD.prototype = {
 	_init: function(){
@@ -126,8 +144,9 @@ PSD.fn = PSD.prototype = {
 					if(WEBFONTS.indexOf(textItem.font) < 0 || this.getEffects().length > 0 || textItem.warpStyle !== WarpStyle.NONE){
 						if(this.linkReg.test(layer.name)){
 							child.link = {href: '#'};
+							child.tag = 'blank';
 							child.textInfo = undefined;
-							_textLayersInfo.push(child);
+							_content.push(child);
 						}
 						return;
 					}
@@ -135,11 +154,8 @@ PSD.fn = PSD.prototype = {
 					return;
 				}
 				try{
-					if(textItem.kind == TextType.PARAGRAPHTEXT){
-						child.width = layer.textItem.width.value;
-						child.height = layer.textItem.height.value;
-					}
-
+					child.tag = 'text';
+					
 					child.textInfo = {
 						color: textItem.color.rgb.hexValue, 
 						contents:textItem.contents, 
@@ -151,8 +167,14 @@ PSD.fn = PSD.prototype = {
 						indent: Math.round(textItem.firstLineIndent.value),
 						underline: textItem.underline == UnderlineType.UNDERLINEOFF ? false : true,
 						textRange: this.getTextRange(),
-						position:{x: textItem.position[0].value, y: textItem.position[1].value}
+						position:{x: textItem.position[0].value, y: textItem.position[1].value},
+						leftIndent: textItem.leftIndent.value,
+						rightIndent: textItem.rightIndent.value
 					};
+					if(textItem.kind == TextType.PARAGRAPHTEXT){
+						child.textInfo.width = layer.textItem.width.value;
+						child.textInfo.height = layer.textItem.height.value;
+					}
 					// line height
 					if(!textItem.useAutoLeading){
 						child.textInfo.lineHeight = Math.round(textItem.leading.value);
@@ -185,16 +207,26 @@ PSD.fn = PSD.prototype = {
 						child.link = {href: '#'};
 					}
 				
-					this.textLayers.push(layer);
-					_textLayersInfo.push(child);
+					this.contentLayers.push(layer);
+					_content.push(child);
 					
 				}catch(e){return;}
 			}else{
 				// link
-				if(this.linkReg.test(layer.name)){
+				if((this.linkReg.test(layer.name) && this.imgReg.test(layer.name)) || this.linkReg.test(layer.name)){
 					child.link = {href: '#'};
-					child.kind = 'LayerKind.TEXT';
-					_textLayersInfo.push(child);
+					child.tag = 'img';
+					child.textInfo = undefined;
+					this.contentLayers.push(layer);
+					_content.push(child);
+				}else if(this.imgReg.test(layer.name)){
+					child.tag = 'img';
+					var region = [[left, top], [right, top], [right, bottom], [left, bottom]];
+					child.src = this.exportSelection(region).name;
+					
+					child.textInfo = undefined;
+					this.contentLayers.push(layer);
+					_content.push(child);
 				}
 
 				this.tree.imgCount++;
@@ -256,35 +288,28 @@ PSD.fn = PSD.prototype = {
 		return this.tree;
 	},
 	hiddenTextLayers: function(){
-		for(var i = 0, l = this.textLayers.length; i < l; i++){
-			if(!this.textLayers[i].visible) continue;
-			this.textLayers[i].visible = false;
+		for(var i = 0, l = this.contentLayers.length; i < l; i++){
+			if(!this.contentLayers[i].visible) continue;
+			this.contentLayers[i].visible = false;
 		}
 	},
 	visibleTextLayers: function(){
-		for(var i = 0, l = this.textLayers.length; i < l; i++){
-			if(this.textLayers[i].visible) continue;
-			this.textLayers[i].visible = true;
+		for(var i = 0, l = this.contentLayers.length; i < l; i++){
+			if(this.contentLayers[i].visible) continue;
+			this.contentLayers[i].visible = true;
 		}
 	},
 	/* 自动切片并导出图片 */
-	autoSliceAndExport: function(options, height){
+	autoSliceAndExport: function(exportConfig, height){
 		this.hiddenTextLayers();
 		
-		if(!options){
-			options = new ExportOptionsSaveForWeb();
-			options.format = SaveDocumentType.JPEG;
-			options.quality = 60;
-		}
-		var extension = 'jpg';
-		if(options.format == SaveDocumentType.PNG){
-			extension = 'png';
-		}
+		var conf = exportConfig || _exportConfig;
+		var extension = _getExtension(conf);
 		
 		if(!height){
 			// 生成测试img，用于计算切片高度
 			var testImg = File(this.dir + '/' + 'img.tmp.' + extension);
-			this.doc.exportDocument (testImg, ExportType.SAVEFORWEB, options);
+			this.doc.exportDocument (testImg, ExportType.SAVEFORWEB, exportConfig);
 			var size = testImg.length, HEIGHT = 120;
 			
 			if(size < 70000){
@@ -314,16 +339,8 @@ PSD.fn = PSD.prototype = {
 				y = y + HEIGHT;
 				fy = y > docHeight ? docHeight : y;
 				region = [[0, y - HEIGHT], [docWidth, y - HEIGHT], [docWidth, fy], [0, fy]];
-				selection.select(region);
-				selection.copy(true);
 				
-				var newDoc = this.docs.add(docWidth, HEIGHT - (y - fy));
-				newDoc.paste();
-				newDoc.layers[newDoc.layers.length - 1].remove();
-				
-				var img = new File(slicesFolder + "/slice_" + _index + "." + extension);
-				newDoc.exportDocument (img, ExportType.SAVEFORWEB, options);
-				newDoc.close(SaveOptions.DONOTSAVECHANGES);
+				this.exportSelection(region, exportConfig);
 
 				_slices.push({index:_index, type:"ArtLayer", visible:true, kind:"LayerKind.NORMAL", isBackgroundLayer:false,
 					name:'slice_'+_index+'.'+extension, right: docWidth, top:y - HEIGHT, left:0, bottom:fy});
@@ -336,15 +353,48 @@ PSD.fn = PSD.prototype = {
 		this.visibleTextLayers();
 		return _slices;
 	},
+	// 导出选择区域
+	exportSelection: function(region, exportConfig){
+		if(!region) return;
+		// image config
+	
+		var conf = exportConfig || _exportConfig;
+		var extension = _getExtension(conf);
+		// copy selected area
+		var	selection = this.doc.selection, xset = [], yset = [];
+		selection.select(region);
+		selection.copy(true);
+		
+		for(var i = 0, l = region.length; i < l; i++){
+			xset.push(region[i][0]);
+			yset.push(region[i][1]);
+		}
+		var width = Math.max.apply(null, xset) - Math.min.apply(null, xset),
+			height = Math.max.apply(null, yset) - Math.min.apply(null, yset);
+		// export image
+		var newDoc = this.docs.add(width, height);
+		newDoc.paste();
+		newDoc.layers[newDoc.layers.length - 1].remove();
+		_index++;
+		
+		var slicesFolder = new Folder(this.dir + '/slices/');
+		!slicesFolder.exists && slicesFolder.create();
+		
+		var img = new File(slicesFolder + "/slice_" + _index + "." + extension);
+		newDoc.exportDocument (img, ExportType.SAVEFORWEB, conf);
+		newDoc.close(SaveOptions.DONOTSAVECHANGES);
+		img.name = 'slice_'+_index+'.'+extension;
+		return {name:img.name};
+	},
 	getTextLayersAndSlices: function(option, height){
 		if(_slices.length <= 0) this.autoSliceAndExport(option, height);
-		var data = {name: this.doc.name, imgCount:_sliceCount, childs:_slices.concat(_textLayersInfo)};
+		var data = {name: this.doc.name, imgCount:_sliceCount, childs:_slices.concat(_content)};
 		//this.exportJSON(data);
 		return data;
 	},
 	
 	getTextLayers: function(){
-		return _textLayersInfo;
+		return _content;
 	},
 	// 获取text range
 	getTextRange: function(){
