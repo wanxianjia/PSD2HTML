@@ -47,16 +47,18 @@ page.table.prototype.createMain = function(){
 
 
 /**
- * 创建表格行/列 
+ *创建表格行/列  
  */
 page.table.prototype.createRow = function(){
 	var rowLen = this.rowData.length,
 		colLen = this.colData.length,
-		textObj = {};
+		textObj = {},
+		tdWidths = {},
+		tdHeights = {};
 	for(var row=-1;row<rowLen;row++){
 		this.tr[row] = new XML('<tr></tr>');
 		for(var col=-1;col<colLen;col++){
-			var tdKey = row+'-'+col,
+			var tdKey = row+'_'+col,
 				width = 0,
 				text = new XML();
 			if(!this.isMergeTd[tdKey]){
@@ -71,6 +73,7 @@ page.table.prototype.createRow = function(){
 						width = this.colData[col+1].left - this.colData[col].left;
 					}
 					this.td[tdKey]['@width'] = width;
+					tdWidths[tdKey] = width;
 				}
 				if(col>-1 && row > -1 && this.rowData[row].top == this.colData[col].top){
 					text = new page.element(this.colData[col],this.option);
@@ -95,7 +98,8 @@ page.table.prototype.createRow = function(){
 			height = this.rowData[row+1].top - this.rowData[row].top; - this.getHeightOvewValue(row+1) + this.getHeightOvewValue(row);
 		}
 		if(height>0){
-			this.td[row+'--1']['@height'] = height;
+			this.td[row+'_-1']['@height'] = height;
+			tdHeights[row+'_-1'] = height;
 		}else if(height == 0){
 			delete this.tr[row];
 		}
@@ -111,7 +115,6 @@ page.table.prototype.createRow = function(){
 		}
 	}
 	
-	
 	for(var row in this.tr){
 		//td回归tr
 		for(var col in this.td){
@@ -123,8 +126,81 @@ page.table.prototype.createRow = function(){
 		this.tbody.appendChild(this.tr[row]);
 	}
 	
+	psd.hiddenTextLayers();
+	for(var i in this.td){
+		var colspan = 0,
+			rowspan = 0;
+		if(this.td[i]['@colspan'] != ''){
+			colspan = parseInt(this.td[i]['@colspan'],10);
+		}
+		if(this.td[i]['@rowspan'] != ''){
+			rowspan = parseInt(this.td[i]['@rowspan'],10);
+		}
+		var pos = this.getTdPosition(i,colspan,rowspan,tdWidths,tdHeights);
+		if(isNaN(pos.bottom) || isNaN(pos.top) || isNaN(pos.left) || isNaN(pos.right)){
+			
+		}else{
+			var image = psd.exportSelection([[pos.left,pos.top],[pos.right,pos.top],[pos.right,pos.bottom],[pos.left,pos.bottom]],this.option.exportConfig);
+			//没有文本的填充图片
+			if(typeof(textObj[i]) == 'undefined'){
+				var div = new XML('<DIV></DIV>'),
+					img = new XML('<img />');
+				img['@src'] = 'slices/'+image.name;
+				img['@width'] = image.width;
+				img['@height'] = image.height;
+				div['@STYLE'] = 'overflow:hidden;width:'+image.width+'px;height:'+image.height+'px;';
+				div.appendChild(img);
+				this.td[i].appendChild(div);
+			}else{
+				//有文本的填充背景
+				this.td[i]['@background'] = 'slices/'+image.name;
+			}
+		}
+	}
+	psd.visibleTextLayers();
 	
 };
+
+/**
+ * 获取td位置 
+ */
+page.table.prototype.getTdPosition = function(tdKey,colspan,rowspan,tdWidths,tdHeights){
+	var key = tdKey.split('_'),
+		row = parseInt(key[0],10),
+		col = parseInt(key[1],10);
+	
+	var heightCount=0,
+		widthCount=0;
+	for(var i=-1;i<row;i++){
+		heightCount += tdHeights[i+'_-1'];
+	}
+	
+	for(var i=-1;i<col;i++){
+		widthCount += tdWidths['-1_'+i];
+	}
+	
+	var curHeight = tdHeights[row+'_-1'],
+		curWidth = tdWidths['-1_'+col];
+		
+	if(colspan > 1){
+		for(var i=col+1;i<col+colspan;i++){
+			curWidth += tdWidths['-1_'+i];
+		}
+	}
+	if(rowspan > 1){
+		for(var i=row+1;i<row+rowspan;i++){
+			curHeight += tdHeights[i+'_-1'];
+		}
+	}
+	
+	return {
+		left:widthCount,
+		top:heightCount,
+		right:widthCount + curWidth,
+		bottom:heightCount + curHeight
+	}
+	
+}
 
 /**
  * 高度误差 
@@ -151,8 +227,8 @@ page.table.prototype.mergeCol = function(obj,row){
 		}
 		if(start === true && width < obj.width){
 			n++;
-			width += parseInt(this.td['-1-'+i]['@width']);
-			this.isMergeTd[row+'-'+i] = true;
+			width += parseInt(this.td['-1_'+i]['@width']);
+			this.isMergeTd[row+'_'+i] = true;
 		}
 	}
 	return n;
@@ -173,13 +249,13 @@ page.table.prototype.mergeRow = function(obj,col,colspan){
 		}
 		if(start === true && height < obj.height){
 			n++;
-			height += parseInt(this.td[i+'--1']['@height']);
+			height += parseInt(this.td[i+'_-1']['@height']);
 			if(obj.index != this.rowData[i].index){
-				delete this.td[i+'-'+col];
+				delete this.td[i+'_'+col];
 				//合并斜对角的td
 				if(colspan > 1){
 					for(var j=col+1;j<colspan+col;j++){
-						delete this.td[i+'-'+j];
+						delete this.td[i+'_'+j];
 					}
 				}
 				

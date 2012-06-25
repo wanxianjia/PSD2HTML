@@ -61,7 +61,7 @@ page.edmHtml = function(data,option,psd){
 	head.appendChild(title);
 	html.appendChild(head);
 	html.appendChild(body);
-	return '<!DOCTYPE html>'+html.toXMLString();	
+	return '<!DOCTYPE html>'+page.formatHtml(html.toXMLString());	
 };
 
 /**
@@ -71,7 +71,7 @@ page.edmHtml = function(data,option,psd){
  * @param {Object} psd
  */
 page.bssHtml = function(data,option,psd){
-	return new page.table(data.childs,option,psd).toXMLString();	
+	return page.formatHtml(new page.table(data.childs,option,psd).toXMLString());	
 };
 
 /**
@@ -80,5 +80,14 @@ page.bssHtml = function(data,option,psd){
  * @param {Object} option
  */
 page.normalPage = function(data,option){
-	return '<!DOCTYPE html>'+ new page.web(data,option).toXMLString();
+	return '<!DOCTYPE html>'+ page.formatHtml(new page.web(data,option).toXMLString());
 };
+
+page.formatHtml = function(htmlCode){
+	return htmlCode.replace(new RegExp(page.space, 'g'), "&nbsp;").replace(new RegExp(page.newline, 'g'), "<br/>");
+}
+
+//换行
+page.newline = '~~~~nweline~~~~';
+//空格
+page.space = '~~~~space~~~~';

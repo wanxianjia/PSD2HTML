@@ -32,6 +32,7 @@ new page.init(data,{
 	'height':psd.getHeight(),
 	'encode':"gb2312",
 	'builder':APP.OPTION.builder,
-	'path':psd.dir + "/" + psd.doc.name.split(".")[0] + ".html"
+	'path':psd.dir + "/" + psd.doc.name.split(".")[0] + ".html",
+	'exportConfig':option
 });
 psd = null;

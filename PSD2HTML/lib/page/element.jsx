@@ -68,12 +68,12 @@ page.element.prototype.text = function(){
 	//如果有链接
 	if(typeof(this.item.link) != 'undefined'){
 		elm = new XML('<a></a>');
-		a['@href'] = this.item.link.href;
+		elm['@href'] = this.item.link.href;
 	}
 	
 	//单行文本
 	if(this.item.textInfo.textType == 'TextType.POINTTEXT'){
-		elm.appendChild(new XML(this.item.textInfo.contents));
+		elm.appendChild(new XML(this.formatSpaceAndNewline(this.item.textInfo.contents)));
 	}else if(this.item.textInfo.textType == 'TextType.PARAGRAPHTEXT'){
 		//段落文本
 		var textRange = this.item.textInfo.textRange,
@@ -84,7 +84,7 @@ page.element.prototype.text = function(){
 			}else{
 				var span = new XML('<span></span>'),
 				eachText = textContents.substring(textRange[i].range[0],textRange[i].range[1]);
-				span.appendChild(new XML(eachText));
+				span.appendChild(new XML(this.formatSpaceAndNewline(eachText)));
 				//行内样式
 				if(this.option.builder == "normal"){
 					var cssName = 'style'+this.option.i+'-'+i;
@@ -109,4 +109,8 @@ page.element.prototype.text = function(){
 		elm['@style'] = styleCss.join(';');
 	}
 	return elm;
-}
+};
+
+page.element.prototype.formatSpaceAndNewline = function(str){
+	return str.replace(/\r\n/g, page.newline).replace(/\n/g, page.newline).replace(/\r/g, page.newline).replace(/\s/g, page.space);
+};
