@@ -73,7 +73,17 @@ page.element.prototype.text = function(){
 	
 	//单行文本
 	if(this.item.textInfo.textType == 'TextType.POINTTEXT'){
-		elm.appendChild(new XML(this.formatSpaceAndNewline(this.item.textInfo.contents)));
+		var span = new XML('<span></span>');
+		if(this.option.builder == "normal"){
+			var lineCss = "white-space:pre-wrap;*white-space:pre;*word-wrap: break-word;",
+				className = 'style'+this.option.i+'a';
+			this.option.styleCss.appendChild('.'+className+'{'+lineCss+'}');
+			span['@class'] = className;
+		}else{
+			span['@style'] = "white-space:pre-wrap;*white-space:pre;*word-wrap: break-word;";
+		}
+		span.appendChild(new XML(this.item.textInfo.contents));
+		elm.appendChild(span);
 	}else if(this.item.textInfo.textType == 'TextType.PARAGRAPHTEXT'){
 		//段落文本
 		var textRange = this.item.textInfo.textRange,
@@ -84,15 +94,15 @@ page.element.prototype.text = function(){
 			}else{
 				var span = new XML('<span></span>'),
 				eachText = textContents.substring(textRange[i].range[0],textRange[i].range[1]);
-				span.appendChild(new XML(this.formatSpaceAndNewline(eachText)));
+				span.appendChild(new XML(eachText));
 				//行内样式
 				if(this.option.builder == "normal"){
 					var cssName = 'style'+this.option.i+'-'+i;
-					var lineCss = '.'+cssName+'{font-size:'+textRange[i].size+'px;color:#'+textRange[i].color+';font-family:\''+textRange[i].font+'\'}';
+					var lineCss = '.'+cssName+'{font-size:'+textRange[i].size+'px;color:#'+textRange[i].color+';font-family:\''+textRange[i].font+';\';white-space:pre-wrap;*white-space: pre;*word-wrap: break-word;}';
 					this.option.styleCss.appendChild(lineCss);
 					span['@class'] = cssName;
 				}else{
-					span['@style'] = 'margin:0px;padding:0px;font-size:'+textRange[i].size+'px;color:#'+textRange[i].color+';';
+					span['@style'] = 'margin:0px;padding:0px;font-size:'+textRange[i].size+'px;color:#'+textRange[i].color+';white-space:pre-wrap;*white-space: pre;*word-wrap: break-word;';
 				}
 				elm.appendChild(span);
 			}
@@ -101,16 +111,22 @@ page.element.prototype.text = function(){
 	
 	//Css
 	var styleCss = new page.css(this.item,this.option);
+	styleCss.push("overflow:hidden");
 	if(this.option.builder == "normal"){
 		var cssName = 'style'+ this.option.i;
 		elm['@class'] = "absolute "+cssName;
 		this.option.styleCss.appendChild('.'+cssName+'{'+styleCss.join(";")+';}');
 	}else{
+		styleCss.push('width:'+this.item.width+'px;');
 		elm['@style'] = styleCss.join(';');
 	}
 	return elm;
 };
 
+/**
+ * 替换字符串中的回车和空格 
+ * @param {Object} str
+ */
 page.element.prototype.formatSpaceAndNewline = function(str){
-	return str.replace(/\r\n/g, page.newline).replace(/\n/g, page.newline).replace(/\r/g, page.newline).replace(/\s/g, page.space);
+	return str.replace(/\r\n/g, page.newline).replace(/\n/g, page.newline).replace(/\r/g, page.newline);
 };

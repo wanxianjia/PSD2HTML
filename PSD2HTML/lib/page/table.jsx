@@ -59,8 +59,7 @@ page.table.prototype.createRow = function(){
 		this.tr[row] = new XML('<tr></tr>');
 		for(var col=-1;col<colLen;col++){
 			var tdKey = row+'_'+col,
-				width = 0,
-				text = new XML();
+				width = 0;
 			if(!this.isMergeTd[tdKey]){
 				this.td[tdKey] = new XML('<td align="left" valign="top"></td>');
 				//设置宽度 
@@ -76,15 +75,16 @@ page.table.prototype.createRow = function(){
 					tdWidths[tdKey] = width;
 				}
 				if(col>-1 && row > -1 && this.rowData[row].top == this.colData[col].top){
-					text = new page.element(this.colData[col],this.option);
+					var text = new page.element(this.colData[col],this.option);
 					//合并列
 					var colspan = this.mergeCol(this.colData[col],row);
 					if(colspan>1){
 						this.td[tdKey]['@colspan'] = colspan;
 					}
 					textObj[tdKey] = {col:col,row:row,data:this.rowData[row],colspan:colspan};
+					this.td[tdKey].appendChild(text);
 				}
-				this.td[tdKey].appendChild(text);
+				
 			}
 		}
 		
@@ -126,7 +126,17 @@ page.table.prototype.createRow = function(){
 		this.tbody.appendChild(this.tr[row]);
 	}
 	
+	this.insertTdImg(textObj,tdWidths,tdHeights);
+	
+};
+
+/**
+ * 往TD里插入图片 
+ */
+page.table.prototype.insertTdImg = function(textObj,tdWidths,tdHeights){
+	//隐藏所有文本图层
 	psd.hiddenTextLayers();
+	//为td插入图片
 	for(var i in this.td){
 		var colspan = 0,
 			rowspan = 0;
@@ -138,7 +148,7 @@ page.table.prototype.createRow = function(){
 		}
 		var pos = this.getTdPosition(i,colspan,rowspan,tdWidths,tdHeights);
 		if(isNaN(pos.bottom) || isNaN(pos.top) || isNaN(pos.left) || isNaN(pos.right)){
-			
+			$.writeln(i+'---'+pos.top +'--'+pos.bottom+'--'+pos.left+'--'+pos.right);
 		}else{
 			var image = psd.exportSelection([[pos.left,pos.top],[pos.right,pos.top],[pos.right,pos.bottom],[pos.left,pos.bottom]],this.option.exportConfig);
 			//没有文本的填充图片
@@ -148,17 +158,20 @@ page.table.prototype.createRow = function(){
 				img['@src'] = 'slices/'+image.name;
 				img['@width'] = image.width;
 				img['@height'] = image.height;
+				img['@border']= "0";
+				img['@style'] = 'display:block;margin:0px;padding:0px;'
 				div['@STYLE'] = 'overflow:hidden;width:'+image.width+'px;height:'+image.height+'px;';
 				div.appendChild(img);
-				this.td[i].appendChild(div);
+				this.td[i].appendChild(img);
+				this.td[i]['@style'] = "margin:0px;padding:0px;font-size:0px;"
 			}else{
 				//有文本的填充背景
 				this.td[i]['@background'] = 'slices/'+image.name;
 			}
 		}
 	}
+	//显示所有文本图层
 	psd.visibleTextLayers();
-	
 };
 
 /**
@@ -181,7 +194,7 @@ page.table.prototype.getTdPosition = function(tdKey,colspan,rowspan,tdWidths,tdH
 	
 	var curHeight = tdHeights[row+'_-1'],
 		curWidth = tdWidths['-1_'+col];
-		
+	
 	if(colspan > 1){
 		for(var i=col+1;i<col+colspan;i++){
 			curWidth += tdWidths['-1_'+i];
