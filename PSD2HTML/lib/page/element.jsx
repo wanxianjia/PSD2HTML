@@ -1,3 +1,9 @@
+/**
+ * @author: wuming.xiaowm
+ * @date : 6/24 2012
+ * @description: HTML元素解析
+ */
+
 // @include "css.jsx"
 
 /**
@@ -5,9 +11,10 @@
  * @param {Object} item
  * @param {Object} option
  */
-page.element = function(data,option){
+page.element = function(data,option,psd){
 	this.item = data;
 	this.option = option;
+	this.psd = psd;
 	return this.getTextElement();
 };
 
@@ -33,9 +40,10 @@ page.element.prototype.getTextElement = function(){
  * 图片图层 
  */
 page.element.prototype.img = function(){
-	var div = new XML('<DIV></DIV>');
-	var img = new XML('<img />');
-	img['@src'] = 'slices/'+this.item.src;
+	var div = new XML('<DIV></DIV>'),
+		img = new XML('<img />'),
+		psdImgObj = this.psd.exportSelection([[this.item.left,this.item.top],[this.item.right,this.item.top],[this.item.right,this.item.bottom],[this.item.left,this.item.bottom]],this.option.exportConfig);
+	img['@src'] = 'slices/'+psdImgObj.name;
 	img['@width'] = this.item.width;
 	img['@height'] = this.item.height;
 	if(typeof(this.item.link) != 'undefined'){
@@ -117,7 +125,7 @@ page.element.prototype.text = function(){
 		elm['@class'] = "absolute "+cssName;
 		this.option.styleCss.appendChild('.'+cssName+'{'+styleCss.join(";")+';}');
 	}else{
-		styleCss.push('width:'+this.item.width+'px;');
+		//styleCss.push('width:'+this.item.width+'px;');
 		elm['@style'] = styleCss.join(';');
 	}
 	return elm;

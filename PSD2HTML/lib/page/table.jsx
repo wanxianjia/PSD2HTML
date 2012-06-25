@@ -1,3 +1,9 @@
+/**
+ * @author: wuming.xiaowm
+ * @date : 6/24 2012
+ * @description: 网页表格创建
+ */
+
 // @include "data.jsx"
 // @include "element.jsx"
 
@@ -5,10 +11,12 @@
  * 表格解析器
  * @param {Object} data
  * @param {Object} option
+ * @param {Object} psd
  */
-page.table = function(data,option){
+page.table = function(data,option,psd){
 	this.option = option;
 	var resultData = new page.data(data,option);
+	this.psd = psd;
 	//高宽
 	this.width = option.width;
 	this.height = option.height;
@@ -54,14 +62,17 @@ page.table.prototype.createRow = function(){
 		colLen = this.colData.length,
 		textObj = {},
 		tdWidths = {},
-		tdHeights = {};
+		tdHeights = {};//是要删除的tr
 	for(var row=-1;row<rowLen;row++){
 		this.tr[row] = new XML('<tr></tr>');
 		for(var col=-1;col<colLen;col++){
 			var tdKey = row+'_'+col,
 				width = 0;
 			if(!this.isMergeTd[tdKey]){
-				this.td[tdKey] = new XML('<td align="left" valign="top"></td>');
+				this.td[tdKey] = new XML('<td></td>');
+				this.td[tdKey]['@border'] = '0';
+				this.td[tdKey]['@align'] = 'left';
+				this.td[tdKey]['@valign'] = 'top';
 				//设置宽度 
 				if(row == -1){
 					if(col == -1){
@@ -75,7 +86,7 @@ page.table.prototype.createRow = function(){
 					tdWidths[tdKey] = width;
 				}
 				if(col>-1 && row > -1 && this.rowData[row].top == this.colData[col].top){
-					var text = new page.element(this.colData[col],this.option);
+					var text = new page.element(this.colData[col],this.option,psd);
 					//合并列
 					var colspan = this.mergeCol(this.colData[col],row);
 					if(colspan>1){
@@ -97,12 +108,12 @@ page.table.prototype.createRow = function(){
 		}else{
 			height = this.rowData[row+1].top - this.rowData[row].top; - this.getHeightOvewValue(row+1) + this.getHeightOvewValue(row);
 		}
-		if(height>0){
+		//if(height>0){
 			this.td[row+'_-1']['@height'] = height;
 			tdHeights[row+'_-1'] = height;
-		}else if(height == 0){
-			delete this.tr[row];
-		}
+		//}else if(height == 0){
+			//delete this.tr[row];
+		//}
 		
 	}
 	
@@ -135,11 +146,14 @@ page.table.prototype.createRow = function(){
  */
 page.table.prototype.insertTdImg = function(textObj,tdWidths,tdHeights){
 	//隐藏所有文本图层
-	psd.hiddenTextLayers();
+	this.psd.hiddenTextLayers();
 	//为td插入图片
 	for(var i in this.td){
 		var colspan = 0,
 			rowspan = 0;
+		if(this.tr[i.split("_")[0]] == undefined){
+			continue;
+		}
 		if(this.td[i]['@colspan'] != ''){
 			colspan = parseInt(this.td[i]['@colspan'],10);
 		}
@@ -149,8 +163,8 @@ page.table.prototype.insertTdImg = function(textObj,tdWidths,tdHeights){
 		var pos = this.getTdPosition(i,colspan,rowspan,tdWidths,tdHeights);
 		if(isNaN(pos.bottom) || isNaN(pos.top) || isNaN(pos.left) || isNaN(pos.right)){
 			$.writeln(i+'---'+pos.top +'--'+pos.bottom+'--'+pos.left+'--'+pos.right);
-		}else{
-			var image = psd.exportSelection([[pos.left,pos.top],[pos.right,pos.top],[pos.right,pos.bottom],[pos.left,pos.bottom]],this.option.exportConfig);
+		}else if(pos.bottom - pos.top >0 && pos.right - pos.left >0){
+			var image = this.psd.exportSelection([[pos.left,pos.top],[pos.right,pos.top],[pos.right,pos.bottom],[pos.left,pos.bottom]],this.option.exportConfig);
 			//没有文本的填充图片
 			if(typeof(textObj[i]) == 'undefined'){
 				var div = new XML('<DIV></DIV>'),
@@ -171,7 +185,7 @@ page.table.prototype.insertTdImg = function(textObj,tdWidths,tdHeights){
 		}
 	}
 	//显示所有文本图层
-	psd.visibleTextLayers();
+	this.psd.visibleTextLayers();
 };
 
 /**

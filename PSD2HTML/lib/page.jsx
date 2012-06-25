@@ -1,8 +1,15 @@
+/**
+ * @author: wuming.xiaowm
+ * @date : 6/24 2012
+ * @description: 生成器接口
+ */
+
 var page = {};
 
 // @include "io.jsx"
 // @include "page/table.jsx"
 // @include "page/web.jsx"
+// @include "json2-min.jsx"
 
 
 /**
@@ -12,6 +19,7 @@ var page = {};
  * @param {Object} psd
  */
 page.init = function(data,option,psd){ 
+	IO.saveFile('E:/test/a.js',JSON.stringify(data),'gb2312');
 	//文件保存路径
 	this.filePath = option.path;
 	//文件编码
@@ -31,7 +39,7 @@ page.init = function(data,option,psd){
 			this.htmlCode = page.bssHtml(data,option,psd);
 			break;
 		default:
-			this.htmlCode = page.normalPage(data,option);
+			this.htmlCode = page.normalPage(data,option,psd);
 			break;
 	}
 	
@@ -61,7 +69,7 @@ page.edmHtml = function(data,option,psd){
 	head.appendChild(title);
 	html.appendChild(head);
 	html.appendChild(body);
-	return '<!DOCTYPE html>'+page.formatHtml(html.toXMLString());	
+	return '<!DOCTYPE html>'+html.toXMLString();	
 };
 
 /**
@@ -71,23 +79,15 @@ page.edmHtml = function(data,option,psd){
  * @param {Object} psd
  */
 page.bssHtml = function(data,option,psd){
-	return page.formatHtml(new page.table(data.childs,option,psd).toXMLString());	
-};
+	return new page.table(data.childs,option,psd).toXMLString();	
+}
 
 /**
  * 普通网页 
  * @param {Object} data
  * @param {Object} option
  */
-page.normalPage = function(data,option){
-	return '<!DOCTYPE html>'+ page.formatHtml(new page.web(data,option).toXMLString());
+page.normalPage = function(data,option,psd){
+	return '<!DOCTYPE html>'+ new page.web(data,option,psd).toXMLString();
 };
 
-page.formatHtml = function(htmlCode){
-	return htmlCode.replace(new RegExp(page.space, 'g'), "&nbsp;").replace(new RegExp(page.newline, 'g'), "<br/>");
-}
-
-//换行
-page.newline = '~~~~nweline~~~~';
-//空格
-page.space = '~~~~space~~~~';

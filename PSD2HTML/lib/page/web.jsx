@@ -1,3 +1,9 @@
+/**
+ * @author: wuming.xiaowm
+ * @date : 6/24 2012
+ * @description: 普通网页解析
+ */
+
 // @include "css.jsx"
 // @include "element.jsx"
 
@@ -5,8 +11,9 @@
  * 网页解析器
  * @param {Object} data
  * @param {Object} option
+ * @param {Object} psd
  */
-page.web = function(data,option){
+page.web = function(data,option,psd){
 	this.htmlCode = '';
 	this.data = data;
 	this.option = option;
@@ -64,7 +71,7 @@ page.web.prototype.parse = function(){
 		}else{
 			this.option.i = i;
 			this.option.styleCss = styleCss;
-			pageContent.appendChild(new page.element(item,this.option));
+			pageContent.appendChild(new page.element(item,this.option,psd));
 		}
 	}
 	//CMS foot

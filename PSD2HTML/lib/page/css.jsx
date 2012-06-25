@@ -1,4 +1,10 @@
 /**
+ * @author: wuming.xiaowm
+ * @date : 6/24 2012
+ * @description: css解析
+ */
+
+/**
  * css解析
  * @param {Object} data
  */

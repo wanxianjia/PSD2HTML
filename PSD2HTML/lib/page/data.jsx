@@ -1,4 +1,10 @@
 /**
+ * @author: wuming.xiaowm
+ * @date : 6/24 2012
+ * @description: 数据解析
+ */
+
+/**
  * 数据解析 
  * @param {Object} data
  * @param {Object} option
@@ -76,4 +82,30 @@ page.data.prototype.setLackTextObj = function(){
 page.data.prototype.sorts = function(){
 	this.rowData.sort(function(a,b){return a.top-b.top;});
 	this.colData.sort(function(a,b){return a.left-b.left;});
+	//this.removeRepeat();
+};
+
+/**
+ * 去掉相同的数据 
+ */
+page.data.prototype.removeRepeat = function(){
+	//去掉横向
+	var newRowData = [],
+		removeIndex = {};
+	for(var i=1;i<this.rowData.length;i++){
+		if(this.rowData[i]['top'] != this.rowData[i-1]['top']){
+			newRowData.push(this.rowData[i]);
+		}else{
+			removeIndex[this.rowData[i].index] = true;
+		}
+	}
+	this.rowData = newRowData;
+	//去掉纵向
+	var newColData = [];
+	for(var i in this.colData){
+		if(removeIndex[this.colData[i].index] !== true){
+			newColData.push(this.colData[i]);
+		}
+	}
+	//this.colData = newColData;
 };
