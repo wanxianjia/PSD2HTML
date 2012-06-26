@@ -62,7 +62,7 @@ page.table.prototype.createRow = function(){
 		colLen = this.colData.length,
 		textObj = {},
 		tdWidths = {},
-		tdHeights = {};//是要删除的tr
+		tdHeights = {};
 	for(var row=-1;row<rowLen;row++){
 		this.tr[row] = new XML('<tr></tr>');
 		for(var col=-1;col<colLen;col++){
@@ -94,6 +94,8 @@ page.table.prototype.createRow = function(){
 					}
 					textObj[tdKey] = {col:col,row:row,data:this.rowData[row],colspan:colspan};
 					this.td[tdKey].appendChild(text);
+				}else{
+					this.td[tdKey].appendChild(new XML());
 				}
 				
 			}
@@ -121,7 +123,7 @@ page.table.prototype.createRow = function(){
 	for(var i in textObj){
 		var data = textObj[i],
 			rowspan = this.mergeRow(data.data,data.col,data.colspan);
-		if(rowspan > 1){
+		if(rowspan > 1 && this.td[i] != undefined){
 			this.td[i]['@rowspan'] = rowspan;
 		}
 	}
@@ -129,15 +131,14 @@ page.table.prototype.createRow = function(){
 	for(var row in this.tr){
 		//td回归tr
 		for(var col in this.td){
-			if(row == col.substring(0,row.length)){
+			if(row == col.split('_')[0]){
 				this.tr[row].appendChild(this.td[col]);
 			}
 		}
 		//tr回归到tbody
 		this.tbody.appendChild(this.tr[row]);
 	}
-	
-	this.insertTdImg(textObj,tdWidths,tdHeights);
+	//this.insertTdImg(textObj,tdWidths,tdHeights);
 	
 };
 
@@ -234,8 +235,8 @@ page.table.prototype.getTdPosition = function(tdKey,colspan,rowspan,tdWidths,tdH
  * @param {Object} i
  */
 page.table.prototype.getHeightOvewValue = function(i){
-	if(this.rowData[i].textInfo.size == 0){return 0;}
-	if(this.rowData[i].textInfo <= 14){return 0;}
+	//if(this.rowData[i].textInfo.size == 0){return 0;}
+	//if(this.rowData[i].textInfo <= 14){return 0;}
 	return this.rowData[i].textInfo.size/this.rowData[i].textInfo.lineHeight*this.rowData[i].textInfo.size;
 };
 

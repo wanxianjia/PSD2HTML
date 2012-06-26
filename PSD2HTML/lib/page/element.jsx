@@ -46,6 +46,7 @@ page.element.prototype.img = function(){
 	img['@src'] = 'slices/'+psdImgObj.name;
 	img['@width'] = this.item.width;
 	img['@height'] = this.item.height;
+	img['@border'] = '0';
 	if(typeof(this.item.link) != 'undefined'){
 		var a = new XML('<a></a>');
 		a['@href'] = this.item.link.href;
@@ -83,10 +84,7 @@ page.element.prototype.text = function(){
 	if(this.item.textInfo.textType == 'TextType.POINTTEXT'){
 		var span = new XML('<span></span>');
 		if(this.option.builder == "normal"){
-			var lineCss = "white-space:pre-wrap;*white-space:pre;*word-wrap: break-word;",
-				className = 'style'+this.option.i+'a';
-			this.option.styleCss.appendChild('.'+className+'{'+lineCss+'}');
-			span['@class'] = className;
+			span['@class'] = "pre";
 		}else{
 			span['@style'] = "white-space:pre-wrap;*white-space:pre;*word-wrap: break-word;";
 		}
@@ -106,9 +104,9 @@ page.element.prototype.text = function(){
 				//行内样式
 				if(this.option.builder == "normal"){
 					var cssName = 'style'+this.option.i+'-'+i;
-					var lineCss = '.'+cssName+'{font-size:'+textRange[i].size+'px;color:#'+textRange[i].color+';font-family:\''+textRange[i].font+';\';white-space:pre-wrap;*white-space: pre;*word-wrap: break-word;}';
+					var lineCss = '.'+cssName+'{font-size:'+textRange[i].size+'px;color:#'+textRange[i].color+';font-family:\''+textRange[i].font+';\';}';
 					this.option.styleCss.appendChild(lineCss);
-					span['@class'] = cssName;
+					span['@class'] = cssName + " pre";
 				}else{
 					span['@style'] = 'margin:0px;padding:0px;font-size:'+textRange[i].size+'px;color:#'+textRange[i].color+';white-space:pre-wrap;*white-space: pre;*word-wrap: break-word;';
 				}
@@ -119,13 +117,13 @@ page.element.prototype.text = function(){
 	
 	//Css
 	var styleCss = new page.css(this.item,this.option);
-	styleCss.push("overflow:hidden");
 	if(this.option.builder == "normal"){
 		var cssName = 'style'+ this.option.i;
-		elm['@class'] = "absolute "+cssName;
+		elm['@class'] = "absolute over_hide "+cssName;
 		this.option.styleCss.appendChild('.'+cssName+'{'+styleCss.join(";")+';}');
 	}else{
 		//styleCss.push('width:'+this.item.width+'px;');
+		styleCss.push("overflow:hidden");
 		elm['@style'] = styleCss.join(';');
 	}
 	return elm;

@@ -19,7 +19,7 @@ var page = {};
  * @param {Object} psd
  */
 page.init = function(data,option,psd){ 
-	IO.saveFile('E:/test/a.js',JSON.stringify(data),'gb2312');
+	//IO.saveFile('D:/home/a.js',JSON.stringify(data),'gb2312');
 	//文件保存路径
 	this.filePath = option.path;
 	//文件编码
