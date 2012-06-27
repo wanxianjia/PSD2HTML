@@ -123,7 +123,7 @@ page.table.prototype.createRow = function(){
 			height = this.rowData[0].top; - this.getHeightOvewValue(0);
 		}else if(row == rowLen-1){
 			//最后一列
-			height = this.rowData[row].height + this.getHeightOvewValue(row);
+			height = this.rowData[row].height;// + this.getHeightOvewValue(row);
 		}else{
 			//中间列
 			height = this.rowData[row+1].top - this.rowData[row].top; - this.getHeightOvewValue(row+1) + this.getHeightOvewValue(row);
@@ -145,6 +145,7 @@ page.table.prototype.createRow = function(){
 	
 	//第一行
 	this.setFirstCol(colLen);
+	//第一列
 	this.setFirstRow(rowLen,colLen);
 	
 	var flag = [true,true];
@@ -179,6 +180,7 @@ page.table.prototype.createRow = function(){
 	
 	//最后一行
 	this.setLastCol(rowLen,colLen);
+	//最后一列
 	this.setLastRow(rowLen,colLen);
 	
 	//this.insertTdImg(textObj,tdWidths,tdHeights);
@@ -190,27 +192,24 @@ page.table.prototype.createRow = function(){
  * 表格的第一行高度变为0,再第一行后面增加一行合并本行所有列的tr   
  */
 page.table.prototype.setFirstCol = function(colLen){
-	var firstTr = new XML('<tr></tr>');
+	var data = this.getSortData('top'),
+		firstTr = new XML('<tr></tr>');
 		firstTd = new XML('<td></td>'),
 		width = this.width,
-		height =  parseInt(this.td['-1_-1']['@height'],10);
+		height =  data[0].top;
+		top = 0,
+		left = 0,
+		bottom = height,
+		right = width,
+		img = this.getImg(top,right,bottom,left);
+	
+				
 	firstTd['@colspan'] = colLen+3;
 	firstTd['@height'] = height;
 	this.td['-1_-1']['@height'] = '0';
 	firstTr.appendChild(firstTd);
 	
-	//图片对象
-	var image = this.psd.exportSelection([[0,0],[width,0],[width,height],[0,height]],this.option.exportConfig),
-		img = new XML('<img />'),
-		div = new XML('<DIV></DIV>');
-		
-	img["@border"] = "0";
-	img["@width"] = this.width;
-	img["@height"] = height;
-	img["@src"] = "slices/" + image.name;
-	div["@style"] = 'overflow:hidden;width:'+image.width+'px;height:'+image.height+'px;'
-	div.appendChild(img);
-	firstTd.appendChild(div);
+	firstTd.appendChild(img);
 	this.tbody.appendChild(firstTr);
 };
 
@@ -218,28 +217,19 @@ page.table.prototype.setFirstCol = function(colLen){
  *最后一行 
  */
 page.table.prototype.setLastCol = function(rowLen,colLen){
-	var lastTr = new XML('<tr></tr>'),
-		lastTd = new XML('<td></td>');
-	lastTd['@colspan'] = colLen+3;
-	lastTd['@height'] = this.height - this.rowData[this.rowData.length - 1].bottom;
-	lastTr.appendChild(lastTd);
-	
-	//图片对象
-	var top = this.rowData[rowLen-1].bottom,
-		width = this.width,
+	var data = this.getSortData('bottom'),
+		lastTr = new XML('<tr></tr>'),
+		lastTd = new XML('<td></td>')
+		top = data[data.length-1].bottom,
+		left = 0,
 		bottom = this.height,
-		image = this.psd.exportSelection([[0,top],[width,top],[width,bottom],[0,bottom]],this.option.exportConfig),
-		img = new XML('<img />'),
-		div = new XML('<DIV></DIV>');
-		
-	img["@border"] = "0";
-	img["@width"] = image.width;
-	img["@height"] = image.height;
-	img["@src"] = "slices/" + image.name;
-	div["@style"] = 'overflow:hidden;width:'+image.width+'px;height:'+image.height+'px;'
-	div.appendChild(img);
+		right = this.width,
+		img = this.getImg(top,right,bottom,left);
 	
-	lastTd.appendChild(div);
+	lastTd.appendChild(img);
+	lastTd['@colspan'] = colLen+3;
+	lastTd['@height'] = this.height - top;
+	lastTr.appendChild(lastTd);
 	
 	this.tbody.appendChild(lastTr);
 };
@@ -248,16 +238,18 @@ page.table.prototype.setLastCol = function(rowLen,colLen){
  * 第一列 
  */
 page.table.prototype.setFirstRow = function(rowLen,colLen){
-	var firesTd = new XML('<td></td>');
-		firesTd['@rowspan'] = rowLen;
-		firesTd.appendChild(new XML());
-		// top:parseInt(this.td['-1']['@height']),
-		// bottom:,
-		// left:,
-		// right:;
-	// //this.psd.exportSelection([[pos.left,pos.top],[pos.right,pos.top],[pos.right,pos.bottom],[pos.left,pos.bottom]],this.option.exportConfig)	
-	// var image = this.psd.exportSelection([[0,top],[width,top],[width,bottom],[0,bottom]],this.option.exportConfig);
+	var dataTop = this.getSortData('top'),
+		firesTd = new XML('<td></td>'),
+		top = dataTop[0].top,
+		left = 0,
+		dataBottom = this.getSortData('bottom'),
+		bottom = dataBottom[dataBottom.length-1].bottom,
+		dataRight = this.getSortData('left'),
+		right = dataRight[0].left,
+		img = this.getImg(top,right,bottom,left);
 		
+	firesTd['@rowspan'] = rowLen;
+	firesTd.appendChild(img);	
 	this.tr[0].appendChild(firesTd);
 };
 
@@ -265,10 +257,23 @@ page.table.prototype.setFirstRow = function(rowLen,colLen){
  * 最后一列
  */
 page.table.prototype.setLastRow = function(rowLen,colLen){
-	var firesTd = new XML('<td></td>');
-		firesTd['@rowspan'] = rowLen;
-		firesTd.appendChild(new XML());
-	this.tr[0].appendChild(firesTd);
+	var lastTd = new XML('<td></td>'),
+		img = new XML('<img />'),
+		div = new XML('<DIV></DIV>'),
+		dataTop = this.getSortData('top'),
+		top = dataTop[0].top,
+		dataLeft = this.getSortData('right'),
+		left = dataLeft[dataLeft.length-1].right,
+		right = this.width,
+		dataBottom = this.getSortData('bottom'),
+		bottom = dataBottom[dataBottom.length-1].bottom,
+		img = this.getImg(top,right,bottom,left);
+	
+	
+	
+	lastTd['@rowspan'] = rowLen;	
+	lastTd.appendChild(img);
+	this.tr[0].appendChild(lastTd);
 };
 
 /**
@@ -422,3 +427,42 @@ page.table.prototype.mergeRow = function(obj,col,colspan){
 	return n;
 };
 
+/**
+ * 获取图片 
+ * @param {Object} top
+ * @param {Object} right
+ * @param {Object} bottom
+ * @param {Object} left
+ */
+page.table.prototype.getImg = function(top,right,bottom,left){
+	var img = new XML('<img />'),
+		div = new XML('<DIV></DIV>');
+	if(bottom - top <=0 || right-left <=0){
+		return new XML();
+	}	
+	
+	var image = this.psd.exportSelection([[left,top],[right,top],[right,bottom],[left,bottom]],this.option.exportConfig);
+	img['@src'] = 'slices/'+image.name;
+	img['@width'] = image.width;
+	img['@height'] = image.height;
+	img['@border']= "0";
+	img['@style'] = 'display:block;margin:0px;padding:0px;'
+	div['@style'] = 'overflow:hidden;width:'+image.width+'px;height:'+image.height+'px;';
+	div.appendChild(img);
+	return div;
+};
+
+/**
+ * 获取数据
+ * @param {Object} field
+ * @param {Object} order asc/desc
+ */
+page.table.prototype.getSortData = function(field,order){
+	var data = this.rowData;
+	if(order == "desc"){
+		data.sort(function(a,b){return b[field] - a[field];});
+	}else{
+		data.sort(function(a,b){return a[field] - b[field];});
+	}
+	return data;
+};
