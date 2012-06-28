@@ -43,7 +43,7 @@ page.css.prototype.get = function(){
 	//取文字大小
 	var fontSize = textInfo.size,
 	//取行高
-	lineHeight = textInfo.lineHeight;
+	lineHeight = textInfo.lineHeight-1;
 	//如果是段落，有行高和宽高
 	if(textInfo.textType == "TextType.PARAGRAPHTEXT") {
 		//如果行高为%
@@ -80,9 +80,11 @@ page.css.prototype.get = function(){
 		//z-index
 		style.push('z-index:' + item.index);
 		//定位
-		var top = item.top - Math.round(item.textInfo.size/3.75);
+		var top = 0;
 		if(textInfo.textType == "TextType.PARAGRAPHTEXT") {
 			top = item.top - (item.textInfo.lineHeight - item.textInfo.size)/2;
+		}else{
+			top = item.top - Math.round(item.textInfo.size/3.75);
 		}
 		style.push('top:' + top + 'px');
 		style.push('left:' + (item.left - (this.option.width - 952) / 2) + 'px');

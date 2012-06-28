@@ -20,8 +20,6 @@ page.data = function(data,option){
 	//原始数据
 	this.data = data;
 	
-	//带索引的数据
-	this.dataMap = {};
 	
 	//横向排序的数据
 	this.rowData = [];
@@ -36,7 +34,6 @@ page.data = function(data,option){
 	return {
 		colCount:this.colSize,
 		rowCount:this.rowSize,
-		dataMap:this.dataMap,
 		colData:this.colData,
 		rowData:this.rowData
 	};
@@ -56,7 +53,6 @@ page.data.prototype.getUsefulData = function(){
 				this.data[i].textInfo = this.setLackTextObj();
 			}
 			this.data[i].position = {};
-			this.dataMap[this.data[i].index] = this.data[i];
 			this.rowData.push(this.data[i]);
 			this.colData.push(this.data[i]);
 		}

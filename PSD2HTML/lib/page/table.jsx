@@ -20,14 +20,18 @@ page.table = function(data,option,psd){
 	//高宽
 	this.width = option.width;
 	this.height = option.height;
+	//高度总和
+	this.heightCount = 0;
+	//宽度总和
+	this.widthCount = 0;
 	
 	//行和列的总数
 	this.rowCount = resultData.rowCount;
 	this.colCount = resultData.colCount;
 	
+	//数据源
 	this.rowData = resultData.rowData;
 	this.colData = resultData.colData;
-	this.dataMap = resultData.dataMap;
 	
 	//定义表格
 	this.table = null;
@@ -48,8 +52,8 @@ page.table = function(data,option,psd){
 page.table.prototype.createMain = function(){
 	this.table = new XML('<table border="0" cellspacing="0" cellpadding="0"></table>'),
 	this.tbody = new XML('<tbody></tbody>');
-	this.table.appendChild(this.tbody);
 	this.createRow();
+	this.table.appendChild(this.tbody);
 	this.table['@width'] = this.width;
 };
 
@@ -91,6 +95,7 @@ page.table.prototype.createRow = function(){
 					}
 					this.td[tdKey]['@width'] = width;
 					tdWidths[tdKey] = width;
+					this.widthCount += width;
 				}
 				//判断横向和纵向的top是否相同，如果相同，把文本等嵌入到td中
 				if(col>-1 && row > -1 && this.rowData[row].top == this.colData[col].top){
@@ -119,7 +124,7 @@ page.table.prototype.createRow = function(){
 		var height = 0;
 		if(row == -1){
 			//第一列
-			height = this.rowData[0].top; - this.getHeightOvewValue(0);
+			height = this.rowData[0].top - this.getHeightOvewValue(0);
 		}else if(row == rowLen-1){
 			//最后一列
 			height = this.rowData[row].height + this.getHeightOvewValue(row);
@@ -130,7 +135,7 @@ page.table.prototype.createRow = function(){
 		
 		this.td[row+'_-1']['@height'] = height;
 		tdHeights[row+'_-1'] = height;
-		
+		this.heightCount += height;
 	}
 	
 	//合并行
@@ -182,8 +187,7 @@ page.table.prototype.createRow = function(){
 	//最后一列
 	this.setLastRow(rowLen,colLen);
 	
-	//this.insertTdImg(textObj,tdWidths,tdHeights);
-	
+	this.insertTdImg(textObj,tdWidths,tdHeights);
 };
 
 /**
@@ -195,7 +199,7 @@ page.table.prototype.setFirstCol = function(rowLen,colLen){
 		firstTd = new XML('<td></td>'),
 		width = this.width,
 		data = this.getSortData('top'),
-		height =  data[0].top;
+		height =  data[0].top - this.getHeightOvewValue(0);
 		top = 0,
 		left = 0,
 		bottom = height,
@@ -219,7 +223,7 @@ page.table.prototype.setLastCol = function(rowLen,colLen){
 	var data = this.getSortData('bottom'),
 		lastTr = new XML('<tr></tr>'),
 		lastTd = new XML('<td></td>')
-		top = data[data.length-1].bottom,
+		top = this.heightCount,
 		left = 0,
 		bottom = this.height,
 		right = this.width,
@@ -239,7 +243,7 @@ page.table.prototype.setLastCol = function(rowLen,colLen){
 page.table.prototype.setFirstRow = function(rowLen,colLen){
 	var dataTop = this.getSortData('top'),
 		firesTd = new XML('<td></td>'),
-		top = dataTop[0].top,
+		top = dataTop[0].top - this.getHeightOvewValue(0),
 		left = 0,
 		dataBottom = this.getSortData('bottom'),
 		bottom = dataBottom[dataBottom.length-1].bottom,
@@ -260,9 +264,9 @@ page.table.prototype.setLastRow = function(rowLen,colLen){
 		img = new XML('<img />'),
 		div = new XML('<DIV></DIV>'),
 		dataTop = this.getSortData('top'),
-		top = dataTop[0].top,
+		top = dataTop[0].top - this.getHeightOvewValue(0),
 		dataLeft = this.getSortData('right'),
-		left = dataLeft[dataLeft.length-1].right,
+		left = this.widthCount,
 		right = this.width,
 		dataBottom = this.getSortData('bottom'),
 		bottom = dataBottom[dataBottom.length-1].bottom,
@@ -358,10 +362,11 @@ page.table.prototype.getTdPosition = function(tdKey,colspan,rowspan,tdWidths,tdH
  * @param {Object} i
  */
 page.table.prototype.getHeightOvewValue = function(i){
-	if(this.rowData[i].textInfo.textType == 'TextType.PARAGRAPHTEXT'){
-		return (this.rowData[i].textInfo.lineHeight - this.rowData[i].textInfo.size)/2;
+	var textInfo = this.rowData[i].textInfo;
+	if(textInfo.textType == 'TextType.PARAGRAPHTEXT'){
+		return Math.ceil(textInfo.lineHeight - this.rowData[i].textInfo.size)/2;
 	}else{
-		return 0;
+		return Math.round(textInfo.size/3.75);
 	}
 	
 };
