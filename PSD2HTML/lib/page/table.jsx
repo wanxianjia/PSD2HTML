@@ -84,7 +84,7 @@ page.table.prototype.createRow = function(){
 						width = this.colData[0].left;
 					}else if(col == colLen - 1){
 						//最后一列
-						width = this.colData[col].width;
+						width = this.width - this.colData[col].left;
 					}else{
 						//中间列
 						width = this.colData[col+1].left - this.colData[col].left;
@@ -95,7 +95,6 @@ page.table.prototype.createRow = function(){
 				//判断横向和纵向的top是否相同，如果相同，把文本等嵌入到td中
 				if(col>-1 && row > -1 && this.rowData[row].top == this.colData[col].top){
 					//设置td的属性
-					this.td[tdKey]['@border'] = '0';
 					this.td[tdKey]['@align'] = 'left';
 					this.td[tdKey]['@valign'] = 'top';
 					
@@ -123,10 +122,10 @@ page.table.prototype.createRow = function(){
 			height = this.rowData[0].top; - this.getHeightOvewValue(0);
 		}else if(row == rowLen-1){
 			//最后一列
-			height = this.rowData[row].height;// + this.getHeightOvewValue(row);
+			height = this.rowData[row].height + this.getHeightOvewValue(row);
 		}else{
 			//中间列
-			height = this.rowData[row+1].top - this.rowData[row].top; - this.getHeightOvewValue(row+1) + this.getHeightOvewValue(row);
+			height = this.rowData[row+1].top - this.rowData[row].top - this.getHeightOvewValue(row+1) + this.getHeightOvewValue(row);
 		}
 		
 		this.td[row+'_-1']['@height'] = height;
@@ -144,7 +143,7 @@ page.table.prototype.createRow = function(){
 	}
 	
 	//第一行
-	this.setFirstCol(colLen);
+	this.setFirstCol(rowLen,colLen);
 	//第一列
 	this.setFirstRow(rowLen,colLen);
 	
@@ -167,7 +166,7 @@ page.table.prototype.createRow = function(){
 				if(colObj[1] == colLen-1 && flag[1]){
 					flag[1] = false;
 					var td = new XML('<td></td>');
-					td['@width'] = this.width - this.colData[this.colData.length - 1].right;
+					//td['@width'] = this.width - this.colData[this.colData.length - 1].right;
 					td.appendChild(new XML());
 					this.tr[row].appendChild(td);
 				}
@@ -191,11 +190,11 @@ page.table.prototype.createRow = function(){
  * 第一行
  * 表格的第一行高度变为0,再第一行后面增加一行合并本行所有列的tr   
  */
-page.table.prototype.setFirstCol = function(colLen){
-	var data = this.getSortData('top'),
-		firstTr = new XML('<tr></tr>');
+page.table.prototype.setFirstCol = function(rowLen,colLen){
+	var firstTr = new XML('<tr></tr>');
 		firstTd = new XML('<td></td>'),
 		width = this.width,
+		data = this.getSortData('top'),
 		height =  data[0].top;
 		top = 0,
 		left = 0,
@@ -209,7 +208,7 @@ page.table.prototype.setFirstCol = function(colLen){
 	this.td['-1_-1']['@height'] = '0';
 	firstTr.appendChild(firstTd);
 	
-	firstTd.appendChild(img);
+	firstTd.appendChild(img.element);
 	this.tbody.appendChild(firstTr);
 };
 
@@ -226,7 +225,7 @@ page.table.prototype.setLastCol = function(rowLen,colLen){
 		right = this.width,
 		img = this.getImg(top,right,bottom,left);
 	
-	lastTd.appendChild(img);
+	lastTd.appendChild(img.element);
 	lastTd['@colspan'] = colLen+3;
 	lastTd['@height'] = this.height - top;
 	lastTr.appendChild(lastTd);
@@ -249,7 +248,7 @@ page.table.prototype.setFirstRow = function(rowLen,colLen){
 		img = this.getImg(top,right,bottom,left);
 		
 	firesTd['@rowspan'] = rowLen;
-	firesTd.appendChild(img);	
+	firesTd.appendChild(img.element);	
 	this.tr[0].appendChild(firesTd);
 };
 
@@ -272,7 +271,7 @@ page.table.prototype.setLastRow = function(rowLen,colLen){
 	
 	
 	lastTd['@rowspan'] = rowLen;	
-	lastTd.appendChild(img);
+	lastTd.appendChild(img.element);
 	this.tr[0].appendChild(lastTd);
 };
 
@@ -295,28 +294,16 @@ page.table.prototype.insertTdImg = function(textObj,tdWidths,tdHeights){
 		if(this.td[i]['@rowspan'] != ''){
 			rowspan = parseInt(this.td[i]['@rowspan'],10);
 		}
-		var pos = this.getTdPosition(i,colspan,rowspan,tdWidths,tdHeights);
-		if(isNaN(pos.bottom) || isNaN(pos.top) || isNaN(pos.left) || isNaN(pos.right)){
-			//$.writeln(i+'---'+pos.top +'--'+pos.bottom+'--'+pos.left+'--'+pos.right);
-		}else if(pos.bottom - pos.top >0 && pos.right - pos.left >0){
-			var image = this.psd.exportSelection([[pos.left,pos.top],[pos.right,pos.top],[pos.right,pos.bottom],[pos.left,pos.bottom]],this.option.exportConfig);
+		var pos = this.getTdPosition(i,colspan,rowspan,tdWidths,tdHeights),
+			img = this.getImg(pos.top,pos.right,pos.bottom,pos.left);
+			
+		if(typeof(textObj[i]) == 'undefined'){
 			//没有文本的填充图片
-			if(typeof(textObj[i]) == 'undefined'){
-				var div = new XML('<DIV></DIV>'),
-					img = new XML('<img />');
-				img['@src'] = 'slices/'+image.name;
-				img['@width'] = image.width;
-				img['@height'] = image.height;
-				img['@border']= "0";
-				img['@style'] = 'display:block;margin:0px;padding:0px;'
-				div['@style'] = 'overflow:hidden;width:'+image.width+'px;height:'+image.height+'px;';
-				div.appendChild(img);
-				this.td[i].appendChild(img);
-				this.td[i]['@style'] = "margin:0px;padding:0px;font-size:0px;"
-			}else{
-				//有文本的填充背景
-				this.td[i]['@background'] = 'slices/'+image.name;
-			}
+			this.td[i].appendChild(img.element);
+			this.td[i]['@style'] = "margin:0px;padding:0px;font-size:0px;"
+		}else{
+			//有文本的填充背景
+			this.td[i]['@background'] = 'slices/'+img.imgObject.name;
 		}
 	}
 	//显示所有文本图层
@@ -330,7 +317,9 @@ page.table.prototype.getTdPosition = function(tdKey,colspan,rowspan,tdWidths,tdH
 	var key = tdKey.split('_'),
 		row = parseInt(key[0],10),
 		col = parseInt(key[1],10);
-	
+	if(row == '-1' || col == '-1'){
+		return {top:0,left:0,right:0,bottom:0};
+	}
 	var heightCount=0,
 		widthCount=0;
 	for(var i=-1;i<row;i++){
@@ -369,9 +358,12 @@ page.table.prototype.getTdPosition = function(tdKey,colspan,rowspan,tdWidths,tdH
  * @param {Object} i
  */
 page.table.prototype.getHeightOvewValue = function(i){
-	//if(this.rowData[i].textInfo.size == 0){return 0;}
-	//if(this.rowData[i].textInfo <= 14){return 0;}
-	return this.rowData[i].textInfo.size/this.rowData[i].textInfo.lineHeight*this.rowData[i].textInfo.size;
+	if(this.rowData[i].textInfo.textType == 'TextType.PARAGRAPHTEXT'){
+		return (this.rowData[i].textInfo.lineHeight - this.rowData[i].textInfo.size)/2;
+	}else{
+		return 0;
+	}
+	
 };
 
 /**
@@ -449,7 +441,7 @@ page.table.prototype.getImg = function(top,right,bottom,left){
 	img['@style'] = 'display:block;margin:0px;padding:0px;'
 	div['@style'] = 'overflow:hidden;width:'+image.width+'px;height:'+image.height+'px;';
 	div.appendChild(img);
-	return div;
+	return {element:div,imgObject:image};
 };
 
 /**

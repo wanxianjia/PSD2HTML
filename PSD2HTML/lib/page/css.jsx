@@ -62,7 +62,7 @@ page.css.prototype.get = function(){
 		style.push('line-height:' + lineHeight);
 		
 		//宽度
-		style.push('width:' + (item.width+5) + 'px');
+		style.push('width:' + (item.width + (item.textInfo.size/4)) + 'px');
 		if(this.type == "page"){
 			//高度
 			style.push('height:' + item.height + 'px');
