@@ -1,4 +1,4 @@
-﻿// @include "json2-min.jsx"
+// @include "json2-min.jsx"
 // @include "web-fonts.jsx"
 
 //setting for app preferences
@@ -369,8 +369,13 @@ PSD.fn = PSD.prototype = {
 			xset.push(region[i][0]);
 			yset.push(region[i][1]);
 		}
-		var width = Math.max.apply(null, xset) - Math.min.apply(null, xset),
-			height = Math.max.apply(null, yset) - Math.min.apply(null, yset);
+		// var width = Math.max.apply(null, xset) - Math.min.apply(null, xset),
+			// height = Math.max.apply(null, yset) - Math.min.apply(null, yset);
+		xset.sort(function(a,b){return a-b;});
+		yset.sort(function(a,b){return a-b;});
+		var width = xset[xset.length-1] - xset[0],
+			height = yset[yset.length-1] - yset[0];
+		
 		// export image
 		var newDoc = this.docs.add(width, height);
 		newDoc.paste();
@@ -384,7 +389,7 @@ PSD.fn = PSD.prototype = {
 		newDoc.exportDocument (img, ExportType.SAVEFORWEB, conf);
 		newDoc.close(SaveOptions.DONOTSAVECHANGES);
 		img.name = 'slice_'+_index+'.'+extension;
-		return {name:img.name};
+		return {name:img.name,width:width,height:height};
 	},
 	getTextLayersAndSlices: function(option, height){
 		if(_slices.length <= 0) this.autoSliceAndExport(option, height);

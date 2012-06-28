@@ -1,6 +1,6 @@
 // @include "../lib/json2-min.jsx"
 // @include "../lib/psd.jsx"
-// @include "../lib/toPage.jsx"
+// @include "../lib/page.jsx"
 
 //alert(JSON.stringify(APP.OPTION)); //设置面板的设置结果
 var appOp = APP.OPTION;
@@ -27,12 +27,12 @@ if(APP.OPTION.builder != "normal"){
 }else{
    data = psd.getTextLayersAndSlices(option);
 }
-new toPage(data,{
+new page.init(data,{
 	'width':psd.getWidth(),
 	'height':psd.getHeight(),
-	'textLayers':psd.getTextLayers(),
 	'encode':"gb2312",
 	'builder':APP.OPTION.builder,
-	'path':psd.dir + "/" + psd.doc.name.split(".")[0] + ".html"
-});
+	'path':psd.dir + "/index.html",
+	'exportConfig':option
+},psd);
 psd = null;
