@@ -59,7 +59,7 @@ page.element.prototype.img = function(){
 	if(this.option.builder == "normal"){
 		var cssName = "style"+this.option.i;
 		
-		styleCss += 'top:'+this.item.top+'px;left:'+(this.item.left + 2 - (this.option.width - 952) / 2)+'px;';
+		styleCss += 'top:'+this.item.top+'px;left:'+(this.item.left - (this.option.width - 952) / 2)+'px;';
 		div['@class'] = cssName+" absolute";
 		this.option.styleCss.appendChild(new XML('.'+cssName+'{'+styleCss+'}'));
 	}else{

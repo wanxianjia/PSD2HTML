@@ -80,8 +80,12 @@ page.css.prototype.get = function(){
 		//z-index
 		style.push('z-index:' + item.index);
 		//定位
-		style.push('top:' + item.top + 'px');
-		style.push('left:' + (item.left + 2 - (this.option.width - 952) / 2) + 'px');
+		var top = item.top - Math.round(item.textInfo.size/3.75);
+		if(textInfo.textType == "TextType.PARAGRAPHTEXT") {
+			top = item.top - (item.textInfo.lineHeight - item.textInfo.size)/2;
+		}
+		style.push('top:' + top + 'px');
+		style.push('left:' + (item.left - (this.option.width - 952) / 2) + 'px');
 	}else{
 		style.push('margin:0px');
 		style.push('padding:0px');
