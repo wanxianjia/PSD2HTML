@@ -43,19 +43,12 @@ page.css.prototype.get = function(){
 	//取文字大小
 	var fontSize = textInfo.size,
 	//取行高
-	lineHeight = textInfo.lineHeight-1;
+	lineHeight = textInfo.lineHeight;
 	//如果是段落，有行高和宽高
 	if(textInfo.textType == "TextType.PARAGRAPHTEXT") {
 		//如果行高为%
 		if( typeof (lineHeight) == "string" && lineHeight.indexOf("%") > -1) {
 			lineHeight = textInfo.lineHeight;
-			//如果行高小于字体，并且字体小于14
-		} else if(lineHeight < fontSize && fontSize < 14) {
-			lineHeight = '14px';
-			//如果行高小于字体
-		} else if(lineHeight < fontSize) {
-			lineHeight = fontSize + 'px';
-			//其他
 		} else {
 			lineHeight = lineHeight + "px";
 		}
@@ -63,10 +56,10 @@ page.css.prototype.get = function(){
 		
 		//宽度
 		style.push('width:' + (item.width + (item.textInfo.size/4)) + 'px');
-		if(this.type == "page"){
+		//if(this.type == "page"){
 			//高度
-			style.push('height:' + item.height + 'px');
-		}
+			//style.push('height:' + item.height + 'px');
+		//}
 	}
 	//对齐
 	style.push('text-align:' + textInfo.textAlign + '');

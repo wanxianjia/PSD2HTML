@@ -14,8 +14,9 @@
  * @param {Object} psd
  */
 page.table = function(data,option,psd){
+	this.data = data;
 	this.option = option;
-	var resultData = new page.data(data,option);
+	var resultData = new page.data(data.childs,option);
 	this.psd = psd;
 	//高宽
 	this.width = option.width;
@@ -67,6 +68,16 @@ page.table.prototype.createRow = function(){
 		textObj = {},//有文本的td集合
 		tdWidths = {},//td宽度集合
 		tdHeights = {};//td高度集合
+	
+	//没有文本图层
+	if(rowLen == 0 && colLen == 0){
+		var tr = new XML('<tr></tr>'),
+			td = new XML('<td><div style="overflow:hidden;width:'+this.width+'px;height:'+this.height+'px;"><img src="slices/'+this.data.childs[0].name+'" width = "'+this.width+'" height="'+this.height+'"/></div></td>');
+		tr.appendChild(td);
+		this.tbody.appendChild(tr);
+		return;
+	}
+	
 	//遍历行
 	for(var row=-1;row<rowLen;row++){
 		//定义tr
@@ -127,7 +138,8 @@ page.table.prototype.createRow = function(){
 			height = this.rowData[0].top - this.getHeightOvewValue(0);
 		}else if(row == rowLen-1){
 			//最后一列
-			height = this.rowData[row].height + this.getHeightOvewValue(row);
+			var overValue = this.getHeightOvewValue(row);
+			height = this.rowData[row].height + (overValue*2)+2;
 		}else{
 			//中间列
 			height = this.rowData[row+1].top - this.rowData[row].top - this.getHeightOvewValue(row+1) + this.getHeightOvewValue(row);
@@ -150,9 +162,9 @@ page.table.prototype.createRow = function(){
 	//第一行
 	this.setFirstCol(rowLen,colLen);
 	//第一列
-	this.setFirstRow(rowLen,colLen);
+	//this.setFirstRow(rowLen,colLen);
 	
-	var flag = [true,true];
+	var flag = [false,false];//[true,true];
 	//td和tr回归到table
 	for(var row in this.tr){
 		//td回归tr
@@ -185,7 +197,7 @@ page.table.prototype.createRow = function(){
 	//最后一行
 	this.setLastCol(rowLen,colLen);
 	//最后一列
-	this.setLastRow(rowLen,colLen);
+	//this.setLastRow(rowLen,colLen);
 	
 	this.insertTdImg(textObj,tdWidths,tdHeights);
 };
@@ -364,6 +376,7 @@ page.table.prototype.getTdPosition = function(tdKey,colspan,rowspan,tdWidths,tdH
 page.table.prototype.getHeightOvewValue = function(i){
 	var textInfo = this.rowData[i].textInfo;
 	if(textInfo.textType == 'TextType.PARAGRAPHTEXT'){
+		//-2 是
 		return Math.ceil(textInfo.lineHeight - this.rowData[i].textInfo.size)/2;
 	}else{
 		return Math.round(textInfo.size/3.75);

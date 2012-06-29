@@ -65,7 +65,8 @@ page.edmHtml = function(data,option,psd){
 		title = new XML('<title>' + data.name + '</title>'),
 		body = new XML('<body></body>');
 	
-	body.appendChild(new page.table(data.childs,option,psd));
+	//body.appendChild(new XML('<style>td{border:1px solid #F00;}</style>'));
+	body.appendChild(new page.table(data,option,psd));
 	head.appendChild(title);
 	html.appendChild(head);
 	html.appendChild(body);
@@ -79,7 +80,7 @@ page.edmHtml = function(data,option,psd){
  * @param {Object} psd
  */
 page.bssHtml = function(data,option,psd){
-	return new page.table(data.childs,option,psd).toXMLString();	
+	return new page.table(data,option,psd).toXMLString();	
 }
 
 /**
