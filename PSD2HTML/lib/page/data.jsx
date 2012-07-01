@@ -7,12 +7,11 @@
 /**
  * 数据解析 
  * @param {Object} data
- * @param {Object} option
  */
-page.data = function(data,option){
+page.data = function(data){
 	//全局高宽
-	this.width = option.width;
-	this.height = option.height;
+	this.width = page.width;
+	this.height = page.height;
 	
 	//数据长度
 	this.len = 0;
@@ -105,3 +104,4 @@ page.data.prototype.removeRepeat = function(){
 	}
 	//this.colData = newColData;
 };
+

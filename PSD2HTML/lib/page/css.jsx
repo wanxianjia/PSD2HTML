@@ -8,9 +8,8 @@
  * css解析
  * @param {Object} data
  */
-page.css = function(data,option){
+page.css = function(data){
 	this.item = data;
-	this.option = option;
 	return this.get();
 }
 
@@ -55,16 +54,16 @@ page.css.prototype.get = function(){
 		style.push('line-height:' + lineHeight);
 		
 		//宽度
-		style.push('width:' + (item.width + (item.textInfo.size/4)) + 'px');
-		//if(this.type == "page"){
+		style.push('width:' + parseInt(item.width + (item.textInfo.size/4),10) + 'px');
+		if(page.option.builder != "normal"){
 			//高度
-			//style.push('height:' + item.height + 'px');
-		//}
+			style.push('height:' + item.height + 'px');
+		}
 	}
 	//对齐
 	style.push('text-align:' + textInfo.textAlign + '');
 	//非网页不需要这些样式
-	if(typeof(this.option) == 'object' && this.option.builder == "normal"){
+	if(typeof(page.option) == 'object' && page.option.builder == "normal"){
 		//字体
 		style.push('font-family:\'' + textInfo.font + '\'');
 		//外边距
@@ -80,7 +79,7 @@ page.css.prototype.get = function(){
 			top = item.top - Math.round(item.textInfo.size/3.75);
 		}
 		style.push('top:' + top + 'px');
-		style.push('left:' + (item.left - (this.option.width - 952) / 2) + 'px');
+		style.push('left:' + (item.left - (page.option.width - 952) / 2) + 'px');
 	}else{
 		style.push('margin:0px');
 		style.push('padding:0px');
