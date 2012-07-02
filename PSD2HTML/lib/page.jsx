@@ -19,7 +19,7 @@ var page = {};
  * @param {Object} psd
  */
 page.init = function(data,option,psd){ 
-	IO.saveFile('d:/home/a.js',JSON.stringify(data),'gb2312');
+	IO.saveFile('e:/test/a.js',JSON.stringify(data),'gb2312');
 	page.option = option;
 	page.psd = psd;
 	page.title = data.name;
@@ -69,7 +69,7 @@ page.edmHtml = function(data){
 		title = new XML('<title>' + data.name + '</title>'),
 		body = new XML('<body></body>');
 	
-	body.appendChild(new XML('<style>td{border:1px solid #F00;}</style>'));
+	//body.appendChild(new XML('<style>td{border:1px solid #F00;}</style>'));
 	body.appendChild(new page.table(data));
 	head.appendChild(title);
 	html.appendChild(head);

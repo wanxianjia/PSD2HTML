@@ -1,4 +1,4 @@
-/*
+﻿/*
 <javascriptresource> 
 <name>PSD TO HTML</name> 
 <about>v1.0--https://github.com/wanxianjia/PSD2HTML</about> 
@@ -54,7 +54,7 @@ var APP = {version: '1.0'};
 			output: Group{\
 				orientation:"row",\
 				b: Button{text:"'+i18n("selectEmportFolder")+'", properties:{name:"open"}, helpTip:"'+i18n("selectEmportFolder")+'"},\
-				s: EditText  { text:"/d/home", preferredSize:[180, 20], helpTip:"'+i18n("defaultToMyDocument")+'"}\
+				s: EditText  { text:"/e/test", preferredSize:[180, 20], helpTip:"'+i18n("defaultToMyDocument")+'"}\
 			}\
 		},\
 		buttons:Group{\
@@ -69,11 +69,11 @@ var APP = {version: '1.0'};
 			extension:'jpg',
 			quality:60,
 		},
-		output:'/d/home'
+		output:'/e/test'
 	};
 	// 选择文件夹事件
 	APP.win.option.output.b.onClick = function(){
-		var output = Folder.selectDialog (i18n("selectEmportFolder"),'/d/home');
+		var output = Folder.selectDialog (i18n("selectEmportFolder"),'/e/test');
 		if(output){
 			APP.win.option.output.s.text  = APP.OPTION.output = output;
 		}

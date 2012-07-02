@@ -66,7 +66,7 @@ page.table.prototype.createRow = function(){
 	//没有文本图层
 	if(rowLen == 0 && colLen == 0){
 		var tr = new XML('<tr></tr>'),
-			td = new XML('<td><div style="overflow:hidden;width:'+page.width+'px;height:'+page.height+'px;"><img src="slices/'+this.data.childs[0].name+'" width = "'+page.width+'" height="'+page.height+'"/></div></td>');
+			td = new XML('<td><DIV style="overflow:hidden;width:'+page.width+'px;height:'+page.height+'px;"><img src="slices/'+this.data.childs[0].name+'" width = "'+page.width+'" height="'+page.height+'"/></DIV></td>');
 		tr.appendChild(td);
 		this.tbody.appendChild(tr);
 		return;
@@ -94,9 +94,7 @@ page.table.prototype.createRow = function(){
 						width = this.colData[0].left;
 					}else if(col == colLen - 1){
 						//最后一列
-						//width = page.width - this.colData[col].left;
-						this.textData.sort(function(a,b){return a.right-b.right});
-						width = this.textData[this.textData.length-1].right - this.textData[this.textData.length-2].right;
+						width = page.width - this.colData[col].left;
 					}else{
 						//中间列
 						width = this.colData[col+1].left - this.colData[col].left;
@@ -161,7 +159,7 @@ page.table.prototype.createRow = function(){
 	//第一列
 	this.setFirstRow(rowLen,colLen);
 	
-	var flag = [true,true];
+	var flag = [true,false];
 	//td和tr回归到table
 	for(var row in this.tr){
 		//td回归tr
@@ -194,7 +192,7 @@ page.table.prototype.createRow = function(){
 	//最后一行
 	this.setLastCol(rowLen,colLen);
 	//最后一列
-	this.setLastRow(rowLen,colLen);
+	//this.setLastRow(rowLen,colLen);
 	
 	this.insertTdImg(textObj,tdWidths,tdHeights);
 };
@@ -216,9 +214,9 @@ page.table.prototype.setFirstCol = function(rowLen,colLen){
 		img = page.getPsdImg(top,right,bottom,left);
 	
 				
-	firstTd['@colspan'] = colLen+3;
+	firstTd['@colspan'] = colLen+2;
 	firstTd['@height'] = height;
-	this.td['-1_-1']['@height'] = '100';
+	this.td['-1_-1']['@height'] = '0';
 	firstTr.appendChild(firstTd);
 	
 	firstTd.appendChild(img.element);
@@ -239,7 +237,7 @@ page.table.prototype.setLastCol = function(rowLen,colLen){
 		img = page.getPsdImg(top,right,bottom,left);
 	
 	lastTd.appendChild(img.element);
-	lastTd['@colspan'] = colLen+3;
+	lastTd['@colspan'] = colLen+2;
 	lastTd['@height'] = page.height - top;
 	lastTr.appendChild(lastTd);
 	
@@ -311,7 +309,6 @@ page.table.prototype.insertTdImg = function(textObj,tdWidths,tdHeights){
 		if(typeof(textObj[i]) == 'undefined'){
 			//没有文本的填充图片
 			this.td[i].appendChild(img.element);
-			this.td[i]['@style'] = "margin:0px;padding:0px;font-size:0px;"
 		}else{
 			//有文本的填充背景
 			this.td[i]['@background'] = 'slices/'+img.imgObject.name;
