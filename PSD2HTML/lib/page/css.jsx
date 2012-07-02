@@ -54,10 +54,11 @@ page.css.prototype.get = function(){
 		style.push('line-height:' + lineHeight);
 		
 		//宽度
-		style.push('width:' + parseInt(item.width + (item.textInfo.size/4),10) + 'px');
+		style.push('width:' + parseInt(item.width - (item.textInfo.size/4),10) + 'px');
+		//style.push('width:' + item.width + 'px');
 		if(page.option.builder != "normal"){
 			//高度
-			style.push('height:' + item.height + 'px');
+			//style.push('height:' + item.height + 'px');
 		}
 	}
 	//对齐

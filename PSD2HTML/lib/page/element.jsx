@@ -102,7 +102,7 @@ page.element.prototype.text = function(){
 				tpl = '',
 				curStart = rangeData[i].range[0],
 				curEnd = rangeData[i].range[1];
-			$.writeln(start+'---'+end+'---'+curStart+'---'+curEnd)
+			//$.writeln(start+'---'+end+'---'+curStart+'---'+curEnd)
 			if(start <= curStart && end >= curEnd){
 				tpl = textContents.substring(rangeData[i].range[0],rangeData[i].range[1]);
 			}else if(start <= curStart && end < curEnd){

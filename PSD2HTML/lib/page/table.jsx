@@ -26,6 +26,7 @@ page.table = function(data){
 	//数据源
 	this.rowData = resultData.rowData;
 	this.colData = resultData.colData;
+	this.textData = resultData.textData;
 	
 	//定义表格
 	this.table = null;
@@ -73,6 +74,7 @@ page.table.prototype.createRow = function(){
 	
 	//遍历行
 	for(var row=-1;row<rowLen;row++){
+		
 		//定义tr
 		this.tr[row] = new XML('<tr></tr>');
 		//遍历列
@@ -92,7 +94,9 @@ page.table.prototype.createRow = function(){
 						width = this.colData[0].left;
 					}else if(col == colLen - 1){
 						//最后一列
-						width = page.width - this.colData[col].left;
+						//width = page.width - this.colData[col].left;
+						this.textData.sort(function(a,b){return a.right-b.right});
+						width = this.textData[this.textData.length-1].right - this.textData[this.textData.length-2].right;
 					}else{
 						//中间列
 						width = this.colData[col+1].left - this.colData[col].left;
@@ -176,7 +180,7 @@ page.table.prototype.createRow = function(){
 				if(colObj[1] == colLen-1 && flag[1]){
 					flag[1] = false;
 					var td = new XML('<td></td>');
-					//td['@width'] = page.width - this.colData[this.colData.length - 1].right;
+					td['@width'] = page.width - this.widthCount;
 					td.appendChild(new XML());
 					this.tr[row].appendChild(td);
 				}
@@ -214,7 +218,7 @@ page.table.prototype.setFirstCol = function(rowLen,colLen){
 				
 	firstTd['@colspan'] = colLen+3;
 	firstTd['@height'] = height;
-	this.td['-1_-1']['@height'] = '0';
+	this.td['-1_-1']['@height'] = '100';
 	firstTr.appendChild(firstTd);
 	
 	firstTd.appendChild(img.element);
@@ -264,13 +268,13 @@ page.table.prototype.setFirstRow = function(rowLen,colLen){
  * 最后一列
  */
 page.table.prototype.setLastRow = function(rowLen,colLen){
+	this.textData.sort(function(a,b){return a.right-b.right});
 	var lastTd = new XML('<td valign="top"></td>'),
 		img = new XML('<img />'),
 		div = new XML('<DIV></DIV>'),
 		dataTop = this.getSortData('top'),
 		top = dataTop[0].top - this.getHeightOvewValue(0),
-		dataLeft = this.getSortData('right'),
-		left = this.widthCount,
+		left = this.textData[this.textData.length-1].right,
 		right = page.width,
 		bottom = this.heightCount,
 		img = page.getPsdImg(top,right,bottom,left);
@@ -367,7 +371,10 @@ page.table.prototype.getTdPosition = function(tdKey,colspan,rowspan,tdWidths,tdH
 page.table.prototype.getHeightOvewValue = function(i){
 	var textInfo = this.rowData[i].textInfo;
 	if(textInfo.textType == 'TextType.PARAGRAPHTEXT'){
-		return Math.ceil(textInfo.lineHeight - this.rowData[i].textInfo.size)/2;
+		if(typeof(textInfo.lineHeight) == 'string' && textInfo.lineHeight.indexOf("%")>-1){
+			return 0;
+		}
+		return Math.ceil(textInfo.lineHeight - textInfo.size)/2;
 	}else{
 		return Math.round(textInfo.size/3.75);
 	}

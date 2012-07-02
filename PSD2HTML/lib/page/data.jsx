@@ -26,6 +26,9 @@ page.data = function(data){
 	//纵向排序的数据
 	this.colData = [];
 	
+	//文本图层数据
+	this.textData = [];
+	
 	
 	//筛选有效数据 
 	this.getUsefulData();
@@ -34,7 +37,8 @@ page.data = function(data){
 		colCount:this.colSize,
 		rowCount:this.rowSize,
 		colData:this.colData,
-		rowData:this.rowData
+		rowData:this.rowData,
+		textData:this.textData
 	};
 	
 	
@@ -54,6 +58,7 @@ page.data.prototype.getUsefulData = function(){
 			this.data[i].position = {};
 			this.rowData.push(this.data[i]);
 			this.colData.push(this.data[i]);
+			this.textData.push(this.data[i]);
 		}
 	};
 	//排序
