@@ -19,7 +19,7 @@ var page = {};
  * @param {Object} psd
  */
 page.init = function(data,option,psd){ 
-	IO.saveFile('e:/test/a.js',JSON.stringify(data),'gb2312');
+	IO.saveFile('d:/home/a.js',JSON.stringify(data),'gb2312');
 	page.option = option;
 	page.psd = psd;
 	page.title = data.name;

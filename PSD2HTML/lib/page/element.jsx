@@ -85,63 +85,61 @@ page.element.prototype.text = function(){
 	}
 	
 	//textRange去重
-	var rangeData = [textRange[0]];
-	for(var i=1;i<textRange.length;i++){
-		if(textRange[i].range[0] != textRange[i-1].range[0]){
-			rangeData.push(textRange[i]);
+	var rangeData = [];
+	for(var i=0;i<textRange.length;i++){
+		if(i>0 && textRange[i].range[0] == textRange[i-1].range[0]){
+			
+		}else{
+			var range = textRange[i].range;
+			if(textContents.substring(range[0],range[1]).indexOf("\r")>-1){
+				var start = range[0];
+				var obj = textContents.substring(range[0],range[1]).split("\r");
+				for(var o=0;o<obj.length;o++){
+					var item = {
+						range:[start,start+obj[o].length+1-overValue],
+						color:textRange[i].color,
+						size:textRange[i].size,
+						font:textRange[i].font
+					};
+					start += obj[o].length + overValue;
+					rangeData.push(item);
+				}
+			}else{
+				rangeData.push(textRange[i]);
+			}
+			
 		}
 	}
 	
+	
+	
+	var start = 0,
+		end = 0;
 	for(var o in pObj){
-		var p = new XML('<p></p>'),
-			start = textSize,
-			end = textSize + pObj[o].length;
-		
+		start = end;
+		end += pObj[o].length + overValue,
+		p = new XML('<p></p>');
+		p['@style'] = 'margin:0px;padding:0px;';
 		for(var i=0;i<rangeData.length;i++){
-			var span = new XML('<span></span>'),
-				tpl = '',
-				curStart = rangeData[i].range[0],
-				curEnd = rangeData[i].range[1];
-			//$.writeln(start+'---'+end+'---'+curStart+'---'+curEnd)
-			if(start <= curStart && end >= curEnd){
-				tpl = textContents.substring(rangeData[i].range[0],rangeData[i].range[1]);
-			}else if(start <= curStart && end < curEnd){
-				tpl = textContents.substring(rangeData[i].range[0],rangeData[i].range[1]);
-				if(tpl.indexOf("\r")>-1){
-					tpl = tpl.substring(0,tpl.indexOf("\r"));
-				}
-				if(end < curStart){
-					tpl = "";
-				}
-			}else if(start > curStart && end > curEnd){
-				tpl = textContents.substring(rangeData[i].range[0],rangeData[i].range[1]);
-				tpl = tpl.substring(tpl.indexOf("\r")+overValue,tpl.length);
-				if(curEnd < start){
-					tpl = "";
-				}
-			}else if(start < curStart && end < curEnd){
-				tpl = textContents.substring(rangeData[i].range[0],rangeData[i].range[1]);
-			}
-			
-			
-			if(page.option.builder == "normal"){
-				var cssName = 'style'+page.option.i+'-'+i;
-				var lineCss = '.'+cssName+'{font-size:'+textRange[i].size+'px;color:#'+textRange[i].color+';font-family:\''+textRange[i].font+';\';}';
-				page.option.styleCss.appendChild(lineCss);
-				span['@class'] = cssName + " pre";
-			}else{
-				span['@style'] = 'margin:0px;padding:0px;font-size:'+textRange[i].size+'px;color:#'+textRange[i].color+';white-space:pre-wrap;*white-space: pre;*word-wrap: break-word;';
-			}
-			
-			
-			if(tpl != ''){
-				span.appendChild(tpl);
+			var textRange = rangeData[i],
+				curStart = textRange.range[0],
+				curEnd = textRange.range[1];
+				
+			if(start<=curStart && end+1>=curEnd){
+				var span = new XML('<span></span>');
+				span.appendChild(new XML(textContents.substring(curStart,curEnd)));
 				p.appendChild(span);
+				
+				if(page.option.builder == "normal"){
+					var cssName = 'style'+page.option.i+'-'+i;
+					var lineCss = '.'+cssName+'{font-size:'+textRange.size+'px;color:#'+textRange.color+';font-family:\''+textRange.font+';\';}';
+					page.option.styleCss.appendChild(lineCss);
+					span['@class'] = cssName + " pre";
+				}else{
+					span['@style'] = 'margin:0px;padding:0px;font-size:'+textRange.size+'px;color:#'+textRange.color+';white-space:pre-wrap;*white-space: pre;*word-wrap: break-word;';
+				}
 			}
 		}
-		
-		
-		textSize += end + overValue;
 		//Css
 		var styleCss = new page.css(this.item);
 		if(page.option.builder == "normal"){
