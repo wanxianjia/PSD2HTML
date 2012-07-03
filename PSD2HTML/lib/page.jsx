@@ -19,7 +19,6 @@ var page = {};
  * @param {Object} psd
  */
 page.init = function(data,option,psd){ 
-	IO.saveFile('d:/home/a.js',JSON.stringify(data),'gb2312');
 	page.option = option;
 	page.psd = psd;
 	page.title = data.name;
@@ -74,7 +73,7 @@ page.edmHtml = function(data){
 	head.appendChild(title);
 	html.appendChild(head);
 	html.appendChild(body);
-	return '<!DOCTYPE html>'+html.toXMLString();	
+	return '<!DOCTYPE html>'+page.formatHtml(html.toXMLString());	
 };
 
 /**
@@ -82,7 +81,7 @@ page.edmHtml = function(data){
  * @param {Object} data
  */
 page.bssHtml = function(data){
-	return new page.table(data).toXMLString();	
+	return page.formatHtml(new page.table(data).toXMLString());	
 }
 
 /**
@@ -118,14 +117,12 @@ page.getPsdImg = function(top,right,bottom,left){
 	return {element:div,imgObject:image};
 };
 
+/**
+ * 格式化HTML代码 
+ * @param {Object} htmlCode
+ */
 page.formatHtml = function(htmlCode){
-	var obj = htmlCode.split("</span>"),
-		html = [];
-	for(var i=1;i<obj.length;i++){
-		
-	}
-	
-	
-	
-	return htmlCode.replace(new RegExp('</span>\s<span', 'g'),'</span><span');
+	var td = htmlCode.split('</td>');
+	//for(var i=0;i)
+	return htmlCode;
 }

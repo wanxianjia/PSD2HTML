@@ -94,7 +94,9 @@ page.table.prototype.createRow = function(){
 						width = this.colData[0].left;
 					}else if(col == colLen - 1){
 						//最后一列
-						width = page.width - this.colData[col].left;
+						var data = this.getSortData('right');
+						width = data[data.length-1].right - this.colData[col].left;
+						$.writeln(width);
 					}else{
 						//中间列
 						width = this.colData[col+1].left - this.colData[col].left;
@@ -159,7 +161,7 @@ page.table.prototype.createRow = function(){
 	//第一列
 	this.setFirstRow(rowLen,colLen);
 	
-	var flag = [true,false];
+	var flag = [true,true];
 	//td和tr回归到table
 	for(var row in this.tr){
 		//td回归tr
@@ -192,7 +194,7 @@ page.table.prototype.createRow = function(){
 	//最后一行
 	this.setLastCol(rowLen,colLen);
 	//最后一列
-	//this.setLastRow(rowLen,colLen);
+	this.setLastRow(rowLen,colLen);
 	
 	this.insertTdImg(textObj,tdWidths,tdHeights);
 };
@@ -214,7 +216,7 @@ page.table.prototype.setFirstCol = function(rowLen,colLen){
 		img = page.getPsdImg(top,right,bottom,left);
 	
 				
-	firstTd['@colspan'] = colLen+2;
+	firstTd['@colspan'] = colLen+3;
 	firstTd['@height'] = height;
 	this.td['-1_-1']['@height'] = '0';
 	firstTr.appendChild(firstTd);
@@ -237,7 +239,7 @@ page.table.prototype.setLastCol = function(rowLen,colLen){
 		img = page.getPsdImg(top,right,bottom,left);
 	
 	lastTd.appendChild(img.element);
-	lastTd['@colspan'] = colLen+2;
+	lastTd['@colspan'] = colLen+3;
 	lastTd['@height'] = page.height - top;
 	lastTr.appendChild(lastTd);
 	
@@ -266,13 +268,12 @@ page.table.prototype.setFirstRow = function(rowLen,colLen){
  * 最后一列
  */
 page.table.prototype.setLastRow = function(rowLen,colLen){
-	this.textData.sort(function(a,b){return a.right-b.right});
 	var lastTd = new XML('<td valign="top"></td>'),
 		img = new XML('<img />'),
 		div = new XML('<DIV></DIV>'),
 		dataTop = this.getSortData('top'),
 		top = dataTop[0].top - this.getHeightOvewValue(0),
-		left = this.textData[this.textData.length-1].right,
+		left = this.widthCount,
 		right = page.width,
 		bottom = this.heightCount,
 		img = page.getPsdImg(top,right,bottom,left);
@@ -438,7 +439,7 @@ page.table.prototype.mergeRow = function(obj,col,colspan){
  * @param {Object} order asc/desc
  */
 page.table.prototype.getSortData = function(field,order){
-	var data = this.rowData;
+	var data = this.textData;
 	if(order == "desc"){
 		data.sort(function(a,b){return b[field] - a[field];});
 	}else{
