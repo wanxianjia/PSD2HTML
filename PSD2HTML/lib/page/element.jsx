@@ -37,7 +37,7 @@ page.element.prototype.getTextElement = function(){
  * 图片图层 
  */
 page.element.prototype.img = function(){
-	var div = new XML('<DIV></DIV>'),
+	var elm = null,
 		img = new XML('<img />'),
 		psdImgObj = page.getPsdImg(this.item.top,this.item.right,this.item.bottom,this.item.left);
 	img['@src'] = 'slices/'+psdImgObj.imgObject.name;
@@ -47,24 +47,22 @@ page.element.prototype.img = function(){
 	
 	
 	if(typeof(this.item.link) != 'undefined'){
-		var a = new XML('<a></a>');
-		a['@href'] = this.item.link.href;
-		a.appendChild(img);
-		div.appendChild(a);
+		elm = new XML('<a></a>');
+		elm['@href'] = this.item.link.href;
+		elm.appendChild(img);
 	}else{
-		div.appendChild(img);
+		elm = img;
 	}
-	var styleCss ='width:'+this.item.width+'px;height:'+this.item.height+'px;overflow:hidden;';
+	var styleCss ='width:'+this.item.width+'px;height:'+this.item.height+'px;';
 	if(page.option.builder == "normal"){
 		var cssName = "style"+page.option.i;
-		
-		styleCss += 'top:'+this.item.top+'px;left:'+(this.item.left - (page.option.width - 952) / 2)+'px;';
-		div['@class'] = cssName+" absolute";
+		styleCss += 'top:'+this.item.top+'px;left:'+(this.item.left - (page.option.width - 952) / 2)+'px;display:block;';
+		elm['@class'] = cssName+" absolute";
 		page.option.styleCss.appendChild(new XML('.'+cssName+'{'+styleCss+'}'));
 	}else{
-		div['@style'] = styleCss;
+		elm['@style'] = styleCss;
 	}
-	return div;
+	return elm;
 };
 
 /**

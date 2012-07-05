@@ -96,7 +96,6 @@ page.table.prototype.createRow = function(){
 						//最后一列
 						var data = this.getSortData('right');
 						width = data[data.length-1].right - this.colData[col].left;
-						$.writeln(width);
 					}else{
 						//中间列
 						width = this.colData[col+1].left - this.colData[col].left;
@@ -367,6 +366,8 @@ page.table.prototype.getTdPosition = function(tdKey,colspan,rowspan,tdWidths,tdH
  * @param {Object} i
  */
 page.table.prototype.getHeightOvewValue = function(i){
+	//不需要高度误差
+	return 0;
 	var textInfo = this.rowData[i].textInfo;
 	if(textInfo.textType == 'TextType.PARAGRAPHTEXT'){
 		if(typeof(textInfo.lineHeight) == 'string' && textInfo.lineHeight.indexOf("%")>-1){

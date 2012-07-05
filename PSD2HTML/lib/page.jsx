@@ -100,8 +100,7 @@ page.normalPage = function(data){
  * @param {Object} left
  */
 page.getPsdImg = function(top,right,bottom,left){
-	var img = new XML('<img />'),
-		div = new XML('<DIV></DIV>');
+	var img = new XML('<img />');
 	if(bottom - top <=0 || right-left <=0){
 		return new XML();
 	}	
@@ -112,9 +111,7 @@ page.getPsdImg = function(top,right,bottom,left){
 	img['@height'] = image.height;
 	img['@border']= "0";
 	img['@style'] = 'display:block;margin:0px;padding:0px;'
-	div['@style'] = 'overflow:hidden;width:'+image.width+'px;height:'+image.height+'px;';
-	div.appendChild(img);
-	return {element:div,imgObject:image};
+	return {element:img,imgObject:image};
 };
 
 /**
@@ -122,7 +119,14 @@ page.getPsdImg = function(top,right,bottom,left){
  * @param {Object} htmlCode
  */
 page.formatHtml = function(htmlCode){
-	var td = htmlCode.split('</td>');
-	//for(var i=0;i)
+	//htmlCode.replace(new RegExp('<td/>', 'g'), "<td></td>");
+	var code = [];
+		td = htmlCode.split('<td');
+	for(var i in td){
+		var text = td[i];
+		text = '<td'+text.replace(new RegExp('\r', 'g'), "");
+		code.push(text);
+	}
+	$.writeln(code.join(''));
 	return htmlCode;
 }
