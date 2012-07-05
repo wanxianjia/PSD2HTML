@@ -49,7 +49,7 @@ page.web.prototype.parse = function(){
 	//page head部分
 	html.appendChild(head);
 	//CMS head
-	body.appendChild('#parse("$pageInfo.header")');
+	//body.appendChild('#parse("$pageInfo.header")');
 	//文档主体
 	doc.appendChild(pageContent);
 	body.appendChild(doc);
@@ -72,7 +72,7 @@ page.web.prototype.parse = function(){
 		}
 	}
 	//CMS foot
-	body.appendChild('#parse("$pageInfo.footer")');
+	//body.appendChild('#parse("$pageInfo.footer")');
 	//设置全局的网页HTML代码内容
 	//this.htmlContent = '<!DOCTYPE html>\n' + this.formatHtml(html.toXMLString());
 	this.htmlCode = html;

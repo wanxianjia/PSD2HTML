@@ -124,17 +124,21 @@ page.element.prototype.text = function(){
 				curEnd = textRange.range[1];
 				
 			if(start<=curStart && end+1>=curEnd){
-				var span = new XML('<span></span>');
-				span.appendChild(new XML(textContents.substring(curStart,curEnd)));
-				p.appendChild(span);
-				
-				if(page.option.builder == "normal"){
-					var cssName = 'style'+page.option.i+'-'+i;
-					var lineCss = '.'+cssName+'{font-size:'+textRange.size+'px;color:#'+textRange.color+';font-family:\''+textRange.font+';\';}';
-					page.option.styleCss.appendChild(lineCss);
-					span['@class'] = cssName + " pre";
-				}else{
-					span['@style'] = 'margin:0px;padding:0px;font-size:'+textRange.size+'px;color:#'+textRange.color+';white-space:pre-wrap;*white-space: pre;*word-wrap: break-word;';
+				var text = textContents.substring(curStart,curEnd),
+					textTrim = text.replace(/^\s+/, "").replace(/\s+$/, "")
+				if(text != '' || textTrim == ''){
+					var span = new XML('<span></span>');
+					span.appendChild(new XML(textContents.substring(curStart,curEnd)));
+					p.appendChild(span);
+					
+					if(page.option.builder == "normal"){
+						var cssName = 'style'+page.option.i+'-'+i;
+						var lineCss = '.'+cssName+'{font-size:'+textRange.size+'px;color:#'+textRange.color+';font-family:\''+textRange.font+';\';}';
+						page.option.styleCss.appendChild(lineCss);
+						span['@class'] = cssName + " pre";
+					}else{
+						span['@style'] = 'margin:0px;padding:0px;font-size:'+textRange.size+'px;color:#'+textRange.color+';white-space:pre-wrap;*white-space: pre;*word-wrap: break-word;';
+					}
 				}
 			}
 		}

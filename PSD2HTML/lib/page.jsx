@@ -119,14 +119,5 @@ page.getPsdImg = function(top,right,bottom,left){
  * @param {Object} htmlCode
  */
 page.formatHtml = function(htmlCode){
-	//htmlCode.replace(new RegExp('<td/>', 'g'), "<td></td>");
-	var code = [];
-		td = htmlCode.split('<td');
-	for(var i in td){
-		var text = td[i];
-		text = '<td'+text.replace(new RegExp('\r', 'g'), "");
-		code.push(text);
-	}
-	$.writeln(code.join(''));
-	return htmlCode;
+	return htmlCode;//.replace(/(<\/span>)[\s\S]*?(<span)/g, '</span><span');;
 }
