@@ -12,5 +12,6 @@ i18n.txtMap = {
 	defaultToMyDocument : 'Default output folder: My Documents',
 	processDone 		: 'Processing Finished!',
 	running 		: 'In Processing, Please Wait...',
-	aboutPSD2HTML 	: 'PSD TO HTML(V: 1.0) is a plugin to generate HTML from PSD files for Photoshop, gitHub repo: https://github.com/wanxianjia/PSD2HTML'
+	aboutPSD2HTML 	: 'PSD TO HTML(V: 1.0) is a plugin to generate HTML from PSD files for Photoshop, gitHub repo: https://github.com/wanxianjia/PSD2HTML',
+	pathCannotIncludeDoubleBytes: 'Path can not include double bytes'
 }

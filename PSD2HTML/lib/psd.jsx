@@ -1,4 +1,4 @@
-// @include "json2-min.jsx"
+﻿// @include "json2-min.jsx"
 // @include "web-fonts.jsx"
 
 //setting for app preferences
@@ -26,6 +26,8 @@ function PSD(option){
 	this._init();
 }
 
+app.activeDocument.colorSamplers.removeAll();
+PSD.colorSampler = app.activeDocument.colorSamplers.add([UnitValue(0, 'px'), UnitValue(0, 'px')]);
 
 (function(){
 
@@ -430,6 +432,12 @@ PSD.fn = PSD.prototype = {
 			info.push({range:range, font:font, size:size, color:textColor.rgb.hexValue});
 		}
         return info;
+	},
+	// get pointer (x, y) color
+	getRGBColor: function(x, y){
+		if(!x || !y) return;
+		PSD.colorSampler.move([UnitValue(x, 'px'), UnitValue(y, 'px')]);
+		return PSD.colorSampler.color.rgb.hexValue;
 	}
 }
 

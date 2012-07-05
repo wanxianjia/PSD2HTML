@@ -12,5 +12,6 @@ i18n.txtMap = {
 	defaultToMyDocument: '默认为我的文档',
 	processDone: '处理完成！',
 	running: '运行中。。。',
-	aboutPSD2HTML: 'PSD TO HTML(版本号：1.0)是一款自动生成HTML页面的一款插件，项目地址：https://github.com/wanxianjia/PSD2HTML'
+	aboutPSD2HTML: 'PSD TO HTML(版本号：1.0)是一款自动生成HTML页面的一款插件，项目地址：https://github.com/wanxianjia/PSD2HTML',
+	pathCannotIncludeDoubleBytes:'输出路径中不能包含中文或其他双字节字符'
 }
