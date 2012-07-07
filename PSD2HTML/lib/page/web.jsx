@@ -34,12 +34,13 @@ page.web.prototype.parse = function(){
 	//头信息
 	head.appendChild(new XML('<meta name="builder" content="by psdToHtml,version 1.0" />'));
 	//设置content的样式
-	styleCss.appendChild(new XML('.page{height:' + page.height + 'px;width:952px;margin:0px auto -'+page.height+'px auto;}'));
+	styleCss.appendChild(new XML('.page{height:' + page.height + 'px;margin:0px auto -'+page.height+'px auto;}'));
 	//网页依赖的CSS/js文件	
 	head.appendChild(new XML('<link href="http://img.china.alibaba.com/favicon.ico" rel="shortcut icon" />'));
 	head.appendChild(new XML('<meta http-equiv="Content-Type" content="text/html; charset=' + page.encode + '" />'));
-	head.appendChild(new XML('<link href="http://static.c.aliimg.com/css/app/vas/psd2html/style.css" rel="stylesheet" type="text/css" />'));
-	var importScript = new XML('<script src="http://static.c.aliimg.com/js/app/vas/psd2html/global-merge.js" type="text/javascript"></script>');
+	//以下引用的style文件要随着增量发布的时间戳而更新
+	head.appendChild(new XML('<link href="http://style.china.alibaba.com/app/bp/css/psd2html/1.0/global.20120709.css" rel="stylesheet" type="text/css" />'));
+	var importScript = new XML('<script src="http://style.china.alibaba.com/app/bp/js/psd2html/1.0/global.20120709.js" type="text/javascript"></script>');
 	importScript.appendChild(new XML());
 	head.appendChild(importScript);
 	//内联的CSS

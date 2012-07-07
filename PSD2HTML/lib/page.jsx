@@ -119,5 +119,21 @@ page.getPsdImg = function(top,right,bottom,left){
  * @param {Object} htmlCode
  */
 page.formatHtml = function(htmlCode){
-	return htmlCode;//.replace(/(<\/span>)[\s\S]*?(<span)/g, '</span><span');;
+	var html = [];
+	if(page.option.builder == "normal"){
+		var div = htmlCode.split('<p');
+		for(var i=0;i<div.length;i++){
+			var code = div[i];
+			if(i>0){
+				code = '<p' + code;
+			}
+			if(code.indexOf('<span')>-1){
+				code = code.replace(/(<\/span>)[\s\S]*?(<span)/g, '</span><span');
+			}
+			html.push(code);
+		}
+	}else{
+		html.push(htmlCode);
+	}
+	return html.join('');//.replace(/(<\/span>)[\s\S]*?(<span)/g, '</span><span');;
 }
