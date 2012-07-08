@@ -69,7 +69,10 @@ page.css.prototype.get = function(){
 			
 		}else if(contents.indexOf("\r") == -1 && textInfo.textType != "TextType.PARAGRAPHTEXT"){
 			top -= Math.round(item.textInfo.size/10);
-			lineHeight = item.textInfo.size + 'px';
+			lineHeight = (item.textInfo.size+2) + 'px';
+			if(item.textInfo.size == 12){
+				top -= 1;
+			}
 		}else{
 			lineHeight += 'px';
 			top -= Math.round((item.textInfo.lineHeight - item.textInfo.size)/2);
