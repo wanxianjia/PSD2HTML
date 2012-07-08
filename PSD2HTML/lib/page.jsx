@@ -7,7 +7,7 @@
 var page = {};
 
 // @include "io.jsx"
-// @include "page/table.jsx"
+// @include "page/createTable.jsx"
 // @include "page/web.jsx"
 // @include "json2-min.jsx"
 
@@ -69,11 +69,11 @@ page.edmHtml = function(data){
 		body = new XML('<body></body>');
 	
 	//body.appendChild(new XML('<style>td{border:1px solid #F00;}</style>'));
-	body.appendChild(new page.table(data));
+	body.appendChild(new page.createTable(data));
 	head.appendChild(title);
 	html.appendChild(head);
 	html.appendChild(body);
-	return '<!DOCTYPE html>'+page.formatHtml(html.toXMLString());	
+	return '<!DOCTYPE html>'+html.toXMLString();	
 };
 
 /**

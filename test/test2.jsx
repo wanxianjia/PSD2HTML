@@ -29,8 +29,8 @@ var APP = {version: '1.0'};
 			builder: Panel{\
 				text: "'+i18n("selectPageType")+'",\
 				a: Group{\
-					j: RadioButton{text:"'+i18n("staticPage")+'", helpTip:"Normal page", data:"normal",value:true}\
-					e: RadioButton{text:"'+i18n("edm")+'", helpTip:"EDM", data:"EDM"},\
+					j: RadioButton{text:"'+i18n("staticPage")+'", helpTip:"Normal page", data:"normal"}\
+					e: RadioButton{text:"'+i18n("edm")+'", helpTip:"EDM", data:"EDM",value:true},\
 					l: RadioButton{text:"'+i18n("bbs")+'", helpTip:"Editor code", data:"BBS"},\
 					i: RadioButton{text:"Export JSON and Image", data:"file"}\
 				}\
