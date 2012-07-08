@@ -139,8 +139,16 @@ page.element.prototype.text = function(){
 					
 					if(page.option.builder == "normal"){
 						var cssName = 'style'+page.option.i+'-'+i,
-							fontCss = 'font-size:'+textRange.size+'px;color:#'+textRange.color+';font-family:\''+textRange.font+'\'',
+							fontCss = 'font-size:'+textRange.size+'px;color:#'+textRange.color,
 							lineCss = '';
+							if(textRange.font != 'SimSun'){
+								if(textRange.font.indexOf(' ')>-1 || textRange.font.indexOf('-')>-1){
+									fontCss += ';font-family:\''+textRange.font+'\'';
+								}else{
+									fontCss += ';font-family:'+textRange.font;
+								}
+								
+							}
 						if(typeof(this.cssMap[fontCss]) != 'undefined'){
 							cssName = this.cssMap[fontCss];
 						}else{

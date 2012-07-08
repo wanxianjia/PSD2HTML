@@ -37,21 +37,12 @@ page.css.prototype.get = function(){
 		style.push('text-indent:' + textInfo.indent + 'px');
 	}
 	
-	//取文字大小
-	var fontSize = Math.round(textInfo.size),
-	//取行高
-	lineHeight = textInfo.lineHeight;
-	//如果行高为%
-	if(typeof(lineHeight) == "string" && lineHeight.indexOf("%") > -1) {
-		lineHeight = textInfo.lineHeight;
-	} else {
-		lineHeight = lineHeight + "px";
-	}
-	style.push('line-height:' + lineHeight);
 	
 	//宽度
 	var width = item.width;
-	width += parseInt(item.textInfo.size/4,10) + Math.round(item.textInfo.size/6)+5;
+	width += parseInt(item.textInfo.size/4,10) + Math.round(item.textInfo.size/6);
+	var contents = item.textInfo.contents;
+	$.writeln(contents.substring(contents.length-1,contents.length));
 	style.push('width:' + width + 'px');
 	//高度暂时不需要
 	if(page.option.builder != "normal"){
@@ -61,22 +52,30 @@ page.css.prototype.get = function(){
 	style.push('text-align:' + textInfo.textAlign + '');
 	//非网页不需要这些样式
 	if(page.option.builder == "normal"){
-		//外边距
-		style.push('margin-right:0px');
-		style.push('margin-bottom:0px');
 		//z-index
 		style.push('z-index:' + item.index);
-		//定位
-		var top = 0;
+		//top和行高
+		var top = item.top,
+			lineHeight = item.textInfo.lineHeight;
 		if(typeof(item.textInfo.lineHeight) == 'string'){
-			top = item.top - Math.round(item.textInfo.size/3) -3;
-		}else{
-			if(textInfo.contents.indexOf("\r")>-1 || textInfo.textType == "TextType.PARAGRAPHTEXT") {
-				top = item.top - Math.round((item.textInfo.lineHeight - item.textInfo.size)/2,10) -3;
+			//行高不是数字，只有一种情况,自动行高
+			top -= Math.round(item.textInfo.size/5);
+			//文字大小为12，并且行高为自动，那么他的行高为他的字体大小+2，不知道原因
+			if(item.textInfo.size == 12 && contents.indexOf("\r") == -1 && textInfo.textType != "TextType.PARAGRAPHTEXT"){
+				lineHeight = '14px';
 			}else{
-				top = item.top - Math.round(item.textInfo.size/3.75) -3;
+				lineHeight = item.textInfo.lineHeight;
 			}
+			
+		}else if(contents.indexOf("\r") == -1 && textInfo.textType != "TextType.PARAGRAPHTEXT"){
+			top -= Math.round(item.textInfo.size/10);
+			lineHeight = item.textInfo.size + 'px';
+		}else{
+			lineHeight += 'px';
+			top -= Math.round((item.textInfo.lineHeight - item.textInfo.size)/2);
+			
 		}
+		style.push('line-height:' + lineHeight);
 		style.push('top:' + top + 'px');
 		style.push('left:' + (item.left - (page.option.width - 952) / 2) + 'px');
 	}else{
@@ -85,7 +84,8 @@ page.css.prototype.get = function(){
 	}
 	
 	//文字大小
-	style.push('font-size:' + fontSize + 'px');
+	style.push('font-size:' + item.textInfo.size + 'px');
 	
 	return style;
-}
+};
+
