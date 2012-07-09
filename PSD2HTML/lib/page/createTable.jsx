@@ -207,6 +207,7 @@ page.createTable.prototype.createEachCol = function(){
 						continue;
 					}else{
 						//没有文本的td，算出从这一列到下一个有文本（或结束）的列的宽度
+						
 					}
 				}
 				
