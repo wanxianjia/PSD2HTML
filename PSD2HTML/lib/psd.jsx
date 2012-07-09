@@ -424,12 +424,19 @@ PSD.fn = PSD.prototype = {
 			var font = textStyle.getString(charIDToTypeID("FntN" )); 
 			var size = textStyle.getDouble(charIDToTypeID("Sz  " ));
 			var color = textStyle.getObjectValue(charIDToTypeID('Clr '));
+			var bold = textStyle.getBoolean(stringIDToTypeID('syntheticBold'));
+			var italic = textStyle.getBoolean(stringIDToTypeID('syntheticItalic'));
+			var underlineValue = textStyle.getEnumerationValue(stringIDToTypeID( "underline" ));
+			var underline = underlineValue == 1647 ? true : false;
+			var autoLeading = textStyle.getBoolean(stringIDToTypeID( "autoLeading" ));
 			var textColor = new SolidColor;
 			
 			textColor.rgb.red = color.getDouble(charIDToTypeID('Rd  '));
 			textColor.rgb.green = color.getDouble(charIDToTypeID('Grn '));
 			textColor.rgb.blue = color.getDouble(charIDToTypeID('Bl  '));
-			info.push({range:range, font:font, size:size, color:textColor.rgb.hexValue});
+			var o = {range:range, font:font, size:size, color:textColor.rgb.hexValue, bold:bold, italic:italic, underline:underline};
+			if(!autoLeading) o.lineHeight = textStyle.getUnitDoubleValue(charIDToTypeID( "Ldng" ));
+			info.push(o);
 		}
         return info;
 	},
@@ -438,6 +445,10 @@ PSD.fn = PSD.prototype = {
 		if(!x || !y) return;
 		PSD.colorSampler.move([UnitValue(x, 'px'), UnitValue(y, 'px')]);
 		return PSD.colorSampler.color.rgb.hexValue;
+	},
+	reset: function(){
+		this.doc.activeHistoryState = this.doc.historyStates[0];
+		this.doc.save();
 	}
 }
 
