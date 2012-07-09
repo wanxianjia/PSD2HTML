@@ -19,8 +19,12 @@ var page = {};
  * @param {Object} psd
  */
 page.init = function(data,option,psd){ 
-	page.option = option;
 	page.psd = psd;
+	
+	//隐藏所有文本图层
+	psd.hiddenTextLayers();
+	
+	page.option = option;
 	page.title = data.name;
 	page.width = option.width;
 	page.height = option.height;
@@ -49,6 +53,12 @@ page.init = function(data,option,psd){
 	}
 	
 	this.saveFile();
+	
+	//显示所有文本图层
+	psd.visibleTextLayers();
+	
+	//重置psd
+	//psd.reset();
 };
 
 /**
@@ -68,12 +78,11 @@ page.edmHtml = function(data){
 		title = new XML('<title>' + data.name + '</title>'),
 		body = new XML('<body></body>');
 	
-	//body.appendChild(new XML('<style>td{border:1px solid #F00;}</style>'));
 	body.appendChild(new page.createTable(data));
 	head.appendChild(title);
 	html.appendChild(head);
 	html.appendChild(body);
-	return '<!DOCTYPE html>'+html.toXMLString();	
+	return '<!DOCTYPE html>\r'+html.toXMLString();	
 };
 
 /**
@@ -89,7 +98,7 @@ page.bssHtml = function(data){
  * @param {Object} data
  */
 page.normalPage = function(data){
-	return '<!DOCTYPE html>'+ page.formatHtml(new page.web(data).toXMLString());
+	return '<!DOCTYPE html>\r'+ page.formatHtml(new page.web(data).toXMLString());
 };
 
 /**
@@ -112,6 +121,13 @@ page.getPsdImg = function(top,right,bottom,left){
 	img['@border']= "0";
 	img['@style'] = 'display:block;margin:0px;padding:0px;'
 	return {element:img,imgObject:image};
+};
+
+/**
+ *  获取PSD里的颜色
+ */
+page.getPsdRGBColor = function(x,y){
+	return page.psd.getRGBColor(x,y);
 };
 
 /**

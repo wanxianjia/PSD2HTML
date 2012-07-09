@@ -43,7 +43,7 @@ page.css.prototype.get = function(){
 	width += parseInt(item.textInfo.size/4,10) + Math.round(item.textInfo.size/6);
 	var contents = item.textInfo.contents,
 		lastStr = contents.substring(contents.length-1,contents.length);
-	$.writeln(/^(\w|[\u4E00-\u9FA5])*$/.test(lastStr));
+	//$.writeln(/^(\w|[\u4E00-\u9FA5])*$/.test(lastStr));
 	style.push('width:' + width + 'px');
 	//高度暂时不需要
 	if(page.option.builder != "normal"){
