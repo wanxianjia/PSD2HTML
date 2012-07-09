@@ -11,6 +11,7 @@
  * @param {Object} item
  */
 page.element = function(data){
+	this.cssMap = {};//用于去除相同的Css
 	this.item = data;
 	return this.getTextElement();
 };
@@ -69,7 +70,7 @@ page.element.prototype.img = function(){
  * 文本图层 
  */
 page.element.prototype.text = function(){
-	var elm = new XML('<DIV></DIV>'),
+	var elm = new XML('<div class=""></div>'),
 		overValue = this.item.textInfo.contents.indexOf('\r\n')>-1 ? 2:1,
 		textSize = 0,
 		textRange = this.item.textInfo.textRange,
@@ -116,47 +117,72 @@ page.element.prototype.text = function(){
 	for(var o in pObj){
 		start = end;
 		end += pObj[o].length + overValue,
-		p = new XML('<p></p>');
-		p['@style'] = 'margin:0px;padding:0px;';
+		p = new XML('<p></p>'),
+		isCreateP = true;
+		if(page.option.builder != "normal"){
+			p['@style'] = 'margin:0px;padding:0px;';
+		}
+		var len = rangeData.length
 		for(var i=0;i<rangeData.length;i++){
 			var textRange = rangeData[i],
 				curStart = textRange.range[0],
 				curEnd = textRange.range[1];
 				
-			if(start<=curStart && end+1>=curEnd){
+			if(start<=curStart && end+1>=curEnd && end>curStart){
 				var text = textContents.substring(curStart,curEnd),
-					textTrim = text.replace(/^\s+/, "").replace(/\s+$/, "")
-				if(text != '' || textTrim == ''){
+					textTrim = text.replace(/^\s+/, "").replace(/\s+$/, "");
+				
+				if(text.length>0 && textTrim.length>0){
 					var span = new XML('<span></span>');
 					span.appendChild(new XML(textContents.substring(curStart,curEnd)));
 					p.appendChild(span);
 					
 					if(page.option.builder == "normal"){
-						var cssName = 'style'+page.option.i+'-'+i;
-						var lineCss = '.'+cssName+'{font-size:'+textRange.size+'px;color:#'+textRange.color+';font-family:\''+textRange.font+';\';}';
-						page.option.styleCss.appendChild(lineCss);
-						span['@class'] = cssName + " pre";
+						var cssName = 'style'+page.option.i+'-'+i,
+							fontCss = 'font-size:'+textRange.size+'px;color:#'+textRange.color,
+							lineCss = '';
+							if(textRange.font != 'SimSun'){
+								if(textRange.font.indexOf(' ')>-1 || textRange.font.indexOf('-')>-1){
+									fontCss += ';font-family:\''+textRange.font+'\'';
+								}else{
+									fontCss += ';font-family:'+textRange.font;
+								}
+								
+							}
+						if(typeof(this.cssMap[fontCss]) != 'undefined'){
+							cssName = this.cssMap[fontCss];
+						}else{
+							var lineCss = '.'+cssName+'{'+fontCss+';}';
+							page.option.styleCss.appendChild(lineCss);
+							this.cssMap[fontCss] = cssName;
+						}
+						span['@class'] = cssName;
 					}else{
 						span['@style'] = 'margin:0px;padding:0px;font-size:'+textRange.size+'px;color:#'+textRange.color+';white-space:pre-wrap;*white-space: pre;*word-wrap: break-word;';
 					}
+				}else{
+					isCreateP = false;
 				}
 			}
 		}
-		//Css
-		var styleCss = new page.css(this.item);
-		if(page.option.builder == "normal"){
-			var cssName = 'style'+ page.option.i;
-			elm['@class'] = "absolute over_hide "+cssName;
-			page.option.styleCss.appendChild('.'+cssName+'{'+styleCss.join(";")+';}');
-		}else{
-			//styleCss.push('width:'+this.item.width+'px;');
-			styleCss.push("overflow:hidden");
-			elm['@style'] = styleCss.join(';');
+		
+		if(p.toXMLString().indexOf("span")>-1){
+			if(page.option.builder != "normal"){
+				p['@style'] = "margin:0px;padding:0px;";
+			}
+			elm.appendChild(p);
 		}
-		if(page.option.builder != "normal"){
-			p['@style'] = "margin:0px;padding:0px;";
-		}
-		elm.appendChild(p);
+	}
+	
+	//Css
+	var styleCss = new page.css(this.item);
+	if(page.option.builder == "normal"){
+		var cssName = 'style'+ page.option.i;
+		elm['@class'] = "absolute over_hide "+cssName;
+		page.option.styleCss.appendChild('.'+cssName+'{'+styleCss.join(";")+';}');
+	}else{
+		styleCss.push("overflow:hidden");
+		elm['@style'] = styleCss.join(';');
 	}
 	
 	return elm;

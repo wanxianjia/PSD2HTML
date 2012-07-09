@@ -7,7 +7,7 @@
 var page = {};
 
 // @include "io.jsx"
-// @include "page/table.jsx"
+// @include "page/createTable.jsx"
 // @include "page/web.jsx"
 // @include "json2-min.jsx"
 
@@ -69,11 +69,11 @@ page.edmHtml = function(data){
 		body = new XML('<body></body>');
 	
 	//body.appendChild(new XML('<style>td{border:1px solid #F00;}</style>'));
-	body.appendChild(new page.table(data));
+	body.appendChild(new page.createTable(data));
 	head.appendChild(title);
 	html.appendChild(head);
 	html.appendChild(body);
-	return '<!DOCTYPE html>'+page.formatHtml(html.toXMLString());	
+	return '<!DOCTYPE html>'+html.toXMLString();	
 };
 
 /**
@@ -119,5 +119,21 @@ page.getPsdImg = function(top,right,bottom,left){
  * @param {Object} htmlCode
  */
 page.formatHtml = function(htmlCode){
-	return htmlCode;//.replace(/(<\/span>)[\s\S]*?(<span)/g, '</span><span');;
+	var html = [];
+	if(page.option.builder == "normal"){
+		var div = htmlCode.split('<p');
+		for(var i=0;i<div.length;i++){
+			var code = div[i];
+			if(i>0){
+				code = '<p' + code;
+			}
+			if(code.indexOf('<span')>-1){
+				code = code.replace(/(<\/span>)[\s\S]*?(<span)/g, '</span><span');
+			}
+			html.push(code);
+		}
+	}else{
+		html.push(htmlCode);
+	}
+	return html.join('');//.replace(/(<\/span>)[\s\S]*?(<span)/g, '</span><span');;
 }

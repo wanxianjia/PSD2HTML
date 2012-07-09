@@ -1,27 +1,141 @@
-﻿// @include "../PSD2HTML/lib/toPage.jsx"
+﻿/*
+<javascriptresource> 
+<name>PSD TO HTML</name> 
+<about>v1.0--https://github.com/wanxianjia/PSD2HTML</about> 
+<menu>help</menu> 
+<enableinfo>true</enableinfo> 
+</javascriptresource>
+*/
 
+// Settings
+#target photoshop
+app.displayDialogs = DialogModes.NO; // suppress all dialogs
+app.bringToFront(); // bring top
 
-function main(){
-//    var test = "test";
-    var data = {"\u006e\u0061\u006d\u0065":"\u0063\u0068\u0069\u006e\u0061\u002e\u0070\u0073\u0064","\u0069\u006d\u0067\u0043\u006f\u0075\u006e\u0074":1,"\u0063\u0068\u0069\u006c\u0064\u0073":[{"\u0069\u006e\u0064\u0065\u0078":5,"\u0074y\u0070\u0065":"\u0041\u0072\u0074\u004c\u0061y\u0065\u0072","\u0076\u0069\u0073\u0069\u0062\u006c\u0065":true,"\u006b\u0069\u006e\u0064":"\u004c\u0061y\u0065\u0072\u004b\u0069\u006e\u0064\u002e\u004e\u004f\u0052\u004d\u0041\u004c","\u0069\u0073\u0042\u0061\u0063\u006b\u0067\u0072\u006f\u0075\u006e\u0064\u004c\u0061y\u0065\u0072":false,"\u006e\u0061\u006d\u0065":"\u0073\u006c\u0069\u0063\u0065\u005f\u0035\u002e\u006a\u0070\u0067","\u0072\u0069\u0067\u0068\u0074":600,"\u0074\u006f\u0070":0,"\u006c\u0065\u0066\u0074":0,"\u0062\u006f\u0074\u0074\u006f\u006d":410},{"\u0074y\u0070\u0065":"\u0041\u0072\u0074\u004c\u0061y\u0065\u0072","\u006e\u0061\u006d\u0065":"\u0020\u0020\u0020\u0020中国又以“华夏”、“中华”、“神州”、“中土”等的代称出现，最早指天下的“中心”\u002d黄河流域黄河中下游的中原河洛地带，后","\u0076\u0069\u0073\u0069\u0062\u006c\u0065":true,"\u006c\u0065\u0066\u0074":302,"\u0074\u006f\u0070":86,"\u0072\u0069\u0067\u0068\u0074":579,"\u0062\u006f\u0074\u0074\u006f\u006d":361,"\u006b\u0069\u006e\u0064":"\u004c\u0061y\u0065\u0072\u004b\u0069\u006e\u0064\u002e\u0054\u0045\u0058\u0054","\u0069\u0073\u0042\u0061\u0063\u006b\u0067\u0072\u006f\u0075\u006e\u0064\u004c\u0061y\u0065\u0072":false,"\u0069\u006e\u0064\u0065\u0078":2,"\u0077\u0069\u0064\u0074\u0068":279,"\u0068\u0065\u0069\u0067\u0068\u0074":340,"\u0074\u0065\u0078\u0074\u0049\u006e\u0066\u006f":{"\u0063\u006f\u006c\u006f\u0072":"\u0046\u0045\u0045\u0033\u0030\u0030","\u0063\u006f\u006e\u0074\u0065\u006e\u0074\u0073":"\u0020\u0020\u0020\u0020中国又以“华夏”、“中华”、“神州”、“中土”等的代称出现，最早指天下的“中心”\u002d黄河流域黄河中下游的中原河洛地带，后逐渐带有王朝统治正统性的意义。中华民国建立后，“中国”正式成为中国的国家称谓。中国为世界文明古国，有五千多年的悠久文化与文明史。中国是国际社会的中流砥柱，联合国安全理事会常任理事国；世界第二大经济体；世界第一大出口国，世界第二大进口国，拥有最多外汇储备；是世界上经济成长最快的国家之一。中国首都是北京，中国的生产力总体水平还比较低，地区发展也不平衡。","\u0066\u006f\u006e\u0074":"\u0053\u0069\u006d\u0053\u0075\u006e","\u0073\u0069z\u0065":12,"\u0074\u0065\u0078\u0074\u0054y\u0070\u0065":"\u0054\u0065\u0078\u0074\u0054y\u0070\u0065\u002e\u0050\u0041\u0052\u0041\u0047\u0052\u0041\u0050\u0048\u0054\u0045\u0058\u0054","\u0062\u006f\u006c\u0064":false,"\u0069\u0074\u0061\u006c\u0069\u0063":false,"\u0069\u006e\u0064\u0065\u006e\u0074":0,"\u0075\u006e\u0064\u0065\u0072\u006c\u0069\u006e\u0065":false,"\u0074\u0065\u0078\u0074\u0052\u0061\u006e\u0067\u0065":[{"\u0072\u0061\u006e\u0067\u0065":[0,113],"\u0066\u006f\u006e\u0074":"\u0053\u0069\u006d\u0053\u0075\u006e","\u0073\u0069z\u0065":12,"\u0063\u006f\u006c\u006f\u0072":"\u0046\u0045\u0045\u0033\u0030\u0030"},{"\u0072\u0061\u006e\u0067\u0065":[113,122],"\u0066\u006f\u006e\u0074":"\u0053\u0069\u006d\u0053\u0075\u006e","\u0073\u0069z\u0065":18,"\u0063\u006f\u006c\u006f\u0072":"\u0030\u0030\u0030\u0030\u0030\u0030"},{"\u0072\u0061\u006e\u0067\u0065":[122,171],"\u0066\u006f\u006e\u0074":"\u0053\u0069\u006d\u0053\u0075\u006e","\u0073\u0069z\u0065":12,"\u0063\u006f\u006c\u006f\u0072":"\u0046\u0045\u0045\u0033\u0030\u0030"},{"\u0072\u0061\u006e\u0067\u0065":[171,206],"\u0066\u006f\u006e\u0074":"\u0053\u0069\u006d\u0053\u0075\u006e","\u0073\u0069z\u0065":12,"\u0063\u006f\u006c\u006f\u0072":"\u0046\u0046\u0046\u0046\u0046\u0046"},{"\u0072\u0061\u006e\u0067\u0065":[206,208],"\u0066\u006f\u006e\u0074":"\u0053\u0069\u006d\u0053\u0075\u006e","\u0073\u0069z\u0065":12,"\u0063\u006f\u006c\u006f\u0072":"\u0046\u0046\u0030\u0030\u0030\u0030"},{"\u0072\u0061\u006e\u0067\u0065":[208,239],"\u0066\u006f\u006e\u0074":"\u0053\u0069\u006d\u0053\u0075\u006e","\u0073\u0069z\u0065":12,"\u0063\u006f\u006c\u006f\u0072":"\u0046\u0046\u0046\u0046\u0046\u0046"}],"\u006c\u0069\u006e\u0065\u0048\u0065\u0069\u0067\u0068\u0074":24,"\u0074\u0065\u0078\u0074\u0041\u006c\u0069\u0067\u006e":"\u006c\u0065\u0066\u0074"}},{"\u0074y\u0070\u0065":"\u0041\u0072\u0074\u004c\u0061y\u0065\u0072","\u006e\u0061\u006d\u0065":"\u0061","\u0076\u0069\u0073\u0069\u0062\u006c\u0065":true,"\u006c\u0065\u0066\u0074":24,"\u0074\u006f\u0070":298,"\u0072\u0069\u0067\u0068\u0074":266,"\u0062\u006f\u0074\u0074\u006f\u006d":311,"\u006b\u0069\u006e\u0064":"\u004c\u0061y\u0065\u0072\u004b\u0069\u006e\u0064\u002e\u0054\u0045\u0058\u0054","\u0069\u0073\u0042\u0061\u0063\u006b\u0067\u0072\u006f\u0075\u006e\u0064\u004c\u0061y\u0065\u0072":false,"\u0069\u006e\u0064\u0065\u0078":3,"\u0074\u0065\u0078\u0074\u0049\u006e\u0066\u006f":{"\u0063\u006f\u006c\u006f\u0072":"\u0046\u0031\u0046\u0031\u0046\u0031","\u0063\u006f\u006e\u0074\u0065\u006e\u0074\u0073":"\u0054\u0068\u0065\u0020\u0050\u0065\u006f\u0070\u006c\u0065\u0027\u0073\u0020\u0052\u0065\u0070\u0075\u0062\u006c\u0069\u0063\u0020\u006f\u0066\u0020\u0043\u0068\u0069\u006e\u0061","\u0066\u006f\u006e\u0074":"\u0053\u0069\u006d\u0053\u0075\u006e","\u0073\u0069z\u0065":14,"\u0074\u0065\u0078\u0074\u0054y\u0070\u0065":"\u0054\u0065\u0078\u0074\u0054y\u0070\u0065\u002e\u0050\u004f\u0049\u004e\u0054\u0054\u0045\u0058\u0054","\u0062\u006f\u006c\u0064":false,"\u0069\u0074\u0061\u006c\u0069\u0063":false,"\u0069\u006e\u0064\u0065\u006e\u0074":0,"\u0075\u006e\u0064\u0065\u0072\u006c\u0069\u006e\u0065":false,"\u0074\u0065\u0078\u0074\u0052\u0061\u006e\u0067\u0065":[{"\u0072\u0061\u006e\u0067\u0065":[0,31],"\u0066\u006f\u006e\u0074":"\u0053\u0069\u006d\u0053\u0075\u006e","\u0073\u0069z\u0065":14,"\u0063\u006f\u006c\u006f\u0072":"\u0046\u0031\u0046\u0031\u0046\u0031"}],"\u006c\u0069\u006e\u0065\u0048\u0065\u0069\u0067\u0068\u0074":24,"\u0074\u0065\u0078\u0074\u0041\u006c\u0069\u0067\u006e":"\u006c\u0065\u0066\u0074"},"\u006c\u0069\u006e\u006b":{"\u0068\u0072\u0065\u0066":"\u0023"}},{"\u0074y\u0070\u0065":"\u0041\u0072\u0074\u004c\u0061y\u0065\u0072","\u006e\u0061\u006d\u0065":"中华人民共和国","\u0076\u0069\u0073\u0069\u0062\u006c\u0065":true,"\u006c\u0065\u0066\u0074":387,"\u0074\u006f\u0070":41,"\u0072\u0069\u0067\u0068\u0074":482,"\u0062\u006f\u0074\u0074\u006f\u006d":52,"\u006b\u0069\u006e\u0064":"\u004c\u0061y\u0065\u0072\u004b\u0069\u006e\u0064\u002e\u0054\u0045\u0058\u0054","\u0069\u0073\u0042\u0061\u0063\u006b\u0067\u0072\u006f\u0075\u006e\u0064\u004c\u0061y\u0065\u0072":false,"\u0069\u006e\u0064\u0065\u0078":4,"\u0074\u0065\u0078\u0074\u0049\u006e\u0066\u006f":{"\u0063\u006f\u006c\u006f\u0072":"\u0046\u0031\u0046\u0031\u0046\u0031","\u0063\u006f\u006e\u0074\u0065\u006e\u0074\u0073":"中华人民共和国","\u0066\u006f\u006e\u0074":"\u0053\u0069\u006d\u0053\u0075\u006e","\u0073\u0069z\u0065":12,"\u0074\u0065\u0078\u0074\u0054y\u0070\u0065":"\u0054\u0065\u0078\u0074\u0054y\u0070\u0065\u002e\u0050\u004f\u0049\u004e\u0054\u0054\u0045\u0058\u0054","\u0062\u006f\u006c\u0064":true,"\u0069\u0074\u0061\u006c\u0069\u0063":false,"\u0069\u006e\u0064\u0065\u006e\u0074":0,"\u0075\u006e\u0064\u0065\u0072\u006c\u0069\u006e\u0065":false,"\u0074\u0065\u0078\u0074\u0052\u0061\u006e\u0067\u0065":[{"\u0072\u0061\u006e\u0067\u0065":[0,8],"\u0066\u006f\u006e\u0074":"\u0053\u0069\u006d\u0053\u0075\u006e","\u0073\u0069z\u0065":12,"\u0063\u006f\u006c\u006f\u0072":"\u0046\u0031\u0046\u0031\u0046\u0031"}],"\u006c\u0069\u006e\u0065\u0048\u0065\u0069\u0067\u0068\u0074":24,"\u0074\u0065\u0078\u0074\u0041\u006c\u0069\u0067\u006e":"\u006c\u0065\u0066\u0074"}}]};
-    var APP = {
-    	OPTION:{
-    		builder:"PAGE"
-    	}
-    };
-    var psd = {
-    	getWidth:function(){
-    		return 640;
-    	},
-    	getHeight:function(){
-    		return 410;
-    	},
-    	dir:"C:\\Documents and Settings\\wuming.xiaowm\\Documents\\china\\",
-    	doc:{
-    		name:"a.psd"
-    	}
-    }
-    
-    new toPage(data,APP,psd);
-}
-main();
+// Debugging
+// debug level: 0-2 (0:disable, 1:break on error, 2:break at beginning)
+// $.level = 0;
+// debugger; // launch debugger on next line
+// @include "../PSD2HTML/lib/i18n.jsx"
+
+var APP = {version: '1.0'};
+
+(function(){
+	APP.ui = 'dialog{\
+		text:"'+i18n("setting")+'",\
+		option: Group{\
+			orientation:"column",\
+			alignChildren: "left",\
+			builder: Panel{\
+				text: "'+i18n("selectPageType")+'",\
+				a: Group{\
+					j: RadioButton{text:"'+i18n("staticPage")+'", helpTip:"Normal page", data:"normal"}\
+					e: RadioButton{text:"'+i18n("edm")+'", helpTip:"EDM", data:"EDM",value:true},\
+					l: RadioButton{text:"'+i18n("bbs")+'", helpTip:"Editor code", data:"BBS"},\
+					i: RadioButton{text:"Export JSON and Image", data:"file"}\
+				}\
+			},\
+			image: Group{\
+				alignChildren: "left",\
+				orientation: "column",\
+				a: Group{\
+					alignChildren: "left",\
+					t: StaticText{text:"'+i18n("imgFormat")+'"},\
+					jpg: RadioButton{text:"jpg", value:true},\
+					p8: RadioButton{text:"png-8"},\
+					p24: RadioButton{text:"png-24"}\
+				},\
+				q: Group{\
+					alignChildren: "left",\
+					t: StaticText{text:"'+i18n("imgQuality")+'", helpTip:"Image quality"},\
+					s: EditText{ text:"60", preferredSize: [50, 20] }\
+				}\
+			},\
+			output: Group{\
+				orientation:"row",\
+				b: Button{text:"'+i18n("selectEmportFolder")+'", properties:{name:"open"}, helpTip:"'+i18n("selectEmportFolder")+'"},\
+				s: EditText  { text:"/d/psd2html", preferredSize:[180, 20], helpTip:"'+i18n("defaultToMyDocument")+'"}\
+			}\
+		},\
+		buttons:Group{\
+			ok: Button{text:"'+i18n("ok")+'",  properties:{name:"ok"}},\
+			cancel: Button{text:"'+i18n("cancel")+'",  properties:{name:"cancel"}}\
+		}\
+	}';
+
+	APP.win = new Window(APP.ui);
+	APP.OPTION = {
+		image:{
+			extension:'jpg',
+			quality:60,
+		},
+		output:'/d/psd2html'
+	};
+	// 选择文件夹事件
+	APP.win.option.output.b.onClick = function(){
+		var output = Folder.selectDialog (i18n("selectEmportFolder"),'/d/psd2html');
+		if(output){
+			APP.win.option.output.s.text  = APP.OPTION.output = output;
+		}
+	}
+
+	APP.win.option.image.a.addEventListener('click', function(e){
+		var target = e.target,
+			quality = this.parent.q;
+		switch(target.text){
+			case "jpg":
+				quality.show();
+				APP.OPTION.image.extension = 'jpg';
+				APP.OPTION.image.type = 'jpg';
+				break;
+			case "png-24":
+				quality.hide();
+				APP.OPTION.image.extension = 'png';
+				APP.OPTION.image.png8 = false;
+				break;
+			case "png-8":
+				quality.hide();
+				APP.OPTION.image.extension = 'png';
+				APP.OPTION.image.png8 = true;
+				break;
+		}
+	});
+	APP.win.buttons.ok.onClick = function(){
+		if(!APP.OPTION.output){
+			alert(i18n("selectEmportFolder"));
+		}else{
+			var radios = APP.win.option.builder.a.children;
+			for(var i = 0, l = radios.length; i < l; i++){
+				var radio = radios[i];
+				if(radio.value === true){
+					APP.OPTION.builder = radio.data;
+					break;
+				}
+			}
+			if(!APP.OPTION.builder){
+				alert(i18n("selectPageType"));
+			}else{
+                  
+				APP.OPTION.image.quality = APP.win.option.image.q.s.text;
+				APP.win.close();
+				APP.win = new Window('palette{\
+					g: Group{\
+						tx: StaticText{text:"'+i18n("running")+'"},\
+					}\
+				}');
+				APP.win.center();
+				APP.win.show();
+				if(APP.OPTION.builder === 'file'){
+					$.evalFile(File($.fileName).parent+'/PSD2HTML/builder/importFile.jsx');
+				}else{
+                    $.evalFile(File($.fileName).parent+'/../PSD2HTML/builder/toPage.jsx');
+                }
+				APP.win.close();
+				alert(i18n("processDone"));
+			}
+		}
+
+	}
+
+	APP.win.show();
+})();
