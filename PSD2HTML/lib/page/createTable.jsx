@@ -5,6 +5,7 @@
  */
 
 // @include "data.jsx"
+// @include "element.jsx"
 
 /**
  * 创建表格 
@@ -27,6 +28,7 @@ page.createTable = function(data){
 	this.setTfoot();
 	this.parseWidth();
 	this.parseHeight();
+	this.setWidth();
 	this.createEachCol();
 	
 	//返回
@@ -41,12 +43,15 @@ page.createTable.prototype.createTableMain = function(){
 	this.tbody = new XML('<tbody></tbody>');
 	this.thead = new XML('<thead></thead>');
 	this.tfoot = new XML('<tfoot></tfoot>');
+	//设置宽度的tbody
+	this.setWidthTbody = new XML('<tbody></tbody>');
 	this.tr = {};
 	this.td = {};
 	this.table['@width'] = page.width;
 	
 	this.table.appendChild(this.thead);
 	this.table.appendChild(this.tfoot);
+	this.table.appendChild(this.setWidthTbody);
 	this.table.appendChild(this.tbody);
 };
 
@@ -64,7 +69,7 @@ page.createTable.prototype.setThead = function(){
 	
 	var psdImg = page.getPsdImg(top,right,bottom,left);
 	
-	th['@colspan'] = this.colCount;	
+	th['@colspan'] = this.colCount+1;	
 	th.appendChild(psdImg.element);
 	tr.appendChild(th);
 	this.thead.appendChild(tr);
@@ -84,7 +89,7 @@ page.createTable.prototype.setTfoot = function(){
 		
 	var psdImg = page.getPsdImg(top,right,bottom,left);
 	
-	td['@colspan'] = this.colCount;		
+	td['@colspan'] = this.colCount+1;		
 	td.appendChild(psdImg.element);
 	tr.appendChild(td);
 	this.tfoot.appendChild(tr);
@@ -97,8 +102,7 @@ page.createTable.prototype.setFirstCol = function(){
 	var firstTd = new XML('<td></td>'),
 		data = this.sortData('right');
 		
-	firstTd['@width'] = this.width[0];
-	firstTd['@rowspan'] = this.rowCount;
+	firstTd['@rowspan'] = this.rowCount-2;
 	
 	var top = this.rowData[0].top,
 		left = 0,
@@ -110,7 +114,7 @@ page.createTable.prototype.setFirstCol = function(){
 		
 	firstTd.appendChild(firstImgObj.element);
 	
-	this.tr[0].appendChild(firstTd);
+	this.tr[1].appendChild(firstTd);
 	
 };
 
@@ -121,8 +125,7 @@ page.createTable.prototype.setLastCol = function(){
 	var lastTd = new XML('<td></td>'),
 		data = this.sortData('right');
 		
-	lastTd['@width'] = this.width[this.width.length-1];
-	lastTd['@rowspan'] = this.rowCount;
+	lastTd['@rowspan'] = this.rowCount-2;
 	
 	var top = this.rowData[0].top,
 		left = data[0].right,
@@ -133,7 +136,7 @@ page.createTable.prototype.setLastCol = function(){
 		
 	lastTd.appendChild(lastImgObj.element);
 	
-	this.tr[0].appendChild(lastTd);
+	this.tr[1].appendChild(lastTd);
 };
 
 
@@ -141,38 +144,43 @@ page.createTable.prototype.setLastCol = function(){
  * 设置每一列 
  */
 page.createTable.prototype.createEachCol = function(){
-	for(var row=0;row<this.rowCount;row++){
+	for(var row=1;row<this.rowCount-1;row++){
 		this.tr[row] = new XML('<tr></tr>');
 		for(var col=1;col<this.colCount-1;col++){
-			//最钱一列
-			if(row == 0 && col == 1){
+			//设置高度
+			if(col == 1){
+				var td = new XML('<td></td>');
+				td['@height'] = this.height[row];
+				td.appendChild(new XML());
+				this.tr[row].appendChild(td);
+			}
+			
+			//最前一列
+			if(row == 1 && col == 1){
 				this.setFirstCol();
 			} 
 			
 			var tdKey = row+'_'+col;
 			this.td[tdKey] = new XML('<td></td>');
 			
-			//宽度
-			if(row == 0){
-				this.td[tdKey]['@width'] = this.width[col];
+			var elm = new XML();
+			
+			for(var i in this.textData){
+				var item = this.textData[i];
+				if(item.left == this.left[col-1] && item.top == this.top[row-1]){
+					this.td[tdKey]['@valign'] = 'top';
+					this.td[tdKey]['@align'] = 'left';
+					elm = new XML(item.name);
+					continue;
+				}
 			}
 			
-			//高度
-			if(col == 1){
-				this.td[tdKey]['@height'] = this.height[row+1];
-			}
-			
-			this.td[tdKey]['@valign'] = 'top';
-			this.td[tdKey]['@align'] = 'left';
-			
-			this.td[tdKey].appendChild(new XML());
+			this.td[tdKey].appendChild(elm);
 			
 			this.tr[row].appendChild(this.td[tdKey]);
 			
-			
-			
 			//最后一列
-			if(row == 0 && col == this.colCount-2){
+			if(row == 1 && col == this.colCount-2){
 				this.setLastCol();
 			}
 		}
@@ -184,89 +192,79 @@ page.createTable.prototype.createEachCol = function(){
  * 分析宽度 
  */
 page.createTable.prototype.parseWidth = function(){
-	var leftData = this.sortData('left','asc'),
-		rightData = this.sortData('right','asc'),
-		widthData = this.sortData('width','asc'),
-		widthCount = 0,
-		value = 0,
-		n=0;
+	this.width = [];
+	this.left = [];
+	var data = this.textData,
+		obj = [];
+		
 	
-	this.width = new Object();
-	
-	//最前
-	value = this.colData[0].left;
-	widthCount += value;
-	var widths = [value];
-	//前半部分
-	for(var i=1;i<leftData.length;i++){
-		value = leftData[i].left - leftData[i-1].left;
-		widths.push(value);
-		n++;
-		widthCount += value;
+	for(var i=0;i<data.length;i++){
+		obj.push(data[i].left);
+		obj.push(data[i].right);
 	}
+	obj.sort(function(a,b){return a-b;});
 	
-	//中间
-	widths.push(0);
-	
-	//后半部分
-	for(var i=0;i<rightData.length;i++){
-		if(i < rightData.length-1){
-			value = rightData[i+1].right - rightData[i].right;
-			widthCount += value;
-			widths.push(value);
-		}
+	this.width.push(obj[0]);
+	this.left.push(obj[0]);
+	for(var i=1;i<obj.length;i++){
+		this.width.push(obj[i]-obj[i-1]);
+		this.left.push(obj[i])
 	}
-	
-	//最后
-	value = page.width - rightData[rightData.length-1].right;
-	widths.push(value);
-	widthCount += value;
-	
-	//设置中间列的宽度
-	var value = page.width - widthCount;
-	widths[n+1] = value;
-	
-	this.width = widths;
+	this.width.push(page.width - obj[obj.length-1]);
 };
 
 /**
  * 分析高度 
  */
 page.createTable.prototype.parseHeight = function(){
-	var heights = [],
-		heightCount = 0,
-		topData = this.sortData('top','asc');
+	this.height = [];
+	this.top = [];
+	var data = this.textData,
+		obj = [];
 		
-		
-	heights.push(topData[0].top);
-	heightCount += topData[0].top;
 	
-	for(var i=0;i<topData.length;i++){
-		var value = topData[i].height;
-		
-		heights.push(value);
-		heightCount += value;
-		
-		if(i<topData.length-1){
-			value = topData[i+1].top - topData[i].bottom;
-			heights.push(value);
-			heightCount += value;
-		}
-		
+	for(var i=0;i<data.length;i++){
+		obj.push(data[i].top);
+		obj.push(data[i].bottom);
+	}
+	obj.sort(function(a,b){return a-b;});
+	
+	
+	this.height.push(obj[0]);
+	this.top.push(obj[0]);
+	for(var i=1;i<obj.length;i++){
+		this.height.push(obj[i]-obj[i-1]);
+		this.top.push(obj[i]);
+	}
+	this.height.push(page.height - obj[obj.length-1]);
+};
+
+
+/**
+ * 设置宽度 
+ */
+page.createTable.prototype.setWidth = function(){
+	var tr = new XML('<tr></tr>');
+	var td0 = new XML('<td></td>');
+	td0['@width']=0;
+	td0['@height']=0;
+	td0.appendChild(new XML());
+	tr.appendChild(td0);
+	for(var i=0;i<this.colCount;i++){
+		var td = new XML('<td></td>');
+		td['@width'] = this.width[i];
+		td.appendChild(new XML());
+		tr.appendChild(td);
 	}
 	
-	heights.push(page.height - heightCount);
-	
-	this.height = heights;
-	
-}
-
+	this.setWidthTbody.appendChild(tr);
+};
 
 /**
  * 行和列总数 
  */
 page.createTable.prototype.getRowAndColCount = function(){
-	var row = 1,
+	var row = 3,
 		col = 3;
 	
 	var heightData = this.sortData('top');
@@ -281,7 +279,7 @@ page.createTable.prototype.getRowAndColCount = function(){
 		
 	}	
 	
-	var widthData = this.sortData('width');
+	var widthData = this.sortData('left');
 	for(var c=1;c<widthData.length;c++){
 		if(widthData[c].left != widthData[c-1].left){
 			col++;
@@ -289,12 +287,12 @@ page.createTable.prototype.getRowAndColCount = function(){
 		if(widthData[c].right  != widthData[c-1].right){
 			col++;
 		}
-		
 	}
 	
 	
 	this.rowCount = row;
 	this.colCount = col;
+	
 };
 
 
