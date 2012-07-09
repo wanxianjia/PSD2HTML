@@ -187,7 +187,7 @@ page.createTable.prototype.createEachCol = function(){
 					if(item.left == this.left[col-1] && item.top == this.top[row-1]){
 						this.td[tdKey]['@valign'] = 'top';
 						this.td[tdKey]['@align'] = 'left';
-						elm = new XML(1);
+						elm = new XML();
 						
 						//设置合并列
 						var colspan = this.getMergeCol(item.width,row,col),
@@ -204,8 +204,9 @@ page.createTable.prototype.createEachCol = function(){
 						this.td[tdKey]['@background'] = 'slices/' + psdImg.imgObject.name;
 						this.td[tdKey]['@bgcolor'] = '#' + page.getPsdRGBColor(item.left,item.top);
 						
-						
 						continue;
+					}else{
+						//没有文本的td，算出从这一列到下一个有文本（或结束）的列的宽度
 					}
 				}
 				
