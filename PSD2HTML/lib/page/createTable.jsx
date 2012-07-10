@@ -51,8 +51,6 @@ page.createTable.prototype.createTableMain = function(){
 	this.tbody = new XML('<tbody></tbody>');
 	this.thead = new XML('<thead></thead>');
 	this.tfoot = new XML('<tfoot></tfoot>');
-	//设置宽度的tbody
-	this.setWidthTbody = new XML('<tbody></tbody>');
 	this.tr = {};
 	this.td = {};
 	this.table['@width'] = page.width;
@@ -324,7 +322,7 @@ page.createTable.prototype.setWidth = function(){
 		tr.appendChild(td);
 	}
 	
-	this.setWidthTbody.appendChild(tr);
+	this.thead.appendChild(tr);
 };
 
 /**
