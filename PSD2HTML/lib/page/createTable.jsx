@@ -16,8 +16,6 @@ page.createTable = function(data){
 	this.data = data;
 	var resultData = new page.data(data.childs);
 	this.textData = resultData.textData;
-	this.rowData = resultData.rowData;
-	this.colData = resultData.colData;
 	
 	//行和列的总数
 	this.getRowAndColCount();
@@ -57,7 +55,6 @@ page.createTable.prototype.createTableMain = function(){
 	
 	this.table.appendChild(this.thead);
 	this.table.appendChild(this.tfoot);
-	this.table.appendChild(this.setWidthTbody);
 	this.table.appendChild(this.tbody);
 };
 
@@ -185,7 +182,7 @@ page.createTable.prototype.createEachCol = function(){
 					if(item.left == this.left[col-1] && item.top == this.top[row-1]){
 						this.td[tdKey]['@valign'] = 'top';
 						this.td[tdKey]['@align'] = 'left';
-						elm = new XML();
+						elm = new XML(1);
 						
 						//设置合并列
 						var colspan = this.getMergeCol(item.width,row,col),
@@ -205,7 +202,7 @@ page.createTable.prototype.createEachCol = function(){
 						continue;
 					}else{
 						//没有文本的td，算出从这一列到下一个有文本（或结束）的列的宽度
-						
+						$.writeln(this.getNotTextColWidth(col,row));
 					}
 				}
 				
@@ -259,7 +256,7 @@ page.createTable.prototype.getMergeRow = function(height,row,col){
 page.createTable.prototype.parseWidth = function(){
 	this.width = [];
 	this.left = [];
-	var data = this.textData,
+	var data = this.sortData('left'),
 		obj = [];
 		
 	
@@ -273,7 +270,7 @@ page.createTable.prototype.parseWidth = function(){
 	this.left.push(obj[0]);
 	for(var i=1;i<obj.length;i++){
 		this.width.push(obj[i]-obj[i-1]);
-		this.left.push(obj[i])
+		this.left.push(obj[i]);
 	}
 	this.width.push(page.width - obj[obj.length-1]);
 };
@@ -284,7 +281,7 @@ page.createTable.prototype.parseWidth = function(){
 page.createTable.prototype.parseHeight = function(){
 	this.height = [];
 	this.top = [];
-	var data = this.textData,
+	var data = this.sortData('height'),
 		obj = [];
 		
 	
@@ -408,3 +405,26 @@ page.createTable.prototype.oneColData = function(){
 	this.table.appendChild(tr);
 	
 };
+
+/**
+ * 获取没有文本的列表的宽度,
+ * 主意是计算该列到下（或n下）一列有文本或结束的宽度
+ */
+page.createTable.prototype.getNotTextColWidth = function(col,row){
+	var data = this.sortData('left','asc'),
+		top = this.top[row],
+		left = this.left[left],
+		n = 0;
+	for(var i in data){
+		var item = data[i];
+		if(item.top == top && item.left > left){
+			
+		}else{
+			n++;
+		}
+	}
+	
+	$.writeln(col+n);
+
+	return this.left[col+n] - this.left[col];
+}

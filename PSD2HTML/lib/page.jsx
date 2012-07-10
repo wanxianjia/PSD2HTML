@@ -20,42 +20,43 @@ var page = {};
  */
 page.init = function(data,option,psd){ 
 	page.psd = psd;
-	
 	//隐藏所有文本图层
 	psd.hiddenTextLayers();
-	
-	page.option = option;
-	page.title = data.name;
-	page.width = option.width;
-	page.height = option.height;
-	
-	//文件保存路径
-	this.filePath = option.path;
-	//文件编码
-	if(typeof(option) != 'undefined' && typeof(option.encode) != 'undefined'){
-		page.encode = option.encode;
-	}else{
-		page.encode = "gb2312";
-	}
-	this.option = option;
-	
-	//具体解析器
-	switch(option.builder) {
-		case "EDM":
-			this.htmlCode = page.edmHtml(data);
-			break;
-		case "BBS":
-			this.htmlCode = page.bssHtml(data);
-			break;
-		default:
-			this.htmlCode = page.normalPage(data);
-			break;
-	}
-	
-	this.saveFile();
-	
-	//显示所有文本图层
-	psd.visibleTextLayers();
+	//try{
+		page.option = option;
+		page.title = data.name;
+		page.width = option.width;
+		page.height = option.height;
+		
+		//文件保存路径
+		this.filePath = option.path;
+		//文件编码
+		if(typeof(option) != 'undefined' && typeof(option.encode) != 'undefined'){
+			page.encode = option.encode;
+		}else{
+			page.encode = "gb2312";
+		}
+		this.option = option;
+		
+		//具体解析器
+		switch(option.builder) {
+			case "EDM":
+				this.htmlCode = page.edmHtml(data);
+				break;
+			case "BBS":
+				this.htmlCode = page.bssHtml(data);
+				break;
+			default:
+				this.htmlCode = page.normalPage(data);
+				break;
+		}
+		
+		this.saveFile();
+	//}catch(e){
+	//	alert(e.message);
+	//}
+		//显示所有文本图层
+		psd.visibleTextLayers();
 	
 	//重置psd
 	//psd.reset();
@@ -78,6 +79,7 @@ page.edmHtml = function(data){
 		title = new XML('<title>' + data.name + '</title>'),
 		body = new XML('<body></body>');
 	
+	head.appendChild(new XML('<style type="text/css">body{font-size:12px;line-height:12px;}</style>'));
 	body.appendChild(new page.createTable(data));
 	head.appendChild(title);
 	html.appendChild(head);
