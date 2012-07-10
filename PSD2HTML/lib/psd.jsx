@@ -60,6 +60,8 @@ PSD.fn = PSD.prototype = {
 
 		this.dir = Folder(this.output + '/' + this.getPSDName());
 		!this.dir.exists && this.dir.create();
+		
+		this.createSnapshotOnStart();
 	},
 	// 遍历所有图层
 	parseLayers: function(layers, context, skip){
@@ -447,8 +449,49 @@ PSD.fn = PSD.prototype = {
 		return PSD.colorSampler.color.rgb.hexValue;
 	},
 	reset: function(){
-		this.doc.activeHistoryState = this.doc.historyStates[0];
+		this.doc.activeHistoryState = this.doc.historyStates.getByName("psdtohtml");
 		this.doc.save();
+	},
+	createSnapshotOnStart: function(){
+		var his = this.doc.historyStates;
+		try{
+			// if has psdtohtml snapshot
+			var snapshot = his.getByName("psdtohtml");
+			this.doc.activeHistoryState = snapshot;
+			// delete it
+			var idDlt = charIDToTypeID( "Dlt " );
+			var desc175 = new ActionDescriptor();
+			var idnull = charIDToTypeID( "null" );
+				var ref131 = new ActionReference();
+				var idHstS = charIDToTypeID( "HstS" );
+				var idCrnH = charIDToTypeID( "CrnH" );
+				ref131.putProperty( idHstS, idCrnH );
+			desc175.putReference( idnull, ref131 );
+			executeAction( idDlt, desc175, DialogModes.NO );
+		}catch(e){
+			
+		}
+		// create snapshot
+		var idMk = charIDToTypeID( "Mk  " );
+		var desc202 = new ActionDescriptor();
+		var idnull = charIDToTypeID( "null" );
+			var ref163 = new ActionReference();
+			var idSnpS = charIDToTypeID( "SnpS" );
+			ref163.putClass( idSnpS );
+		desc202.putReference( idnull, ref163 );
+		var idFrom = charIDToTypeID( "From" );
+			var ref164 = new ActionReference();
+			var idHstS = charIDToTypeID( "HstS" );
+			var idCrnH = charIDToTypeID( "CrnH" );
+			ref164.putProperty( idHstS, idCrnH );
+		desc202.putReference( idFrom, ref164 );
+		var idNm = charIDToTypeID( "Nm  " );
+		desc202.putString( idNm, "psdtohtml" );
+		var idUsng = charIDToTypeID( "Usng" );
+		var idHstS = charIDToTypeID( "HstS" );
+		var idFllD = charIDToTypeID( "FllD" );
+		desc202.putEnumerated( idUsng, idHstS, idFllD );
+		executeAction( idMk, desc202, DialogModes.NO );
 	}
 }
 
