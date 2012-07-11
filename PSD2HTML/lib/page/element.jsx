@@ -166,12 +166,20 @@ page.element.prototype.text = function(){
 			}
 		}
 		
-		if(p.toXMLString().indexOf("span")>-1){
-			if(page.option.builder != "normal"){
-				p['@style'] = "margin:0px;padding:0px;";
+		if(page.option.builder != "normal"){
+			p['@style'] = "margin:0px;padding:0px;";
+		}
+		
+		
+		if(page.option.builder == "normal"){
+			if(p.toXMLString().indexOf("span")==-1){
+				p = new XML('<br/>');
 			}
 			elm.appendChild(p);
+		}else if(page.option.builder != "normal" && p.toXMLString().indexOf("span")>-1){
+			elm.appendChild(p);
 		}
+		
 	}
 	
 	//Css

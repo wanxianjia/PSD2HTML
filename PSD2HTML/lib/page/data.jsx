@@ -34,10 +34,6 @@ page.data = function(data){
 	this.getUsefulData();
 	
 	return {
-		colCount:this.colSize,
-		rowCount:this.rowSize,
-		colData:this.colData,
-		rowData:this.rowData,
 		textData:this.textData
 	};
 	
@@ -56,15 +52,70 @@ page.data.prototype.getUsefulData = function(){
 				this.data[i].textInfo = this.setLackTextObj();
 			}
 			this.data[i].position = {};
-			this.rowData.push(this.data[i]);
-			this.colData.push(this.data[i]);
-			this.textData.push(this.data[i]);
+			this.textData.push(this.parse(this.data[i]));
 		}
 	};
 	//排序
 	this.sorts();
 	
 };
+
+/**
+ * 解析数据 
+ */
+page.data.prototype.parse = function(item){
+	var width = item.width,
+		hegiht = item.height,
+		top = item.top,
+		left = item.left,
+		right = item.right,
+		bottom = item.bottom,
+		size = item.textInfo.size,
+		lineHeight = item.textInfo.lineHeight,
+		line_height = lineHeight;
+		contents = item.textInfo.contents,
+		textType = item.textInfo.textType;
+		
+	//宽度
+	width += parseInt(size/4,10) + Math.round(size/6);
+	//行高&top
+	if(typeof(lineHeight) == 'string'){
+		//行高不是数字，只有一种情况,自动行高
+		top -= Math.round(size/5);
+		//文字大小为12，并且行高为自动，那么他的行高为他的字体大小+2，不知道原因
+		if(size == 12 && contents.indexOf("\r") == -1 && textType != "TextType.PARAGRAPHTEXT"){
+			lineHeight = '14px';
+		}else{
+			lineHeight = lineHeight;
+		}
+		
+	}else if(contents.indexOf("\r") == -1 && textType != "TextType.PARAGRAPHTEXT"){
+		top -= Math.round(size/10);
+		lineHeight = (size+2) + 'px';
+		if(size == 12){
+			top -= 1;
+		}
+	}else{
+		lineHeight += 'px';
+		top -= Math.round((line_height - size)/2);
+	}
+	
+	//left
+	if(page.option.builder == "normal"){
+		left -= Math.round((page.option.width - 952) / 2);
+	}else{
+		left = left;
+	}
+	right = left + width;
+	
+	item.width = width;
+	item.top = top;
+	item.left = left;
+	item.right = right;
+	item.textInfo.lineHeight = lineHeight;
+	
+	return item;
+}
 
 /**
  * 设置缺失的文本对象 
@@ -82,7 +133,6 @@ page.data.prototype.setLackTextObj = function(){
 page.data.prototype.sorts = function(){
 	this.rowData.sort(function(a,b){return a.top-b.top;});
 	this.colData.sort(function(a,b){return a.left-b.left;});
-	//this.removeRepeat();
 };
 
 /**

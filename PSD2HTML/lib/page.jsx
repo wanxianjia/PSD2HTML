@@ -79,7 +79,7 @@ page.edmHtml = function(data){
 		title = new XML('<title>' + data.name + '</title>'),
 		body = new XML('<body></body>');
 	
-	head.appendChild(new XML('<style type="text/css">body{font-size:12px;line-height:12px;}</style>'));
+	//head.appendChild(new XML('<style type="text/css">body{font-size:12px;line-height:12px;}</style>'));
 	body.appendChild(new page.createTable(data));
 	head.appendChild(title);
 	html.appendChild(head);

@@ -182,11 +182,11 @@ page.createTable.prototype.createEachCol = function(){
 					if(item.left == this.left[col-1] && item.top == this.top[row-1]){
 						this.td[tdKey]['@valign'] = 'top';
 						this.td[tdKey]['@align'] = 'left';
-						elm = new XML(1);
+						elm = new XML(new page.element(item));
 						
 						//设置合并列
 						var colspan = this.getMergeCol(item.width,row,col),
-							rowspan = this.getMergeRow(item.height,row,col);
+							rowspan = this.getMergeRow(item.height,row,col,colspan);
 						if(colspan > 1){
 							this.td[tdKey]['@colspan'] = colspan;
 						}
@@ -202,7 +202,8 @@ page.createTable.prototype.createEachCol = function(){
 						continue;
 					}else{
 						//没有文本的td，算出从这一列到下一个有文本（或结束）的列的宽度
-						$.writeln(this.getNotTextColWidth(col,row));
+						//$.writeln(this.getNotContentColCount(col,row));
+						
 					}
 				}
 				
@@ -238,14 +239,21 @@ page.createTable.prototype.getMergeCol = function(width,row,col){
 /**
  * 获取合并行 
  */
-page.createTable.prototype.getMergeRow = function(height,row,col){
+page.createTable.prototype.getMergeRow = function(height,row,col,colspan){
 	var h =0;
 	for(var i=row;i<this.rowCount;i++){
 		if(height > h){
 			h += this.height[i];
 			this.isMergeTd[i+'_'+col] = true;
 		}else{
-			return i-row;
+			var mergeRowCount = i-row;
+			//合并斜对角
+			for(var n=row;n<mergeRowCount;n++){
+				for(var m=col;m<col+colspan;m++){
+					this.isMergeTd[n+'_'+m] = true;
+				}
+			}
+			return mergeRowCount;
 		}
 	}
 };
@@ -281,7 +289,7 @@ page.createTable.prototype.parseWidth = function(){
 page.createTable.prototype.parseHeight = function(){
 	this.height = [];
 	this.top = [];
-	var data = this.sortData('height'),
+	var data = this.sortData('top'),
 		obj = [];
 		
 	
@@ -407,24 +415,23 @@ page.createTable.prototype.oneColData = function(){
 };
 
 /**
- * 获取没有文本的列表的宽度,
- * 主意是计算该列到下（或n下）一列有文本或结束的宽度
+ * 获取本行没有文本的列表的列数
+ * 主意是计算该列到下（或n下）一列有文本或结束
  */
-page.createTable.prototype.getNotTextColWidth = function(col,row){
-	var data = this.sortData('left','asc'),
-		top = this.top[row],
-		left = this.left[left],
-		n = 0;
-	for(var i in data){
-		var item = data[i];
-		if(item.top == top && item.left > left){
-			
-		}else{
-			n++;
+page.createTable.prototype.getNotContentColCount = function(col,row){
+	var leftData = this.sortData('left','asc'),
+		result = 0;
+	
+	
+	for(var r=row;r<this.rowCount;r++){
+		result = 0;
+		for(var c=0;c<this.colCount;c++){
+			for(var i in this.textData){
+				if(this.textData[i].top == this.top[r] && this.textData[i].left == this.left[c]){
+					return result;
+				}
+			}
+			result ++;
 		}
 	}
-	
-	$.writeln(col+n);
-
-	return this.left[col+n] - this.left[col];
 }
