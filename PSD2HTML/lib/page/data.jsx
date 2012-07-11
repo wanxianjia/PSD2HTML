@@ -78,28 +78,17 @@ page.data.prototype.parse = function(item){
 		
 	//宽度
 	width += parseInt(size/4,10) + Math.round(size/6);
-	//行高&top
+	var overValue = 0;
 	if(typeof(lineHeight) == 'string'){
-		//行高不是数字，只有一种情况,自动行高
-		top -= Math.round(size/5);
-		//文字大小为12，并且行高为自动，那么他的行高为他的字体大小+2，不知道原因
-		if(size == 12 && contents.indexOf("\r") == -1 && textType != "TextType.PARAGRAPHTEXT"){
-			lineHeight = '14px';
-		}else{
-			lineHeight = lineHeight;
-		}
-		
-	}else if(contents.indexOf("\r") == -1 && textType != "TextType.PARAGRAPHTEXT"){
-		top -= Math.round(size/10);
-		lineHeight = (size+2) + 'px';
-		if(size == 12){
-			top -= 1;
-		}
+		overValue = Math.round(size/5);
+		top -= overValue;
+		bottom += overValue;
 	}else{
+		overValue = Math.round((lineHeight - size)/2);
+		top -= overValue;
+		bottom += overValue + 10;
 		lineHeight += 'px';
-		top -= Math.round((line_height - size)/2);
 	}
-	
 	//left
 	if(page.option.builder == "normal"){
 		left -= Math.round((page.option.width - 952) / 2);
@@ -110,6 +99,7 @@ page.data.prototype.parse = function(item){
 	
 	item.width = width;
 	item.top = top;
+	item.bottom = bottom;
 	item.left = left;
 	item.right = right;
 	item.textInfo.lineHeight = lineHeight;

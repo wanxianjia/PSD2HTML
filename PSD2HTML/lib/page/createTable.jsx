@@ -153,6 +153,7 @@ page.createTable.prototype.setLastCol = function(){
  * 设置每一列 
  */
 page.createTable.prototype.createEachCol = function(){
+	this.mergeNotContentColObj = [];
 	for(var row=1;row<this.rowCount-1;row++){
 		this.tr[row] = new XML('<tr></tr>');
 		for(var col=1;col<this.colCount-1;col++){
@@ -175,14 +176,13 @@ page.createTable.prototype.createEachCol = function(){
 			if(this.isMergeTd[tdKey] !== true){
 			
 				this.td[tdKey] = new XML('<td></td>');
-				var elm = new XML();
 				
 				for(var i in this.textData){
 					var item = this.textData[i];
 					if(item.left == this.left[col-1] && item.top == this.top[row-1]){
 						this.td[tdKey]['@valign'] = 'top';
 						this.td[tdKey]['@align'] = 'left';
-						elm = new XML(new page.element(item));
+						var elm = new XML(new page.element(item));
 						
 						//设置合并列
 						var colspan = this.getMergeCol(item.width,row,col),
@@ -199,15 +199,13 @@ page.createTable.prototype.createEachCol = function(){
 						this.td[tdKey]['@background'] = 'slices/' + psdImg.imgObject.name;
 						this.td[tdKey]['@bgcolor'] = '#' + page.getPsdRGBColor(item.left,item.top);
 						
+						this.td[tdKey].appendChild(elm);
+						
 						continue;
 					}else{
-						//没有文本的td，算出从这一列到下一个有文本（或结束）的列的宽度
-						//$.writeln(this.getNotContentColCount(col,row));
-						
+						this.mergeNotContentCol(row,col);
 					}
 				}
-				
-				this.td[tdKey].appendChild(elm);
 				
 				this.tr[row].appendChild(this.td[tdKey]);
 				
@@ -219,6 +217,9 @@ page.createTable.prototype.createEachCol = function(){
 		}
 		this.tbody.appendChild(this.tr[row]);
 	}
+	
+	//this.mergeNotContentCol();
+	
 };
 
 /**
@@ -418,20 +419,9 @@ page.createTable.prototype.oneColData = function(){
  * 获取本行没有文本的列表的列数
  * 主意是计算该列到下（或n下）一列有文本或结束
  */
-page.createTable.prototype.getNotContentColCount = function(col,row){
-	var leftData = this.sortData('left','asc'),
-		result = 0;
-	
-	
-	for(var r=row;r<this.rowCount;r++){
-		result = 0;
-		for(var c=0;c<this.colCount;c++){
-			for(var i in this.textData){
-				if(this.textData[i].top == this.top[r] && this.textData[i].left == this.left[c]){
-					return result;
-				}
-			}
-			result ++;
-		}
+page.createTable.prototype.mergeNotContentCol = function(row,col){
+	var data = this.sortData("left");
+	for(var i=col;i<this.colCount;i++){
+		
 	}
 }

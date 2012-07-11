@@ -57,11 +57,11 @@ page.css.prototype.get = function(){
 		style.push('z-index:' + item.index);
 		style.push('top:' + item.top + 'px');
 		style.push('left:' + item.left + 'px');
-		style.push('width:' + item.width + 'px');
 	}else{
 		style.push('margin:0px');
 		style.push('padding:0px');
 	}
+	style.push('width:' + item.width + 'px');
 	
 	//文字大小
 	style.push('font-size:' + item.textInfo.size + 'px');
