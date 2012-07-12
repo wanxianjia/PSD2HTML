@@ -121,6 +121,8 @@ page.element.prototype.text = function(){
 		isCreateP = true;
 		if(page.option.builder != "normal"){
 			p['@style'] = 'margin:0px;padding:0px;';
+		}else{
+			p['@class'] = 'paragraph';
 		}
 		var len = rangeData.length
 		for(var i=0;i<rangeData.length;i++){
@@ -141,13 +143,12 @@ page.element.prototype.text = function(){
 						var cssName = 'style'+page.option.i+'-'+i,
 							fontCss = 'font-size:'+textRange.size+'px;color:#'+textRange.color,
 							lineCss = '';
-							if(textRange.font != 'SimSun'){
+							if(textRange.font != 'SimSun' && textRange.font != 'NSimSun'){
 								if(textRange.font.indexOf(' ')>-1 || textRange.font.indexOf('-')>-1){
 									fontCss += ';font-family:\''+textRange.font+'\'';
 								}else{
 									fontCss += ';font-family:'+textRange.font;
 								}
-								
 							}
 						if(typeof(this.cssMap[fontCss]) != 'undefined'){
 							cssName = this.cssMap[fontCss];
@@ -186,7 +187,7 @@ page.element.prototype.text = function(){
 	var styleCss = new page.css(this.item);
 	if(page.option.builder == "normal"){
 		var cssName = 'style'+ page.option.i;
-		elm['@class'] = "absolute over_hide "+cssName;
+		elm['@class'] = "each "+cssName;
 		page.option.styleCss.appendChild('.'+cssName+'{'+styleCss.join(";")+';}');
 	}else{
 		styleCss.push("overflow:hidden");

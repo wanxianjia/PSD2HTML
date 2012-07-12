@@ -72,7 +72,7 @@ page.web.prototype.parse = function(){
 	
 	for(var t in this.textData){
 		var item = this.textData[t];
-		page.option.i = i+t;
+		page.option.i = i+parseInt(t,10);
 		page.option.styleCss = styleCss;
 		pageContent.appendChild(new page.element(item));
 	}

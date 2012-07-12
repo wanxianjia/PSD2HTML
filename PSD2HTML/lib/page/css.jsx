@@ -61,7 +61,9 @@ page.css.prototype.get = function(){
 		style.push('margin:0px');
 		style.push('padding:0px');
 	}
-	style.push('width:' + item.width + 'px');
+	if(textInfo.contents.indexOf("\r")>-1 || textInfo.textType == "TextType.PARAGRAPHTEXT"){
+		style.push('width:' + item.width + 'px');
+	}
 	
 	//文字大小
 	style.push('font-size:' + item.textInfo.size + 'px');
