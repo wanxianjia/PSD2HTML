@@ -1,4 +1,4 @@
-﻿// @include "../lib/json2-min.jsx"
+// @include "../lib/json2-min.jsx"
 // @include "../lib/psd.jsx"
 // @include "../lib/page.jsx"
 // @include "../lib/i18n.jsx"
@@ -44,7 +44,7 @@
 		'path':psd.dir + "/index.html",
 		'exportConfig':option
 	},psd);
-	psd.reset();
+	//psd.reset();
 	psd = null;
 })();
 

@@ -38,6 +38,9 @@ page.element.prototype.getTextElement = function(){
  * 图片图层 
  */
 page.element.prototype.img = function(){
+	//显示所有文本图层
+	page.psd.visibleTextLayers();
+	
 	var elm = null,
 		img = new XML('<img />'),
 		psdImgObj = page.getPsdImg(this.item.top,this.item.right,this.item.bottom,this.item.left);
@@ -46,6 +49,9 @@ page.element.prototype.img = function(){
 	img['@height'] = this.item.height;
 	img['@border'] = '0';
 	
+	
+	//隐藏所有文本图层
+	page.psd.hiddenTextLayers();
 	
 	if(typeof(this.item.link) != 'undefined'){
 		elm = new XML('<a></a>');
@@ -59,7 +65,10 @@ page.element.prototype.img = function(){
 		var cssName = "style"+page.option.i;
 		styleCss += 'top:'+this.item.top+'px;left:'+(this.item.left - (page.option.width - 952) / 2)+'px;display:block;';
 		elm['@class'] = cssName+" absolute";
+		
+		
 		page.option.styleCss.appendChild(new XML('.'+cssName+'{'+styleCss+'}'));
+		
 	}else{
 		elm['@style'] = styleCss;
 	}

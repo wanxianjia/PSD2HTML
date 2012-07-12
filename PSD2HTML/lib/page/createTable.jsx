@@ -6,6 +6,7 @@
 
 // @include "data.jsx"
 // @include "element.jsx"
+// @include "../json2-min.jsx"
 
 /**
  * 创建表格 
@@ -33,6 +34,11 @@ page.createTable = function(data){
 		this.parseWidth();
 		this.parseHeight();
 		this.setWidth();
+		
+		//计算哪些列表有内容
+		this.parseContentCol();
+		
+		//每一列
 		this.createEachCol();
 	}
 	
@@ -153,7 +159,7 @@ page.createTable.prototype.setLastCol = function(){
  * 设置每一列 
  */
 page.createTable.prototype.createEachCol = function(){
-	this.mergeNotContentColObj = [];
+	this.textColMap = [];
 	for(var row=1;row<this.rowCount-1;row++){
 		this.tr[row] = new XML('<tr></tr>');
 		for(var col=1;col<this.colCount-1;col++){
@@ -176,13 +182,16 @@ page.createTable.prototype.createEachCol = function(){
 			if(this.isMergeTd[tdKey] !== true){
 			
 				this.td[tdKey] = new XML('<td></td>');
+				//this.td[tdKey]['@i'] = tdKey;
+				var elm = new XML();
 				
-				for(var i in this.textData){
-					var item = this.textData[i];
-					if(item.left == this.left[col-1] && item.top == this.top[row-1]){
-						this.td[tdKey]['@valign'] = 'top';
+				if(this.contentCol[tdKey].is === true){
+					//有内容的列
+					var item = this.contentCol[tdKey].object;
+					
+					this.td[tdKey]['@valign'] = 'top';
 						this.td[tdKey]['@align'] = 'left';
-						var elm = new XML(new page.element(item));
+						elm = new XML(new page.element(item));
 						
 						//设置合并列
 						var colspan = this.getMergeCol(item.width,row,col),
@@ -198,15 +207,24 @@ page.createTable.prototype.createEachCol = function(){
 						var psdImg = page.getPsdImg(item.top,item.right,item.bottom,item.left);
 						this.td[tdKey]['@background'] = 'slices/' + psdImg.imgObject.name;
 						this.td[tdKey]['@bgcolor'] = '#' + page.getPsdRGBColor(item.left,item.top);
-						
-						this.td[tdKey].appendChild(elm);
-						
-						continue;
-					}else{
-						this.mergeNotContentCol(row,col);
+				}else{
+					//没有内容的列
+					
+					var obj = this.getNotContentCol(row,col);
+					if(obj.colspan>1){
+						this.td[tdKey]['@colspan'] = obj.colspan;
 					}
+					var top = this.top[row-1],
+						bottom = top + this.height[row],
+						left = this.left[col-1],
+						right = left + obj.width,
+						psdImg = page.getPsdImg(top,right,bottom,left);
+						
+					elm = psdImg.element;
+					
 				}
 				
+				this.td[tdKey].appendChild(elm);
 				this.tr[row].appendChild(this.td[tdKey]);
 				
 			}
@@ -217,9 +235,6 @@ page.createTable.prototype.createEachCol = function(){
 		}
 		this.tbody.appendChild(this.tr[row]);
 	}
-	
-	//this.mergeNotContentCol();
-	
 };
 
 /**
@@ -249,7 +264,7 @@ page.createTable.prototype.getMergeRow = function(height,row,col,colspan){
 		}else{
 			var mergeRowCount = i-row;
 			//合并斜对角
-			for(var n=row;n<mergeRowCount;n++){
+			for(var n=row;n<mergeRowCount+1;n++){
 				for(var m=col;m<col+colspan;m++){
 					this.isMergeTd[n+'_'+m] = true;
 				}
@@ -419,9 +434,40 @@ page.createTable.prototype.oneColData = function(){
  * 获取本行没有文本的列表的列数
  * 主意是计算该列到下（或n下）一列有文本或结束
  */
-page.createTable.prototype.mergeNotContentCol = function(row,col){
-	var data = this.sortData("left");
-	for(var i=col;i<this.colCount;i++){
-		
+page.createTable.prototype.getNotContentCol = function(row,col){
+	var count = 1,
+		width = this.width[col];
+	for(var i=col+1;i<this.colCount-1;i++){
+		var tdKey = row+'_'+i;
+		if(this.contentCol[tdKey].is === true){
+			break;
+		}else{
+			this.isMergeTd[tdKey] = true;
+			count++;
+			width += this.width[i];
+		}
+	}
+	
+	return {colspan:count,width:width};
+}
+
+/**
+ *分析有哪些列有内容 
+ */
+page.createTable.prototype.parseContentCol = function(){
+	this.contentCol = {};
+	for(var row=1;row<this.rowCount-1;row++){
+		for(var col=1;col<this.colCount-1;col++){
+			var obj = {is:false,object:null};
+			for(var i in this.textData){
+				var item = this.textData[i];
+				if(item.left == this.left[col-1] && item.top == this.top[row-1]){
+					obj.is = true;
+					obj.object = item;
+					continue;
+				}
+			}
+			this.contentCol[row+'_'+col] = obj;
+		}
 	}
 }

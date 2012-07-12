@@ -61,7 +61,7 @@ PSD.fn = PSD.prototype = {
 		this.dir = Folder(this.output + '/' + this.getPSDName());
 		!this.dir.exists && this.dir.create();
 		
-		this.createSnapshotOnStart();
+		//this.createSnapshotOnStart();
 	},
 	// 遍历所有图层
 	parseLayers: function(layers, context, skip){
