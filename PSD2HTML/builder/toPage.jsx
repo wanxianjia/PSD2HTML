@@ -44,7 +44,6 @@
 		'path':psd.dir + "/index.html",
 		'exportConfig':option
 	},psd);
-	//psd.reset();
 	psd = null;
 })();
 

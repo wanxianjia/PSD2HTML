@@ -67,7 +67,7 @@ page.css.prototype.get = function(){
 	
 	//文字大小
 	style.push('font-size:' + item.textInfo.size + 'px');
-	style.push('line-height:' + item.textInfo.lineHeight);
+	style.push('line-height:' + item.textInfo.lineHeight +'px');
 	
 	return style;
 };

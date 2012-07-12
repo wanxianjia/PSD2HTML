@@ -55,11 +55,8 @@ page.init = function(data,option,psd){
 	//}catch(e){
 	//	alert(e.message);
 	//}
-		//显示所有文本图层
-		psd.visibleTextLayers();
-	
-	//重置psd
-	//psd.reset();
+	//显示所有文本图层
+	psd.visibleTextLayers();
 };
 
 /**

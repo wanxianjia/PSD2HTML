@@ -182,7 +182,7 @@ page.createTable.prototype.createEachCol = function(){
 			if(this.isMergeTd[tdKey] !== true){
 			
 				this.td[tdKey] = new XML('<td></td>');
-				//this.td[tdKey]['@i'] = tdKey;
+				this.td[tdKey]['@i'] = tdKey;
 				var elm = new XML();
 				
 				if(this.contentCol[tdKey].is === true){
@@ -210,7 +210,7 @@ page.createTable.prototype.createEachCol = function(){
 				}else{
 					//没有内容的列
 					
-					var obj = this.getNotContentCol(row,col);
+					/*var obj = this.getNotContentCol(row,col);
 					if(obj.colspan>1){
 						this.td[tdKey]['@colspan'] = obj.colspan;
 					}
@@ -221,7 +221,7 @@ page.createTable.prototype.createEachCol = function(){
 						psdImg = page.getPsdImg(top,right,bottom,left);
 						
 					elm = psdImg.element;
-					
+					*/
 				}
 				
 				this.td[tdKey].appendChild(elm);
@@ -442,6 +442,7 @@ page.createTable.prototype.getNotContentCol = function(row,col){
 		if(this.contentCol[tdKey].is === true){
 			break;
 		}else{
+			$.writeln(tdKey);
 			this.isMergeTd[tdKey] = true;
 			count++;
 			width += this.width[i];

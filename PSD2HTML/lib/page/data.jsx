@@ -72,7 +72,6 @@ page.data.prototype.parse = function(item){
 		bottom = item.bottom,
 		size = item.textInfo.size,
 		lineHeight = item.textInfo.lineHeight,
-		line_height = lineHeight;
 		contents = item.textInfo.contents,
 		textType = item.textInfo.textType;
 		
@@ -80,15 +79,16 @@ page.data.prototype.parse = function(item){
 	width += parseInt(size/4,10) + Math.round(size/6);
 	var overValue = 0;
 	if(typeof(lineHeight) == 'string'){
-		overValue = Math.round(size/5);
-		top -= overValue;
-		bottom += overValue;
-	}else{
-		overValue = Math.round((lineHeight - size)/2);
-		top -= overValue;
-		bottom += overValue + 10;
-		lineHeight += 'px';
+		lineHeight = Math.round(size*1.2);
 	}
+	
+	if(lineHeight < size){
+		lineHeight = size;
+	}
+	overValue = Math.round((lineHeight - size)/2);
+	top -= overValue;
+	bottom += overValue + 10;
+	
 	//left
 	if(page.option.builder == "normal"){
 		left -= Math.round((page.option.width - 952) / 2);
@@ -103,6 +103,7 @@ page.data.prototype.parse = function(item){
 	item.left = left;
 	item.right = right;
 	item.textInfo.lineHeight = lineHeight;
+	item.height = bottom-top;
 	
 	return item;
 }
