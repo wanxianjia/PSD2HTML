@@ -34,10 +34,6 @@ page.data = function(data){
 	this.getUsefulData();
 	
 	return {
-		colCount:this.colSize,
-		rowCount:this.rowSize,
-		colData:this.colData,
-		rowData:this.rowData,
 		textData:this.textData
 	};
 	
@@ -56,15 +52,60 @@ page.data.prototype.getUsefulData = function(){
 				this.data[i].textInfo = this.setLackTextObj();
 			}
 			this.data[i].position = {};
-			this.rowData.push(this.data[i]);
-			this.colData.push(this.data[i]);
-			this.textData.push(this.data[i]);
+			this.textData.push(this.parse(this.data[i]));
 		}
 	};
 	//排序
 	this.sorts();
 	
 };
+
+/**
+ * 解析数据 
+ */
+page.data.prototype.parse = function(item){
+	var width = item.width,
+		hegiht = item.height,
+		top = item.top,
+		left = item.left,
+		right = item.right,
+		bottom = item.bottom,
+		size = item.textInfo.size,
+		lineHeight = item.textInfo.lineHeight,
+		line_height = lineHeight;
+		contents = item.textInfo.contents,
+		textType = item.textInfo.textType;
+		
+	//宽度
+	width += parseInt(size/4,10) + Math.round(size/6);
+	var overValue = 0;
+	if(typeof(lineHeight) == 'string'){
+		overValue = Math.round(size/5);
+		top -= overValue;
+		bottom += overValue;
+	}else{
+		overValue = Math.round((lineHeight - size)/2);
+		top -= overValue;
+		bottom += overValue + 10;
+		lineHeight += 'px';
+	}
+	//left
+	if(page.option.builder == "normal"){
+		left -= Math.round((page.option.width - 952) / 2);
+	}else{
+		left = left;
+	}
+	right = left + width;
+	
+	item.width = width;
+	item.top = top;
+	item.bottom = bottom;
+	item.left = left;
+	item.right = right;
+	item.textInfo.lineHeight = lineHeight;
+	
+	return item;
+}
 
 /**
  * 设置缺失的文本对象 
@@ -82,7 +123,6 @@ page.data.prototype.setLackTextObj = function(){
 page.data.prototype.sorts = function(){
 	this.rowData.sort(function(a,b){return a.top-b.top;});
 	this.colData.sort(function(a,b){return a.left-b.left;});
-	//this.removeRepeat();
 };
 
 /**

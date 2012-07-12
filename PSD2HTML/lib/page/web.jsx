@@ -3,7 +3,7 @@
  * @date : 6/24 2012
  * @description: 普通网页解析
  */
-
+// @include "data.jsx"
 // @include "css.jsx"
 // @include "element.jsx"
 
@@ -14,6 +14,7 @@
 page.web = function(data){
 	this.htmlCode = '';
 	this.data = data;
+	this.textData = new page.data(data.childs).textData;
 	this.parse();
 	return this.htmlCode;
 };
@@ -57,24 +58,25 @@ page.web.prototype.parse = function(){
 	//page 主体 
 	html.appendChild(body);
 	
-	
-	for(var i=0;i<len;i++){
+	var i = 0;
+	for(i=0;i<len;i++){
 		var item = this.data.childs[i];
 		if(typeof(item.tag) == 'undefined'){
 			//普通背景图片
 			var bgImg = new XML('<div class="psd2html_bg style' + item.index + '"></div>');
 			bgImg.appendChild(new XML());
-			styleCss.appendChild(new XML('.style' + item.index + '{height:' + (item.bottom - item.top) + 'px;background-image:url(slices/' + item.name + ');}'));
+			styleCss.appendChild(new XML('.style' + item.index + '{height:' + (item.bottom - item.top) + 'px;background-image:url(slices/' + item.name + ');background-position:center top;}'));
 			body.appendChild(bgImg);
-		}else{
-			page.option.i = i;
-			page.option.styleCss = styleCss;
-			pageContent.appendChild(new page.element(item));
 		}
+	}
+	
+	for(var t in this.textData){
+		var item = this.textData[t];
+		page.option.i = i+parseInt(t,10);
+		page.option.styleCss = styleCss;
+		pageContent.appendChild(new page.element(item));
 	}
 	//CMS foot
 	//body.appendChild('#parse("$pageInfo.footer")');
-	//设置全局的网页HTML代码内容
-	//this.htmlContent = '<!DOCTYPE html>\n' + this.formatHtml(html.toXMLString());
 	this.htmlCode = html;
 };
