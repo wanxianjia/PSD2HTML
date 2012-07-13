@@ -48,6 +48,9 @@ page.element.prototype.img = function(){
 	img['@width'] = this.item.width;
 	img['@height'] = this.item.height;
 	img['@border'] = '0';
+	if(page.option.builder != "normal"){
+		img['@style'] = 'display:block;';
+	}
 	
 	
 	//隐藏所有文本图层

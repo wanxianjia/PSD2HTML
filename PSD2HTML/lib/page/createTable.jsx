@@ -182,7 +182,6 @@ page.createTable.prototype.createEachCol = function(){
 			if(this.isMergeTd[tdKey] !== true){
 			
 				this.td[tdKey] = new XML('<td></td>');
-				this.td[tdKey]['@i'] = tdKey;
 				var elm = new XML();
 				
 				if(this.contentCol[tdKey].is === true){
@@ -204,16 +203,26 @@ page.createTable.prototype.createEachCol = function(){
 						}
 						
 						//设置背景
+						/*var leftTopColor = page.getPsdRGBColor(item.left,item.top),
+							rightTopColor = page.getPsdRGBColor(item.right,item.top),
+							rightBottom = page.getPsdRGBColor(item.right,item.bottom),
+							leftBottom = page.getPsdRGBColor(item.left,item.bottom);
+						if(leftTopColor == rightTopColor && leftTopColor == rightBottom && leftTopColor == leftBottom){
+							this.td[tdKey]['@bgcolor'] = '#' + leftTopColor;
+						}else{
+							var psdImg = page.getPsdImg(item.top,item.right,item.bottom,item.left);
+							this.td[tdKey]['@background'] = 'slices/' + psdImg.imgObject.name;
+						}*/
 						var psdImg = page.getPsdImg(item.top,item.right,item.bottom,item.left);
 						this.td[tdKey]['@background'] = 'slices/' + psdImg.imgObject.name;
-						this.td[tdKey]['@bgcolor'] = '#' + page.getPsdRGBColor(item.left,item.top);
 				}else{
 					//没有内容的列
 					
-					/*var obj = this.getNotContentCol(row,col);
+					var obj = this.getNotContentCol(row,col);
 					if(obj.colspan>1){
 						this.td[tdKey]['@colspan'] = obj.colspan;
 					}
+					
 					var top = this.top[row-1],
 						bottom = top + this.height[row],
 						left = this.left[col-1],
@@ -221,12 +230,11 @@ page.createTable.prototype.createEachCol = function(){
 						psdImg = page.getPsdImg(top,right,bottom,left);
 						
 					elm = psdImg.element;
-					*/
 				}
 				
 				this.td[tdKey].appendChild(elm);
 				this.tr[row].appendChild(this.td[tdKey]);
-				
+			
 			}
 			//最后一列
 			if(row == 1 && col == this.colCount-2){
@@ -436,13 +444,14 @@ page.createTable.prototype.oneColData = function(){
  */
 page.createTable.prototype.getNotContentCol = function(row,col){
 	var count = 1,
-		width = this.width[col];
+		width = this.width[col],
+		top = this.top[row],
+		left = this.left[col];
 	for(var i=col+1;i<this.colCount-1;i++){
 		var tdKey = row+'_'+i;
-		if(this.contentCol[tdKey].is === true){
+		if(this.contentCol[tdKey].is === true || this.isMergeTd[tdKey] === true){
 			break;
 		}else{
-			$.writeln(tdKey);
 			this.isMergeTd[tdKey] = true;
 			count++;
 			width += this.width[i];

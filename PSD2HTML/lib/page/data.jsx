@@ -76,10 +76,10 @@ page.data.prototype.parse = function(item){
 		textType = item.textInfo.textType;
 		
 	//宽度
-	width += parseInt(size/4,10) + Math.round(size/6);
+	width += parseInt(size/4,10)+size;
 	var overValue = 0;
 	if(typeof(lineHeight) == 'string'){
-		lineHeight = Math.round(size*1.2);
+		lineHeight = Math.round(size*1.75);
 	}
 	
 	if(lineHeight < size){
@@ -87,7 +87,11 @@ page.data.prototype.parse = function(item){
 	}
 	overValue = Math.round((lineHeight - size)/2);
 	top -= overValue;
-	bottom += overValue + 10;
+	if(item.tag == 'text'){
+		bottom += overValue + 10;
+	}else{
+		bottom += overValue;
+	}
 	
 	//left
 	if(page.option.builder == "normal"){
@@ -104,6 +108,7 @@ page.data.prototype.parse = function(item){
 	item.right = right;
 	item.textInfo.lineHeight = lineHeight;
 	item.height = bottom-top;
+	
 	
 	return item;
 }
