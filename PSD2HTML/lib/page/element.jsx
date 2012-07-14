@@ -95,6 +95,23 @@ page.element.prototype.text = function(){
 		elm['@href'] = this.item.link.href;
 	}
 	
+	//Css
+	var styleCss = new page.css(this.item);
+	if(page.option.builder == "normal"){
+		var cssName = 'style'+ page.option.i;
+		elm['@class'] = "each "+cssName;
+		page.option.styleCss.appendChild('.'+cssName+'{'+styleCss.join(";")+';}');
+	}else{
+		styleCss.push("overflow:hidden;");
+		elm['@style'] = styleCss.join(';');
+	}	
+	
+	//如歌没有换行和空格、行内样式，直接返回
+	if(textRange.length == 0 && textContents.indexOf('\r') == -1 && textContents.indexOf(' ') == -1){
+		elm.appendChild(textContents);
+		return elm;
+	}
+	
 	//textRange去重
 	var rangeData = [];
 	for(var i=0;i<textRange.length;i++){
@@ -174,7 +191,7 @@ page.element.prototype.text = function(){
 						span['@class'] = cssName;
 					}else{
 						var lineCss = '';
-						if(textSpan.indexOf('\s')>-1){
+						if(textSpan.indexOf(' ')>-1){
 							lineCss += 'white-space:pre-wrap;*white-space: pre;*word-wrap: break-word;';
 						}
 						if(textRange.color != this.item.textInfo.color && textRange.color != '000000'){
@@ -209,16 +226,7 @@ page.element.prototype.text = function(){
 		
 	}
 	
-	//Css
-	var styleCss = new page.css(this.item);
-	if(page.option.builder == "normal"){
-		var cssName = 'style'+ page.option.i;
-		elm['@class'] = "each "+cssName;
-		page.option.styleCss.appendChild('.'+cssName+'{'+styleCss.join(";")+';}');
-	}else{
-		styleCss.push("overflow:hidden;");
-		elm['@style'] = styleCss.join(';');
-	}
+
 	
 	return elm;
 };
