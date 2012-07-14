@@ -147,8 +147,10 @@ page.element.prototype.text = function(){
 					textTrim = text.replace(/^\s+/, "").replace(/\s+$/, "");
 				
 				if(text.length>0 && textTrim.length>0){
-					var span = new XML('<span></span>');
-					span.appendChild(new XML(textContents.substring(curStart,curEnd)));
+					var span = new XML('<span></span>'),
+						//文本片段
+						textSpan = textContents.substring(curStart,curEnd);
+					span.appendChild(new XML(textSpan));
 					p.appendChild(span);
 					
 					if(page.option.builder == "normal"){
@@ -171,7 +173,19 @@ page.element.prototype.text = function(){
 						}
 						span['@class'] = cssName;
 					}else{
-						span['@style'] = 'margin:0px;padding:0px;font-size:'+textRange.size+'px;color:#'+textRange.color+';white-space:pre-wrap;*white-space: pre;*word-wrap: break-word;';
+						var lineCss = '';
+						if(textSpan.indexOf('\s')>-1){
+							lineCss += 'white-space:pre-wrap;*white-space: pre;*word-wrap: break-word;';
+						}
+						if(textRange.color != this.item.textInfo.color && textRange.color != '000000'){
+							lineCss += 'color:#'+textRange.color;
+						}
+						if(textRange.size != this.item.textInfo.size){
+							lineCss += 'font-size:'+textRange.size+'px';
+						}
+						if(lineCss.length>0){
+							span['@style'] = lineCss;
+						}
 					}
 				}else{
 					isCreateP = false;
@@ -202,7 +216,7 @@ page.element.prototype.text = function(){
 		elm['@class'] = "each "+cssName;
 		page.option.styleCss.appendChild('.'+cssName+'{'+styleCss.join(";")+';}');
 	}else{
-		styleCss.push("overflow:hidden");
+		styleCss.push("overflow:hidden;");
 		elm['@style'] = styleCss.join(';');
 	}
 	

@@ -66,9 +66,11 @@ page.css.prototype.get = function(){
 	}
 	
 	//文字大小
-	style.push('font-size:' + item.textInfo.size + 'px');
-	style.push('line-height:' + item.textInfo.lineHeight +'px');
-	
+	style.push('font-size:' + textInfo.size + 'px');
+	style.push('line-height:' + textInfo.lineHeight +'px');
+	if(textInfo.color != '000000'){
+		style.push('color:#' + textInfo.color);
+	}
 	return style;
 };
 

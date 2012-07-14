@@ -534,26 +534,33 @@ page.createTable.prototype.parseContentCol = function(){
  * @param {Object} bottom
  */
 page.createTable.prototype.getSolidColor = function(left,top,right,bottom){
-	if(left<1){left =1;}
-	if(top<1){top=1;}
-	if(right>page.width){right=page.width;}
-	if(bottom>page.height){right=page.height;}
 	
-	var topLeft = page.getPsdRGBColor(left,top),
-		topRight = page.getPsdRGBColor(right,top),
-		bottomRight = page.getPsdRGBColor(right,bottom),
-		bottomLeft = page.getPsdRGBColor(left,bottom),
-		leftMid = page.getPsdRGBColor(left,Math.round(bottom - (bottom-top)/2)),
-		rightMid = page.getPsdRGBColor(right,Math.round(bottom - (bottom-top)/2)),
-		topMid = page.getPsdRGBColor(Math.round(right - (right-left)/2),top),
-		bottomMid = page.getPsdRGBColor(Math.round(right - (right-left)/2),bottom),
-		center = page.getPsdRGBColor(Math.round(right - (right-left)/2),Math.round(bottom - (bottom-top)/2));
+	
+	var topLeft = getColor(left,top),
+		topRight = getColor(right,top),
+		bottomRight = getColor(right,bottom),
+		bottomLeft = getColor(left,bottom),
+		leftMid = getColor(left,Math.round(bottom - (bottom-top)/2)),
+		rightMid = getColor(right,Math.round(bottom - (bottom-top)/2)),
+		topMid = getColor(Math.round(right - (right-left)/2),top),
+		bottomMid = getColor(Math.round(right - (right-left)/2),bottom),
+		center = getColor(Math.round(right - (right-left)/2),Math.round(bottom - (bottom-top)/2));
 		
+		//$.writeln(topLeft +'_'+ topRight +'_'+ bottomRight +'_'+ topLeft +'_'+ topLeft +'_'+ bottomRight +'_'+ topLeft +'_'+ bottomLeft +'_'+ topLeft +'_'+ leftMid +'_'+ topLeft +'_'+ rightMid +'_'+ topLeft +'_'+ topMid +'_'+ topLeft +'_'+ bottomMid +'_'+ topLeft +'_'+ center);
 		
 		if(topLeft == topRight && bottomRight == topLeft && topLeft == bottomRight && topLeft == bottomLeft && topLeft == leftMid && topLeft == rightMid && topLeft == topMid && topLeft == bottomMid && topLeft == center){
 			return '#'+topLeft;
 		}else{
 			return false;
 		}
+		
+	function getColor(x,y){
+		if(x<1){x=1;}
+		if(x>page.width-1){x = page.width-1;}
+		if(y<1){y=1;}
+		if(y>page.height-1){y=page.height-1;}
+		
+		return page.getPsdRGBColor(x,y);
+	}
 };
 
