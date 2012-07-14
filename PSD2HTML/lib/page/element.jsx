@@ -107,7 +107,7 @@ page.element.prototype.text = function(){
 	}	
 	
 	//如歌没有换行和空格、行内样式，直接返回
-	if(textRange.length == 0 && textContents.indexOf('\r') == -1 && textContents.indexOf(' ') == -1){
+	if(textRange.length == 1 && textContents.indexOf('\r') == -1 && textContents.indexOf(' ') == -1){
 		elm.appendChild(textContents);
 		return elm;
 	}
