@@ -32,7 +32,7 @@
 
 	var data = null;
 	if(APP.OPTION.builder != "normal"){
-		data = psd.getTextLayersAndSlices(option,psd.getHeight());
+		data = psd.getTextLayersAndSlices(option,-1);
 	}else{
 	   data = psd.getTextLayersAndSlices(option);
 	}

@@ -17,6 +17,7 @@ page.createTable = function(data){
 	this.data = data;
 	var resultData = new page.data(data.childs);
 	this.textData = resultData.textData;
+	this.getSortData = {};
 	
 	//行和列的总数
 	this.getRowAndColCount();
@@ -77,10 +78,17 @@ page.createTable.prototype.setThead = function(){
 		bottom = topData[0].top,
 		left = 0;
 	
-	var psdImg = page.getPsdImg(top,right,bottom,left);
+	//背景
+	var color = this.getSolidColor(left,top,right,bottom);
+	if(color === false){
+		var psdImg = page.getPsdImg(top,right,bottom,left);
+		th.appendChild(psdImg.element);
+	}else{
+		th['@bgcolor'] = color;
+	}
 	
 	th['@colspan'] = this.colCount+1;	
-	th.appendChild(psdImg.element);
+	th['@height'] = bottom - top;
 	tr.appendChild(th);
 	this.thead.appendChild(tr);
 };
@@ -98,10 +106,17 @@ page.createTable.prototype.setTfoot = function(){
 		bottom = page.height,
 		left = 0;
 		
-	var psdImg = page.getPsdImg(top,right,bottom,left);
+	//背景
+	var color = this.getSolidColor(left,top,right,bottom);
+	if(color === false){
+		var psdImg = page.getPsdImg(top,right,bottom,left);
+		td.appendChild(psdImg.element);
+	}else{
+		td['@bgcolor'] = color;
+	}
 	
-	td['@colspan'] = this.colCount+1;		
-	td.appendChild(psdImg.element);
+	td['@colspan'] = this.colCount+1;	
+	td['@height'] = bottom - top;	
 	tr.appendChild(td);
 	this.tfoot.appendChild(tr);
 };
@@ -122,10 +137,14 @@ page.createTable.prototype.setFirstCol = function(){
 		right = leftData[0].left,
 		bottom = bottomData[0].bottom;
 	
-	
-	var firstImgObj = page.getPsdImg(top,right,bottom,left)
-		
-	firstTd.appendChild(firstImgObj.element);
+	//背景
+	var color = this.getSolidColor(left,top,right,bottom);
+	if(color === false){
+		var firstImgObj = page.getPsdImg(top,right,bottom,left)
+		firstTd.appendChild(firstImgObj.element);
+	}else{
+		firstTd['@bgcolor'] = color;
+	}
 	
 	this.tr[1].appendChild(firstTd);
 	
@@ -147,10 +166,14 @@ page.createTable.prototype.setLastCol = function(){
 		right = page.width,
 		bottom = bottomData[0].bottom;
 	
-	var lastImgObj = page.getPsdImg(top,right,bottom,left);
-		
-	lastTd.appendChild(lastImgObj.element);
-	
+	//背景
+	var color = this.getSolidColor(left,top,right,bottom);
+	if(color === false){
+		var lastImgObj = page.getPsdImg(top,right,bottom,left);
+		lastTd.appendChild(lastImgObj.element);
+	}else{
+		lastTd['@bgcolor'] = color;
+	}	
 	this.tr[1].appendChild(lastTd);
 };
 
@@ -203,21 +226,16 @@ page.createTable.prototype.createEachCol = function(){
 						}
 						
 						//设置背景
-						/*var leftTopColor = page.getPsdRGBColor(item.left,item.top),
-							rightTopColor = page.getPsdRGBColor(item.right,item.top),
-							rightBottom = page.getPsdRGBColor(item.right,item.bottom),
-							leftBottom = page.getPsdRGBColor(item.left,item.bottom);
-						if(leftTopColor == rightTopColor && leftTopColor == rightBottom && leftTopColor == leftBottom){
-							this.td[tdKey]['@bgcolor'] = '#' + leftTopColor;
-						}else{
+						var color = this.getSolidColor(item.left,item.top,item.right,item.bottom);
+						if(color === false){
 							var psdImg = page.getPsdImg(item.top,item.right,item.bottom,item.left);
 							this.td[tdKey]['@background'] = 'slices/' + psdImg.imgObject.name;
-						}*/
-						var psdImg = page.getPsdImg(item.top,item.right,item.bottom,item.left);
-						this.td[tdKey]['@background'] = 'slices/' + psdImg.imgObject.name;
+						}else{
+							this.td[tdKey]['@bgcolor'] = color;
+						}
+						
 				}else{
 					//没有内容的列
-					
 					var obj = this.getNotContentCol(row,col);
 					if(obj.colspan>1){
 						this.td[tdKey]['@colspan'] = obj.colspan;
@@ -226,10 +244,16 @@ page.createTable.prototype.createEachCol = function(){
 					var top = this.top[row-1],
 						bottom = top + this.height[row],
 						left = this.left[col-1],
-						right = left + obj.width,
-						psdImg = page.getPsdImg(top,right,bottom,left);
-						
-					elm = psdImg.element;
+						right = left + obj.width;
+					//设置他的背景
+					var color = this.getSolidColor(left,top,right,bottom);
+					if(color === false){
+						var psdImg = page.getPsdImg(top,right,bottom,left);
+						elm = psdImg.element;
+					}else{
+						this.td[tdKey]['@bgcolor'] = color;
+					}
+					
 				}
 				
 				this.td[tdKey].appendChild(elm);
@@ -272,7 +296,7 @@ page.createTable.prototype.getMergeRow = function(height,row,col,colspan){
 		}else{
 			var mergeRowCount = i-row;
 			//合并斜对角
-			for(var n=row;n<mergeRowCount+1;n++){
+			for(var n=row;n<row+mergeRowCount;n++){
 				for(var m=col;m<col+colspan;m++){
 					this.isMergeTd[n+'_'+m] = true;
 				}
@@ -396,24 +420,31 @@ page.createTable.prototype.getRowAndColCount = function(){
  * @param {Object} order desc or asc
  */
 page.createTable.prototype.sortData = function(field,order){
-	var data = [];
-	for(var i in this.textData){
-		data.push(this.textData[i]);
-	};
-	if(typeof(order) == 'undefined' || order == 'desc'){
-		data.sort(function(a,b){return b[field] - a[field];});
+	if(this.getSortData[field+'__'+order]){
+		return this.getSortData[field+'__'+order];
 	}else{
-		data.sort(function(a,b){return a[field] - b[field];});
-	}
-	
-	var resultData = [data[0]];
-	for(var i=1;i<data.length;i++){
-		if(data[i][field] != data[i-1][field]){
-			resultData.push(data[i]);
+		var data = [];
+		for(var i in this.textData){
+			data.push(this.textData[i]);
+		};
+		if(typeof(order) == 'undefined' || order == 'desc'){
+			data.sort(function(a,b){return b[field] - a[field];});
+		}else{
+			data.sort(function(a,b){return a[field] - b[field];});
 		}
+		
+		var resultData = [data[0]];
+		for(var i=1;i<data.length;i++){
+			if(data[i][field] != data[i-1][field]){
+				resultData.push(data[i]);
+			}
+		}
+		
+		this.getSortData[field+'__'+order] = resultData;
+		
+		return resultData;
 	}
 	
-	return resultData;
 };
 
 /**
@@ -422,15 +453,28 @@ page.createTable.prototype.sortData = function(field,order){
 page.createTable.prototype.oneColData = function(){
 	this.table = new XML('<table border="0" cellspacing="0" cellpadding="0"></table>');
 	var tr = new XML('<tr></tr>'),
-		td = new XML('<td></td>'),
-		img = new XML('<img />');
-		
-	img['@width'] = page.width;
-	img['@height'] = page.height;
-	img['@src'] = 'slices/' + this.data.childs[0].name;
-	img['@style'] = 'display:block;margin:0px;padding:0px;';
+		td = new XML('<td></td>');
 	
-	td.appendChild(img);
+	var top = 0,
+		left = 0,
+		right = page.width,
+		bottom = page.height,
+		color = this.getSolidColor(left,top,right,bottom);
+	
+	if(color === false){
+		var psdImg = page.getPsdImg(top,right,bottom,left);
+		var img = new XML('<img />');
+		img['@width'] = page.width;
+		img['@height'] = page.height;
+		img['@src'] = psdImg.imgObject.name;
+		img['@style'] = 'display:block;margin:0px;padding:0px;';
+		td.appendChild(img);
+	}else{
+		td['@bgcolor'] = color;
+		td['@height'] = page.height;
+		td.appendChild(new XML());
+	}
+	
 	tr.appendChild(td);
 	
 	this.table['@width'] = page.width;
@@ -480,4 +524,36 @@ page.createTable.prototype.parseContentCol = function(){
 			this.contentCol[row+'_'+col] = obj;
 		}
 	}
-}
+};
+
+/**
+ * 是否是纯色，  如果9个点都相同，那么他的背景为纯色并返回一个颜色值，或者返回false
+ * @param {Object} left
+ * @param {Object} top
+ * @param {Object} right
+ * @param {Object} bottom
+ */
+page.createTable.prototype.getSolidColor = function(left,top,right,bottom){
+	if(left<1){left =1;}
+	if(top<1){top=1;}
+	if(right>page.width){right=page.width;}
+	if(bottom>page.height){right=page.height;}
+	
+	var topLeft = page.getPsdRGBColor(left,top),
+		topRight = page.getPsdRGBColor(right,top),
+		bottomRight = page.getPsdRGBColor(right,bottom),
+		bottomLeft = page.getPsdRGBColor(left,bottom),
+		leftMid = page.getPsdRGBColor(left,Math.round(bottom - (bottom-top)/2)),
+		rightMid = page.getPsdRGBColor(right,Math.round(bottom - (bottom-top)/2)),
+		topMid = page.getPsdRGBColor(Math.round(right - (right-left)/2),top),
+		bottomMid = page.getPsdRGBColor(Math.round(right - (right-left)/2),bottom),
+		center = page.getPsdRGBColor(Math.round(right - (right-left)/2),Math.round(bottom - (bottom-top)/2));
+		
+		
+		if(topLeft == topRight && bottomRight == topLeft && topLeft == bottomRight && topLeft == bottomLeft && topLeft == leftMid && topLeft == rightMid && topLeft == topMid && topLeft == bottomMid && topLeft == center){
+			return '#'+topLeft;
+		}else{
+			return false;
+		}
+};
+

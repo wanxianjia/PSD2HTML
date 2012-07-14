@@ -55,8 +55,38 @@ page.data.prototype.getUsefulData = function(){
 			this.textData.push(this.parse(this.data[i]));
 		}
 	};
-	//排序
-	this.sorts();
+	
+	//当前的left和上一个的left相差3个像素，置为相同
+	this.textData.sort(function(a,b){return a.left-b.left;});
+	for(var i=1;i<this.textData.length;i++){
+		if(this.textData[i].left - this.textData[i-1].left < 4){
+			this.textData[i].left = this.textData[i-1].left;
+			
+			//right也样必须必须相同
+			if(this.textData[i].right > this.textData[i-1].right){
+				this.textData[i-1].right = this.textData[i].right;
+			}else{
+				this.textData[i].right = this.textData[i-1].right;
+			}
+			
+			
+		}
+	}
+	
+	//当前top和上一个的top相差3个像素，置为相同
+	this.textData.sort(function(a,b){return a.top-b.top;});
+	for(var i=1;i<this.textData.length;i++){
+		if(this.textData[i].top - this.textData[i-1].top < 4){
+			this.textData[i].top = this.textData[i-1].top;
+			//bottom也样必须必须相同
+			if(this.textData[i].bottom > this.textData[i-1].bottom){
+				this.textData[i-1].bottom = this.textData[i].bottom;
+			}else{
+				this.textData[i].bottom = this.textData[i-1].bottom;
+			}
+			
+		}
+	}
 	
 };
 
@@ -73,25 +103,29 @@ page.data.prototype.parse = function(item){
 		size = item.textInfo.size,
 		lineHeight = item.textInfo.lineHeight,
 		contents = item.textInfo.contents,
-		textType = item.textInfo.textType;
+		textType = item.textInfo.textType,
+		widthOver = parseInt(size/4,10),//宽度误差
+		topOver = 0;//top误差
 		
 	//宽度
-	width += parseInt(size/4,10)+size;
-	var overValue = 0;
+	width += widthOver;
+	
 	if(typeof(lineHeight) == 'string'){
-		lineHeight = Math.round(size*1.75);
+		//如果行高为百分比，转换为数字
+		lineHeight = Math.round(size*parseInt(lineHeight)/100);
 	}
 	
 	if(lineHeight < size){
 		lineHeight = size;
 	}
-	overValue = Math.round((lineHeight - size)/2);
-	top -= overValue;
+	topOver = Math.round((lineHeight - size)/2);
+	top -= topOver;
 	if(item.tag == 'text'){
-		bottom += overValue + 10;
+		bottom += topOver + 10;
 	}else{
-		bottom += overValue;
+		bottom += topOver;
 	}
+	
 	
 	//left
 	if(page.option.builder == "normal"){
@@ -108,6 +142,27 @@ page.data.prototype.parse = function(item){
 	item.right = right;
 	item.textInfo.lineHeight = lineHeight;
 	item.height = bottom-top;
+	
+	//计算文字宽度最后一行最后一个是否是标点符合
+	if(item.textInfo.textType == 'TextType.PARAGRAPHTEXT'){
+			//一行文字数量
+		var aRowTextlen = Math.round(item.width/size),
+			//有多少行
+			rowCount = Math.round(contents.length/(aRowTextlen)),
+			//最后一行文本
+			lastText = contents.substr((rowCount-1)*aRowTextlen+1),
+			lastStr = contents.substr(contents.length-1);
+		if(lastText.length >= aRowTextlen && new RegExp(lastStr).test(this.unicode) && rowCount<6){
+			item.width += size - widthOver;
+			item.right += size - widthOver;
+		}
+	}else if(new RegExp(contents.substr(contents.length-1)).test(this.unicode)){
+		//单行最后一个字符有标点符合
+		item.width += size - widthOver;
+		item.right += size - widthOver;
+	}
+		
+	
 	
 	
 	return item;
@@ -156,3 +211,5 @@ page.data.prototype.removeRepeat = function(){
 	//this.colData = newColData;
 };
 
+
+page.data.prototype.unicode = ",.\/<>?;\':\"[]{}()!，。《》、？；‘：“｛｝【】！";
