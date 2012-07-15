@@ -8,6 +8,7 @@ var page = {};
 
 // @include "io.jsx"
 // @include "page/createTable.jsx"
+// @include "page/table.jsx"
 // @include "page/web.jsx"
 // @include "json2-min.jsx"
 
@@ -76,12 +77,12 @@ page.edmHtml = function(data){
 		title = new XML('<title>' + data.name + '</title>'),
 		body = new XML('<body></body>');
 	
-	//head.appendChild(new XML('<style type="text/css">body{font-size:12px;line-height:12px;}</style>'));
-	body.appendChild(new page.createTable(data));
+	//head.appendChild(new XML('<style type="text/css">body{font-size:12px;line-height:12px;}td,th{border:1px solid #F00;}</style>'));
+	body.appendChild(new page.table(data));
 	head.appendChild(title);
 	html.appendChild(head);
 	html.appendChild(body);
-	return '<!DOCTYPE html>\r'+html.toXMLString();	
+	return '<!DOCTYPE html>\r'+page.formatHtml(html.toXMLString());	
 };
 
 /**
@@ -135,6 +136,30 @@ page.getPsdRGBColor = function(x,y){
  */
 page.formatHtml = function(htmlCode){
 	var html = [];
+	
+	var div = htmlCode.split('<p');
+	for(var i=0;i<div.length;i++){
+		var code = div[i];
+		if(i>0){
+			code = '<p' + code;
+		}
+		if(code.indexOf('<span')>-1){
+			code = code.replace(/(<\/span>)[\s\S]*?(<span)/g, '</span><span');
+		}
+		html.push(code);
+	}
+	
+	htmlCode = html.join('');
+
+	//过滤多余的span
+	//htmlCode = htmlCode.replace(/(<span>).*?(<\/span>)/g, '$1$2');
+	//td和img之间去换行
+	//htmlCode = htmlCode.replace(/(>)[\s\S]*?(<img)/g, '><img');
+	//htmlCode = htmlCode.replace(/(\/>)[\s\S]*?(<\/td)/g, '/></td>');
+	
+	return htmlCode;
+	
+	/*
 	if(page.option.builder == "normal"){
 		var div = htmlCode.split('<p');
 		for(var i=0;i<div.length;i++){
@@ -149,6 +174,6 @@ page.formatHtml = function(htmlCode){
 		}
 	}else{
 		html.push(htmlCode);
-	}
-	return html.join('');//.replace(/(<\/span>)[\s\S]*?(<span)/g, '</span><span');;
+	}*/
+	//return html.join('');//.replace(/(<\/span>)[\s\S]*?(<span)/g, '</span><span');;
 }

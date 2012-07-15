@@ -46,16 +46,21 @@ page.data = function(data){
 page.data.prototype.getUsefulData = function(){
 	for(var i in this.data){
 		if(this.data[i].tag == 'text' || this.data[i].tag == 'img'){
+			var data = this.data[i];
+			//主体部分之外的
+			if(data.left < 0 || data.left>page.width || data.top<0 || data.top>page.height || data.right<0 || data.right>page.width || data.bottom<0||data.bottom >page.height){
+				continue;
+			}
 			this.len++;
 			//如果该文本图层没有文本对象，赋一个基本的文本对象
 			if(typeof(this.data[i].textInfo) == 'undefined'){
 				this.data[i].textInfo = this.setLackTextObj();
 			}
 			this.data[i].position = {};
-			this.textData.push(this.parse(this.data[i]));
+			this.textData.push(this.data[i].tag == 'text' ? this.parse(this.data[i]) : this.data[i]);
 		}
 	};
-	
+	/*
 	//当前的left和上一个的left相差3个像素，置为相同
 	this.textData.sort(function(a,b){return a.left-b.left;});
 	for(var i=1;i<this.textData.length;i++){
@@ -63,11 +68,11 @@ page.data.prototype.getUsefulData = function(){
 			this.textData[i].left = this.textData[i-1].left;
 			
 			//right也样必须必须相同
-			/*if(this.textData[i].right > this.textData[i-1].right){
+			if(this.textData[i].right > this.textData[i-1].right){
 				this.textData[i-1].right = this.textData[i].right;
 			}else{
 				this.textData[i].right = this.textData[i-1].right;
-			}*/
+			}
 			
 			
 		}
@@ -79,15 +84,15 @@ page.data.prototype.getUsefulData = function(){
 		if(this.textData[i].top - this.textData[i-1].top < 4){
 			this.textData[i].top = this.textData[i-1].top;
 			//bottom也样必须必须相同
-			/*if(this.textData[i].bottom > this.textData[i-1].bottom){
+			if(this.textData[i].bottom > this.textData[i-1].bottom){
 				this.textData[i-1].bottom = this.textData[i].bottom;
 			}else{
 				this.textData[i].bottom = this.textData[i-1].bottom;
-			}*/
+			}
 			
 		}
 	}
-	
+	*/
 };
 
 /**
@@ -121,7 +126,7 @@ page.data.prototype.parse = function(item){
 	topOver = Math.round((lineHeight - size)/2);
 	top -= topOver;
 	if(item.tag == 'text'){
-		bottom += topOver + 10;
+		bottom += topOver + 3;
 	}else{
 		bottom += topOver;
 	}
@@ -144,6 +149,11 @@ page.data.prototype.parse = function(item){
 	item.height = bottom-top;
 	
 	//计算文字宽度最后一行最后一个是否是标点符合
+	if(item.tag == 'text' && new RegExp(contents.substr(contents.length-1)).test(this.unicode)){
+		item.width += size - widthOver;
+		item.right += size - widthOver;
+	}
+	/*
 	if(item.tag == 'text'){
 		if(item.textInfo.textType == 'TextType.PARAGRAPHTEXT'){
 				//一行文字数量
@@ -163,7 +173,7 @@ page.data.prototype.parse = function(item){
 			item.right += size - widthOver;
 		}
 	}	
-	
+	*/
 	
 	
 	return item;
