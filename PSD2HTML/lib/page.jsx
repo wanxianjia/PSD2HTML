@@ -7,7 +7,6 @@
 var page = {};
 
 // @include "io.jsx"
-// @include "page/createTable.jsx"
 // @include "page/table.jsx"
 // @include "page/web.jsx"
 // @include "json2-min.jsx"
