@@ -107,7 +107,7 @@ page.data.prototype.parse = function(item){
 		bottom = item.bottom,
 		size = item.textInfo.size,
 		lineHeight = item.textInfo.lineHeight,
-		contents = item.textInfo.contents,
+		contents = item.textInfo.contents.replace(/\r\n/g, "\r").replace(/\n/g, "\r"),
 		textType = item.textInfo.textType,
 		widthOver = parseInt(size/4,10),//宽度误差
 		topOver = 0;//top误差
@@ -125,10 +125,12 @@ page.data.prototype.parse = function(item){
 	}
 	topOver = Math.round((lineHeight - size)/2);
 	top -= topOver;
-	if(item.tag == 'text'){
-		bottom += topOver + 3;
-	}else{
-		bottom += topOver;
+	//宽度误差，加上5个像素
+	bottom += topOver + 5;
+	
+	//计算文字宽度最后一行最后一个是否是标点符合
+	if(item.textInfo.textType == 'TextType.POINTTEXT' && contents.indexOf("\n")==-1 && new RegExp(contents.substr(contents.length-1)).test(this.unicode)){
+		width += size;
 	}
 	
 	
@@ -149,10 +151,10 @@ page.data.prototype.parse = function(item){
 	item.height = bottom-top;
 	
 	//计算文字宽度最后一行最后一个是否是标点符合
-	if(item.tag == 'text' && new RegExp(contents.substr(contents.length-1)).test(this.unicode)){
+	/*if(item.tag == 'text' && new RegExp(contents.substr(contents.length-1)).test(this.unicode)){
 		item.width += size - widthOver;
 		item.right += size - widthOver;
-	}
+	}*/
 	/*
 	if(item.tag == 'text'){
 		if(item.textInfo.textType == 'TextType.PARAGRAPHTEXT'){

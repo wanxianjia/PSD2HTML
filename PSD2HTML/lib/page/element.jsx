@@ -86,7 +86,7 @@ page.element.prototype.text = function(){
 		overValue = this.item.textInfo.contents.indexOf('\r\n')>-1 ? 2:1,
 		textSize = 0,
 		textRange = this.item.textInfo.textRange,
-		textContents = this.item.textInfo.contents.replace(/\r\n/g, "\r").replace(/\n/g, "\r"),
+		textContents = this.item.textInfo.contents,
 		pObj = textContents.split('\r');
 	
 	//如果有链接

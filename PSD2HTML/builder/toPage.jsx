@@ -16,6 +16,9 @@
 		return;
 	}
 	psd.parseLayers(null, null, function(layer){
+		if(layer.isBackgroundLayer === true){
+			layer.isBackgroundLayer = false;
+		}
 		if(layer.kind != LayerKind.TEXT && !psd.linkReg.test(layer.name) && !psd.imgReg.test(layer.name)) return true;
 	});
 

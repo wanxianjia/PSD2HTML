@@ -78,7 +78,7 @@ page.table.prototype.oneColData = function(){
 		var img = new XML('<img />');
 		img['@width'] = page.width;
 		img['@height'] = page.height;
-		img['@src'] = psdImg.imgObject.name;
+		img['@src'] = 'slices/'+psdImg.imgObject.name;
 		img['@style'] = 'display:block;margin:0px;padding:0px;';
 		td.appendChild(img);
 	}else{
@@ -237,7 +237,7 @@ page.table.prototype.sortData = function(field,order){
 };
 
 /**
- * 随机抽取50处的颜色值来比较是否相同，如果是返回值,或者返回false
+ * 随机抽取50处的颜色值来比较是否相同，如果是返回true和值,或者返回false和值
  * @param {Object} left
  * @param {Object} top
  * @param {Object} right
@@ -254,7 +254,7 @@ page.table.prototype.getSolidColor = function(left,top,right,bottom){
 			y = Math.floor(top+Math.random()*(bottom-top)),
 			result = getColor(x,y);
 		if(color != result){
-			return {solid:false,value:color};
+			return {solid:false,value:'#'+color};
 		}
 		
 	}
@@ -297,8 +297,8 @@ page.table.prototype.setThead = function(){
 	
 	th['@colspan'] = this.col+1;	
 	th['@height'] = bottom - top;
+	th['@align'] = 'right';
 	tr.appendChild(th);
-	this.thead.appendChild(tr);
 	
 	//创建一列表用来设定宽度
 	var setWidthTr = new XML('<tr></tr>');
@@ -314,6 +314,7 @@ page.table.prototype.setThead = function(){
 		setWidthTr.appendChild(td);
 	}
 	this.thead.appendChild(setWidthTr);
+	this.thead.appendChild(tr);
 };
 
 /**
@@ -335,12 +336,13 @@ page.table.prototype.setTfoot = function(){
 		var psdImg = page.getPsdImg(top,right,bottom,left);
 		td.appendChild(psdImg.element);
 	}else{
-		td['@bgcolor'] = color.solid;
+		td['@bgcolor'] = color.value;
 		td.appendChild(new XML());
 	}
 	
 	td['@colspan'] = this.col+1;	
 	td['@height'] = bottom - top;	
+	td['@align'] = 'right';
 	tr.appendChild(td);
 	this.tfoot.appendChild(tr);
 };
