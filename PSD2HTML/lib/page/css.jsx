@@ -37,6 +37,7 @@ page.css.prototype.get = function(){
 		style.push('text-indent:' + textInfo.indent + 'px');
 	}
 	
+	//style.push('font-family:'+textInfo.font);
 	
 	//宽度
 	/*var width = item.width;

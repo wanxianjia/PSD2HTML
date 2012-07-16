@@ -172,7 +172,7 @@ page.element.prototype.text = function(){
 					
 					if(page.option.builder == "normal"){
 						var cssName = 'style'+page.option.i+'-'+i,
-							fontCss = 'font-size:'+textRange.size+'px;color:#'+textRange.color,
+							fontCss = 'font-size:'+textRange.size+'px;color:#'+textRange.color+';',
 							lineCss = '';
 							if(textRange.font != 'SimSun' && textRange.font != 'NSimSun'){
 								if(textRange.font.indexOf(' ')>-1 || textRange.font.indexOf('-')>-1){
@@ -195,7 +195,7 @@ page.element.prototype.text = function(){
 							lineCss += 'white-space:pre-wrap;*white-space: pre;*word-wrap: break-word;';
 						}
 						if(textRange.color != this.item.textInfo.color && textRange.color != '000000'){
-							lineCss += 'color:#'+textRange.color;
+							lineCss += 'color:#'+textRange.color+';';
 						}
 						if(textRange.size != this.item.textInfo.size){
 							lineCss += 'font-size:'+textRange.size+'px';
