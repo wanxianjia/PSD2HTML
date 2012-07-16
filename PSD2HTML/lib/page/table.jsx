@@ -99,7 +99,9 @@ page.table.prototype.oneColData = function(){
  */
 page.table.prototype.parseRowAndCol = function(){
 	var leftData = this.sortData('left','asc'),
-		topData = this.sortData('top','asc');
+		topData = this.sortData('top','asc'),
+		left = {},
+		top = {};
 	
 	//设置x,y的位置
 	this.top = [];
@@ -114,16 +116,31 @@ page.table.prototype.parseRowAndCol = function(){
 	//推入left
 	this.left.push(0);
 	for(var i in leftData){
-		this.left.push(leftData[i].left);
-		this.left.push(leftData[i].right);
+		//校验是否有相同的值
+		if(left[leftData[i].left] !== true){
+			this.left.push(leftData[i].left);
+			left[leftData[i].left] = true;
+		}
+		if(left[leftData[i].right] !== true){
+			this.left.push(leftData[i].right);
+			left[leftData[i].right] = true;
+		}
+
 	}	
 	this.left.push(page.width);
 	
 	//推入top
 	this.top.push(0);
 	for(var i in topData){
-		this.top.push(topData[i].top);
-		this.top.push(topData[i].bottom);
+		//校验是否有相同的值
+		if(top[topData[i].top] !== true){
+			this.top.push(topData[i].top);
+			top[topData[i].top] = true;
+		}
+		if(top[topData[i].bottom] !== true){
+			this.top.push(topData[i].bottom);
+			top[topData[i].bottom] = true;
+		}
 	}
 	this.top.push(page.height);
 	
@@ -222,16 +239,9 @@ page.table.prototype.sortData = function(field,order){
 			data.sort(function(a,b){return a[field] - b[field];});
 		}
 		
-		var resultData = [data[0]];
-		for(var i=1;i<data.length;i++){
-			if(data[i][field] != data[i-1][field]){
-				resultData.push(data[i]);
-			}
-		}
+		this.getSortData[field+'__'+order] = data;
 		
-		this.getSortData[field+'__'+order] = resultData;
-		
-		return resultData;
+		return data;
 	}
 	
 };
@@ -376,8 +386,6 @@ page.table.prototype.insertRow = function(){
 				//有内容
 				childContent = new XML(new page.element(item.object));
 				
-				//this.td[tdKey]['@width'] = item.object.right-item.object.left;
-				//this.td[tdKey]['@height'] = item.object.bottom-item.object.top;
 				this.td[tdKey]['@valign'] = 'top';
 				this.td[tdKey]['@align'] = 'left';
 				
@@ -412,8 +420,6 @@ page.table.prototype.insertRow = function(){
 					}
 				}
 				
-				//this.td[tdKey]['@width'] = width;
-				//this.td[tdKey]['@height'] = this.height[row];
 				
 				if(colspan>1){
 					this.td[tdKey]['@colspan'] = colspan;

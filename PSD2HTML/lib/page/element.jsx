@@ -215,14 +215,11 @@ page.element.prototype.text = function(){
 		}
 		
 		
-		if(page.option.builder == "normal"){
-			if(p.toXMLString().indexOf("span")==-1){
-				p = new XML('<br/>');
-			}
-			elm.appendChild(p);
-		}else if(page.option.builder != "normal" && p.toXMLString().indexOf("span")>-1){
-			elm.appendChild(p);
+		if(p.toXMLString().indexOf("span")==-1){
+			p = new XML('<br/>');
 		}
+		elm.appendChild(p);
+		
 		
 	}
 	

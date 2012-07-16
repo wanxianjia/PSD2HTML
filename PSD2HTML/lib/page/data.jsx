@@ -60,21 +60,12 @@ page.data.prototype.getUsefulData = function(){
 			this.textData.push(this.data[i].tag == 'text' ? this.parse(this.data[i]) : this.data[i]);
 		}
 	};
-	/*
+	
 	//当前的left和上一个的left相差3个像素，置为相同
 	this.textData.sort(function(a,b){return a.left-b.left;});
 	for(var i=1;i<this.textData.length;i++){
 		if(this.textData[i].left - this.textData[i-1].left < 4){
 			this.textData[i].left = this.textData[i-1].left;
-			
-			//right也样必须必须相同
-			if(this.textData[i].right > this.textData[i-1].right){
-				this.textData[i-1].right = this.textData[i].right;
-			}else{
-				this.textData[i].right = this.textData[i-1].right;
-			}
-			
-			
 		}
 	}
 	
@@ -83,16 +74,9 @@ page.data.prototype.getUsefulData = function(){
 	for(var i=1;i<this.textData.length;i++){
 		if(this.textData[i].top - this.textData[i-1].top < 4){
 			this.textData[i].top = this.textData[i-1].top;
-			//bottom也样必须必须相同
-			if(this.textData[i].bottom > this.textData[i-1].bottom){
-				this.textData[i-1].bottom = this.textData[i].bottom;
-			}else{
-				this.textData[i].bottom = this.textData[i-1].bottom;
-			}
-			
 		}
 	}
-	*/
+	
 };
 
 /**
@@ -128,9 +112,25 @@ page.data.prototype.parse = function(item){
 	//宽度误差，加上5个像素
 	bottom += topOver + 5;
 	
-	//计算文字宽度最后一行最后一个是否是标点符合
+	//单行而最后一个字符等于标点符合，那么他的宽度加上文字大小
 	if(item.textInfo.textType == 'TextType.POINTTEXT' && contents.indexOf("\n")==-1 && new RegExp(contents.substr(contents.length-1)).test(this.unicode)){
 		width += size;
+		right += size;
+	}else if(item.textInfo.textType == 'TextType.PARAGRAPHTEXT'){
+		//一行文字数量
+		var aRowTextlen = Math.round(item.width/size),
+			//有多少行
+			rowCount = Math.round(contents.length/(aRowTextlen)),
+			//最后一行文本
+			lastText = contents.substr((rowCount-1)*aRowTextlen+1),
+			//最后一个字符
+			lastStr = contents.substr(contents.length-1);
+			
+		//最后一个字符是标点符合，判断最后一个字符（标点符合）所在位置是否大于一行总数，如果是，那么他的宽度加上一个文字大小
+		if(new RegExp(lastStr).test(this.unicode) && lastText.lastIndexOf(lastStr) > aRowTextlen-1){
+			width += size;
+			right += size;
+		}
 	}
 	
 	
