@@ -259,7 +259,7 @@ page.table.prototype.getSolidColor = function(left,top,right,bottom){
 		
 	}
 	
-	return color;
+	return '#'+color;
 	
 	//获取颜色
 	function getColor(x,y){
