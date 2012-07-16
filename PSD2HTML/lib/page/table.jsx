@@ -55,8 +55,8 @@ page.table.prototype.createMain = function(){
 	this.table['@width'] = page.width;
 	
 	this.table.appendChild(this.thead);
-	this.table.appendChild(this.tfoot);
 	this.table.appendChild(this.tbody);
+	this.table.appendChild(this.tfoot);
 };
 
 /**
@@ -73,7 +73,7 @@ page.table.prototype.oneColData = function(){
 		bottom = page.height,
 		color = this.getSolidColor(left,top,right,bottom);
 	
-	if(color === false){
+	if(color.solid === false){
 		var psdImg = page.getPsdImg(top,right,bottom,left);
 		var img = new XML('<img />');
 		img['@width'] = page.width;
@@ -82,7 +82,7 @@ page.table.prototype.oneColData = function(){
 		img['@style'] = 'display:block;margin:0px;padding:0px;';
 		td.appendChild(img);
 	}else{
-		td['@bgcolor'] = color;
+		td['@bgcolor'] = color.value;
 		td['@height'] = page.height;
 		td.appendChild(new XML());
 	}
@@ -254,12 +254,12 @@ page.table.prototype.getSolidColor = function(left,top,right,bottom){
 			y = Math.floor(top+Math.random()*(bottom-top)),
 			result = getColor(x,y);
 		if(color != result){
-			return false;
+			return {solid:false,value:color};
 		}
 		
 	}
 	
-	return '#'+color;
+	return {solid:true,value:'#'+color};
 	
 	//获取颜色
 	function getColor(x,y){
@@ -287,11 +287,11 @@ page.table.prototype.setThead = function(){
 	
 	//图片
 	var color = this.getSolidColor(left,top,right,bottom);
-	if(color === false){
+	if(color.solid === false){
 		var psdImg = page.getPsdImg(top,right,bottom,left);
 		th.appendChild(psdImg.element);
 	}else{
-		th['@bgcolor'] = color;
+		th['@bgcolor'] = color.value;
 		th.appendChild(new XML());
 	}
 	
@@ -331,11 +331,11 @@ page.table.prototype.setTfoot = function(){
 		
 	//图片
 	var color = this.getSolidColor(left,top,right,bottom);
-	if(color === false){
+	if(color.solid === false){
 		var psdImg = page.getPsdImg(top,right,bottom,left);
 		td.appendChild(psdImg.element);
 	}else{
-		td['@bgcolor'] = color;
+		td['@bgcolor'] = color.solid;
 		td.appendChild(new XML());
 	}
 	
@@ -388,11 +388,12 @@ page.table.prototype.insertRow = function(){
 				
 				//背景
 				var color = this.getSolidColor(item.object.left,item.object.top,item.object.right,item.object.bottom);
-				if(color === false){
+				if(color.solid === false){
 					var psdImg = page.getPsdImg(item.object.top,item.object.right,item.object.bottom,item.object.left);
 					this.td[tdKey]['@background'] = 'slices/' + psdImg.imgObject.name;
+					this.td[tdKey]['@bgcolor'] = color.value;
 				}else{
-					this.td[tdKey]['@bgcolor'] = color;
+					this.td[tdKey]['@bgcolor'] = color.value;
 				}
 				
 			}else{
@@ -423,11 +424,11 @@ page.table.prototype.insertRow = function(){
 				
 				//图片
 				var color = this.getSolidColor(left,top,right,bottom);
-				if(color === false){
+				if(color.solid === false){
 					var psdImg = page.getPsdImg(top,right,bottom,left);
 					childContent = psdImg.element;
 				}else{
-					this.td[tdKey]['@bgcolor'] = color;
+					this.td[tdKey]['@bgcolor'] = color.value;
 					childContent = new XML();
 				}
 			}
