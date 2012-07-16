@@ -20,7 +20,7 @@ page.css.prototype.get = function(){
 	var style = [],
 		item = this.item,
 		textInfo = this.item.textInfo;
-		
+	/*	
 	if(textInfo.bold == true) {
 		style.push('font-weight:bold');
 	}
@@ -31,7 +31,7 @@ page.css.prototype.get = function(){
 	//下划线
 	if(textInfo.underline == true){
 		style.push('text-decoration:underline');
-	}
+	}*/
 	//缩进
 	if(textInfo.indent != '0') {
 		style.push('text-indent:' + textInfo.indent + 'px');

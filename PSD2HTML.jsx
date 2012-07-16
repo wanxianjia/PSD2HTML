@@ -1,4 +1,4 @@
-﻿﻿/*
+﻿/*
 <javascriptresource> 
 <name>PSD TO HTML</name> 
 <about>v1.0--https://github.com/wanxianjia/PSD2HTML</about> 
@@ -130,7 +130,6 @@ var APP = {version: '1.0'};
                     $.evalFile(File($.fileName).parent+'/PSD2HTML/builder/toPage.jsx');
                 }
 				APP.win.close();
-				alert(i18n("processDone"));
 			}
 		}
 

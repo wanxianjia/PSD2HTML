@@ -131,7 +131,6 @@ var APP = {version: '1.0'};
                     $.evalFile(File($.fileName).parent+'/../PSD2HTML/builder/toPage.jsx');
                 }
 				APP.win.close();
-				alert(i18n("processDone"));
 			}
 		}
 

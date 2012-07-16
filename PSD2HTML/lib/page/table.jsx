@@ -35,9 +35,7 @@ page.table = function(data){
 		
 		
 		this.insertRow();
-		//this.insertCol();
 	}
-	
 	return this.table;
 	
 };

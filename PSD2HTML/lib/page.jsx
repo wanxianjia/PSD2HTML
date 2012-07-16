@@ -9,7 +9,7 @@ var page = {};
 // @include "io.jsx"
 // @include "page/table.jsx"
 // @include "page/web.jsx"
-// @include "json2-min.jsx"
+// @include "i18n.jsx"
 
 
 /**
@@ -22,7 +22,7 @@ page.init = function(data,option,psd){
 	page.psd = psd;
 	//隐藏所有文本图层
 	psd.hiddenTextLayers();
-	//try{
+	try{
 		page.option = option;
 		page.title = data.name;
 		page.width = option.width;
@@ -52,9 +52,12 @@ page.init = function(data,option,psd){
 		}
 		
 		this.saveFile();
-	//}catch(e){
-	//	alert(e.message);
-	//}
+		
+		alert(i18n("processDone"));
+		
+	}catch(e){
+		alert('亲，出错了。\r-------------------\r参考信息：'+e.message+'\r-------------------\r信息反馈请联系肖武明\r旺旺:xiwm2001\r分机：35969');
+	}
 	//显示所有文本图层
 	psd.visibleTextLayers();
 };
@@ -76,7 +79,6 @@ page.edmHtml = function(data){
 		title = new XML('<title>' + data.name + '</title>'),
 		body = new XML('<body></body>');
 	
-	//head.appendChild(new XML('<style type="text/css">body{font-size:12px;line-height:12px;}td,th{border:1px solid #F00;}</style>'));
 	body.appendChild(new page.table(data));
 	head.appendChild(title);
 	html.appendChild(head);

@@ -127,7 +127,10 @@ page.element.prototype.text = function(){
 						range:[start,start+obj[o].length+1-overValue],
 						color:textRange[i].color,
 						size:textRange[i].size,
-						font:textRange[i].font
+						font:textRange[i].font,
+						bold:textRange[i].bold,
+						italic:textRange[i].italic,
+						underline:textRange[i].underline
 					};
 					start += obj[o].length + overValue;
 					rangeData.push(item);
@@ -160,8 +163,8 @@ page.element.prototype.text = function(){
 				curEnd = textRange.range[1];
 				
 			if(start<=curStart && end+1>=curEnd && end>curStart){
-				var text = textContents.substring(curStart,curEnd),
-					textTrim = text.replace(/^\s+/, "").replace(/\s+$/, "");
+				var text = textContents.substring(curStart,curEnd);
+				var textTrim = text.replace(/^\s+/, "").replace(/\s+$/, "");
 				
 				if(text.length>0 && textTrim.length>0){
 					var span = new XML('<span></span>'),
@@ -172,36 +175,59 @@ page.element.prototype.text = function(){
 					
 					if(page.option.builder == "normal"){
 						var cssName = 'style'+page.option.i+'-'+i,
-							fontCss = 'font-size:'+textRange.size+'px;color:#'+textRange.color+';',
-							lineCss = '';
-							if(textRange.font != 'SimSun' && textRange.font != 'NSimSun'){
-								if(textRange.font.indexOf(' ')>-1 || textRange.font.indexOf('-')>-1){
-									fontCss += ';font-family:\''+textRange.font+'\'';
-								}else{
-									fontCss += ';font-family:'+textRange.font;
-								}
+							lineCss = ['font-size:'+textRange.size+'px;color:#'+textRange.color];
+						
+						if(textRange.bold == true){
+							lineCss.push('font-weight:bold');
+						}
+						
+						if(textRange.italic == true){
+							lineCss.push('font-style:italic');
+						}
+						
+						if(textRange.underline == true){
+							lineCss.push('text-decoration:underline');
+						}
+						if(textRange.font != 'SimSun' && textRange.font != 'NSimSun'){
+							if(textRange.font.indexOf(' ')>-1 || textRange.font.indexOf('-')>-1){
+								lineCss.push('font-family:\''+textRange.font+'\'');
+							}else{
+								lineCss.push('font-family:'+textRange.font);
 							}
-						if(typeof(this.cssMap[fontCss]) != 'undefined'){
-							cssName = this.cssMap[fontCss];
+						}
+						if(typeof(this.cssMap[lineCss.join(';')]) != 'undefined'){
+							cssName = this.cssMap[lineCss.join(';')];
 						}else{
-							var lineCss = '.'+cssName+'{'+fontCss+';}';
-							page.option.styleCss.appendChild(lineCss);
-							this.cssMap[fontCss] = cssName;
+							this.cssMap[lineCss.join(';')] = cssName;
+							page.option.styleCss.appendChild('.'+cssName+'{'+lineCss.join(';')+';'+'}');
 						}
 						span['@class'] = cssName;
 					}else{
-						var lineCss = '';
+						var lineCss = [];
 						if(textSpan.indexOf(' ')>-1){
-							lineCss += 'white-space:pre-wrap;*white-space: pre;*word-wrap: break-word;';
+							lineCss.push('white-space:pre-wrap;*white-space: pre;*word-wrap: break-word');
 						}
+						
+						if(textRange.bold == true){
+							lineCss.push('font-weight:bold');
+						}
+						
+						if(textRange.italic == true){
+							lineCss.push('font-style:italic');
+						}
+						
+						if(textRange.underline == true){
+							lineCss.push('text-decoration:underline');
+						}
+						
 						if(textRange.color != this.item.textInfo.color && textRange.color != '000000'){
-							lineCss += 'color:#'+textRange.color+';';
+							lineCss.push('color:#'+textRange.color);
 						}
 						if(textRange.size != this.item.textInfo.size){
-							lineCss += 'font-size:'+textRange.size+'px';
+							lineCss.push('font-size:'+textRange.size+'px');
 						}
 						if(lineCss.length>0){
-							span['@style'] = lineCss;
+							span['@style'] = lineCss.join(';')+';';
 						}
 					}
 				}else{
@@ -222,9 +248,6 @@ page.element.prototype.text = function(){
 		
 		
 	}
-	
-
-	
 	return elm;
 };
 
