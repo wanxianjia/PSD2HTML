@@ -5,7 +5,8 @@
  */
 
 var page = {};
-
+//空格替代符
+page.spaceStr = '~~~space~~~';
 //设置XML对象的常规属性
 //XML.prettyIndent = 0;
 //XML.prettyPrinting = false;
@@ -173,28 +174,24 @@ page.formatHtml = function(htmlCode){
 	htmlCode = html.join('');
 
 	//过滤多余的span
-	//htmlCode = htmlCode.replace(/(<span>).*?(<\/span>)/g, '$1$2');
-	//td和img之间去换行
-	//htmlCode = htmlCode.replace(/(>)[\s\S]*?(<img)/g, '><img');
-	//htmlCode = htmlCode.replace(/(\/>)[\s\S]*?(<\/td)/g, '/></td>');
+	htmlCode = htmlCode.replace(/(<span>)(.*?)(<\/span>)/g,'$2');
+	//td内img去空格去换行
+	var img = htmlCode.split('<img'),
+		html = [];
+	for(var i=0;i<img.length;i++){
+		var code = img[i];
+		if(i>0){
+			code = '<img'+code;
+		}
+		code = code.substring(0,code.lastIndexOf('>'))+'>';
+		code = code.replace('\n',"");
+		code = code.replace(/(\/>)[\s\S]*?(<)/, '/><');
+		html.push(code);
+	}
+	htmlCode = html.join('');
 	
+	//还原空格替代符
+	htmlCode = htmlCode.replace(new RegExp(page.spaceStr ),' ');
 	return htmlCode;
 	
-	/*
-	if(page.option.builder == "normal"){
-		var div = htmlCode.split('<p');
-		for(var i=0;i<div.length;i++){
-			var code = div[i];
-			if(i>0){
-				code = '<p' + code;
-			}
-			if(code.indexOf('<span')>-1){
-				code = code.replace(/(<\/span>)[\s\S]*?(<span)/g, '</span><span');
-			}
-			html.push(code);
-		}
-	}else{
-		html.push(htmlCode);
-	}*/
-	//return html.join('');//.replace(/(<\/span>)[\s\S]*?(<span)/g, '</span><span');;
-}
+};

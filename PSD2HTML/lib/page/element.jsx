@@ -166,7 +166,7 @@ page.element.prototype.text = function(){
 					var span = new XML('<span></span>'),
 						//文本片段
 						textSpan = textContents.substring(curStart,curEnd);
-					span.appendChild(new XML(textSpan));
+					span.appendChild(new XML(textSpan.replace(new RegExp(' '),page.spaceStr)));
 					p.appendChild(span);
 					if(page.option.builder == "normal"){
 						var cssName = 'style'+page.option.i+'-'+i,
