@@ -11,14 +11,6 @@
  * @param {Object} item
  */
 page.element = function(data){
-	//隐藏所有文本图层
-	var layers = page.psd.contentLayers;
-	for(var i in page.psd.contentLayers){
-		if(layers[i].kind == 'LayerKind.TEXT'){
-			layers[i].visible = false;
-		}
-	}
-	
 	//用于去除相同的Css
 	this.cssMap = {};
 	this.item = data;

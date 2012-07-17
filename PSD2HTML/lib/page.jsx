@@ -20,6 +20,8 @@ var page = {};
  */
 page.init = function(data,option,psd){ 
 	page.psd = psd;
+	//隐藏所有文本
+	page.hideAllTextLayers();
 	try{
 		page.option = option;
 		page.title = data.name;
@@ -58,6 +60,19 @@ page.init = function(data,option,psd){
 	}
 	//显示所有文本图层
 	psd.visibleTextLayers();
+};
+
+/**
+ * 隐藏所有文本图层
+ */
+page.hideAllTextLayers = function(){
+	var layers = page.psd.contentLayers;
+	for(var i in page.psd.contentLayers){
+		if(layers[i].kind == 'LayerKind.TEXT'){
+			layers[i].visible = false;
+		}
+	}
+	
 };
 
 /**
