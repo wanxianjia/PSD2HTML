@@ -186,7 +186,7 @@ PSD.fn = PSD.prototype = {
 						child.textInfo.lineHeight = Math.round(textItem.autoLeadingAmount) + '%';
 					}
 					// text justification
-					switch(textItem.justification){
+					switch(textItem.justification.toString()){
 						case 'Justification.LEFT':
 							child.textInfo.textAlign = 'left';
 							break;
@@ -194,7 +194,7 @@ PSD.fn = PSD.prototype = {
 							child.textInfo.textAlign = 'right';
 							break;
 						case 'Justification.CENTER':
-							child.textInfo.textAlign = 'certer';
+							child.textInfo.textAlign = 'center';
 							break;
 						case 'Justification.CENTERJUSTIFIED':
 						case 'Justification.FULLYJUSTIFIED':
