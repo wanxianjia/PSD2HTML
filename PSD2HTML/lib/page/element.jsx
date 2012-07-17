@@ -144,8 +144,8 @@ page.element.prototype.text = function(){
 		end = 0;
 	for(var o in pObj){
 		start = end;
-		end += pObj[o].length + overValue,
-		p = new XML('<p></p>'),
+		end += pObj[o].length + overValue;
+		var p = new XML('<p></p>');
 		isCreateP = true;
 		if(page.option.builder != "normal"){
 			p['@style'] = 'margin:0px;padding:0px;';
@@ -168,64 +168,31 @@ page.element.prototype.text = function(){
 						textSpan = textContents.substring(curStart,curEnd);
 					span.appendChild(new XML(textSpan));
 					p.appendChild(span);
-					
 					if(page.option.builder == "normal"){
 						var cssName = 'style'+page.option.i+'-'+i,
-							lineCss = ['font-size:'+textRange.size+'px;color:#'+textRange.color];
+							lineCss = this.getCss(this.item.textInfo,textRange);
 						
-						if(textRange.bold == true){
-							lineCss.push('font-weight:bold');
-						}
 						
-						if(textRange.italic == true){
-							lineCss.push('font-style:italic');
-						}
-						
-						if(textRange.underline == true){
-							lineCss.push('text-decoration:underline');
-						}
-						if(textRange.font != 'SimSun' && textRange.font != 'NSimSun'){
-							if(textRange.font.indexOf(' ')>-1 || textRange.font.indexOf('-')>-1){
-								lineCss.push('font-family:\''+textRange.font+'\'');
-							}else{
-								lineCss.push('font-family:'+textRange.font);
+						if(typeof(this.cssMap[lineCss.join('')]) != 'undefined'){
+							cssName = this.cssMap[lineCss.join('')];
+						}else{
+							this.cssMap[lineCss.join('')] = cssName;
+							if(lineCss.length>0){
+								span['@class'] = cssName;
+								page.option.styleCss.appendChild('.'+cssName+'{'+lineCss.join(';')+'}');
 							}
 						}
-						if(typeof(this.cssMap[lineCss.join(';')]) != 'undefined'){
-							cssName = this.cssMap[lineCss.join(';')];
-						}else{
-							this.cssMap[lineCss.join(';')] = cssName;
-							page.option.styleCss.appendChild('.'+cssName+'{'+lineCss.join(';')+';'+'}');
-						}
-						span['@class'] = cssName;
 					}else{
-						var lineCss = [];
+						var parentStyle = this.item.textInfo,
+							lineCss = this.getCss(parentStyle,textRange);
 						if(textSpan.indexOf(' ')>-1){
 							lineCss.push('white-space:pre-wrap;*white-space: pre;*word-wrap: break-word');
-						}
-						
-						if(textRange.bold == true){
-							lineCss.push('font-weight:bold');
-						}
-						
-						if(textRange.italic == true){
-							lineCss.push('font-style:italic');
-						}
-						
-						if(textRange.underline == true){
-							lineCss.push('text-decoration:underline');
-						}
-						
-						if(textRange.color != this.item.textInfo.color && textRange.color != '000000'){
-							lineCss.push('color:#'+textRange.color);
-						}
-						if(textRange.size != this.item.textInfo.size){
-							lineCss.push('font-size:'+textRange.size+'px');
 						}
 						if(lineCss.length>0){
 							span['@style'] = lineCss.join(';')+';';
 						}
 					}
+					
 				}else{
 					isCreateP = false;
 				}
@@ -247,3 +214,51 @@ page.element.prototype.text = function(){
 	return elm;
 };
 
+page.element.prototype.getCss = function(parentStyle,textRange){
+	var lineCss = [];
+	if(textRange.size != parentStyle.size && textRange.size != 12){
+		lineCss.push('font-size:'+textRange.size+'px');
+	}
+	if(textRange.color != parentStyle.color){
+		lineCss.push('color:#'+textRange.color+'');
+	}
+	
+	if(textRange.bold == true){
+		if(parentStyle.bold != true){
+			lineCss.push('font-weight:bold');
+		}
+	}else{
+		if(parentStyle.bold == true){
+			lineCss.push('font-weight:normal');
+		}
+	}
+	
+	if(textRange.italic == true){
+		if(parentStyle.italic != true){
+			lineCss.push('font-style:italic');
+		}
+	}else{
+		if(parentStyle.italic == true){
+			lineCss.push('font-style:normal');
+		}
+	}
+	
+	if(textRange.underline == true){
+		if(parentStyle.underline != true){
+			lineCss.push('font-decoration:underline');
+		}
+	}else{
+		if(parentStyle.underline == true){
+			lineCss.push('font-decoration:normal');
+		}
+	}
+	
+	if(textRange.font != 'SimSun' && textRange.font != 'NSimSun' && textRange.font != parentStyle.font){
+		if(textRange.font.indexOf(' ')>-1 || textRange.font.indexOf('-')>-1){
+			lineCss.push('font-family:\''+textRange.font+'\'');
+		}else{
+			lineCss.push('font-family:'+textRange.font);
+		}
+	}
+	return lineCss;
+}

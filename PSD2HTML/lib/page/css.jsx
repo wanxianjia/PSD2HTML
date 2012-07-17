@@ -33,6 +33,13 @@ page.css.prototype.get = function(){
 		style.push('z-index:' + item.index);
 		style.push('top:' + item.top + 'px');
 		style.push('left:' + item.left + 'px');
+		if(textInfo.font != 'SimSun' && textInfo.font != 'NSimSun'){
+			if(textInfo.font.indexOf(' ')>-1 || textInfo.font.indexOf('-')>-1){
+				style.push('font-family:\''+textInfo.font+'\'');
+			}else{
+				style.push('font-family:'+textInfo.font);
+			}
+		}
 	}else{
 		style.push('margin:0px');
 		style.push('padding:0px');

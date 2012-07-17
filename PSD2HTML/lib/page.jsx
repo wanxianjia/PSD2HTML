@@ -6,6 +6,13 @@
 
 var page = {};
 
+//设置XML对象的常规属性
+//XML.prettyIndent = 0;
+//XML.prettyPrinting = false;
+//XML.ignoreWhitespace = false;
+//XML.ignoreComments = false;
+//XML.ignoreProcessingInstructions = false;
+
 // @include "io.jsx"
 // @include "page/table.jsx"
 // @include "page/web.jsx"
@@ -44,7 +51,7 @@ page.init = function(data,option,psd){
 				this.htmlCode = page.edmHtml(data);
 				break;
 			case "BBS":
-				this.htmlCode = page.bssHtml(data);
+				this.htmlCode = page.edmHtml(data);
 				break;
 			default:
 				this.htmlCode = page.normalPage(data);
@@ -56,7 +63,7 @@ page.init = function(data,option,psd){
 		alert(i18n("processDone"));
 		
 	}catch(e){
-		alert('亲，出错了。\r-------------------\r参考信息：'+e.message+'\r-------------------\r信息反馈请联系肖武明\r旺旺:xiwm2001\r分机：35969');
+		alert('亲，出错了。\r-------------------\r参考信息：'+e.message+'\r-------------------\r信息反馈请联系肖武明\r旺旺：xiwm2001\r分机：35969');
 	}
 	//显示所有文本图层
 	psd.visibleTextLayers();
