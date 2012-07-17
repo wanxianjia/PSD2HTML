@@ -191,7 +191,7 @@ page.formatHtml = function(htmlCode){
 	htmlCode = html.join('');
 	
 	//还原空格替代符
-	htmlCode = htmlCode.replace(new RegExp(page.spaceStr ),' ');
+	htmlCode = htmlCode.replace(new RegExp(page.spaceStr,'g'),' ');
 	return htmlCode;
 	
 };
