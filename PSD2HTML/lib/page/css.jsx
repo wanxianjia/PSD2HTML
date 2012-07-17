@@ -20,36 +20,11 @@ page.css.prototype.get = function(){
 	var style = [],
 		item = this.item,
 		textInfo = this.item.textInfo;
-	/*	
-	if(textInfo.bold == true) {
-		style.push('font-weight:bold');
-	}
-	//斜体
-	if(textInfo.italic == true) {
-		style.push('font-style:italic');
-	}
-	//下划线
-	if(textInfo.underline == true){
-		style.push('text-decoration:underline');
-	}*/
 	//缩进
 	if(textInfo.indent != '0') {
 		style.push('text-indent:' + textInfo.indent + 'px');
 	}
 	
-	//style.push('font-family:'+textInfo.font);
-	
-	//宽度
-	/*var width = item.width;
-	width += parseInt(item.textInfo.size/4,10) + Math.round(item.textInfo.size/6);
-	var contents = item.textInfo.contents,
-		lastStr = contents.substring(contents.length-1,contents.length);
-	//$.writeln(/^(\w|[\u4E00-\u9FA5])*$/.test(lastStr));
-	style.push('width:' + width + 'px');
-	//高度暂时不需要
-	if(page.option.builder != "normal"){
-		//style.push('height:' + item.height + 'px');
-	}*/
 	//对齐
 	style.push('text-align:' + textInfo.textAlign + '');
 	//非网页不需要这些样式

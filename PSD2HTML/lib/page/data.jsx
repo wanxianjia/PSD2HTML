@@ -150,32 +150,6 @@ page.data.prototype.parse = function(item){
 	item.textInfo.lineHeight = lineHeight;
 	item.height = bottom-top;
 	
-	//计算文字宽度最后一行最后一个是否是标点符合
-	/*if(item.tag == 'text' && new RegExp(contents.substr(contents.length-1)).test(this.unicode)){
-		item.width += size - widthOver;
-		item.right += size - widthOver;
-	}*/
-	/*
-	if(item.tag == 'text'){
-		if(item.textInfo.textType == 'TextType.PARAGRAPHTEXT'){
-				//一行文字数量
-			var aRowTextlen = Math.round(item.width/size),
-				//有多少行
-				rowCount = Math.round(contents.length/(aRowTextlen)),
-				//最后一行文本
-				lastText = contents.substr((rowCount-1)*aRowTextlen+1),
-				lastStr = contents.substr(contents.length-1);
-			if(lastText.length >= aRowTextlen && new RegExp(lastStr).test(this.unicode) && rowCount<6){
-				item.width += size - widthOver;
-				item.right += size - widthOver;
-			}
-		}else if(new RegExp(contents.substr(contents.length-1)).test(this.unicode)){
-			//单行最后一个字符有标点符合
-			item.width += size - widthOver;
-			item.right += size - widthOver;
-		}
-	}	
-	*/
 	
 	
 	return item;

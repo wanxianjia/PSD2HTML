@@ -11,7 +11,16 @@
  * @param {Object} item
  */
 page.element = function(data){
-	this.cssMap = {};//用于去除相同的Css
+	//隐藏所有文本图层
+	var layers = page.psd.contentLayers;
+	for(var i in page.psd.contentLayers){
+		if(layers[i].kind == 'LayerKind.TEXT'){
+			layers[i].visible = false;
+		}
+	}
+	
+	//用于去除相同的Css
+	this.cssMap = {};
 	this.item = data;
 	return this.getTextElement();
 };
@@ -38,8 +47,6 @@ page.element.prototype.getTextElement = function(){
  * 图片图层 
  */
 page.element.prototype.img = function(){
-	//显示所有文本图层
-	page.psd.visibleTextLayers();
 	
 	var elm = null,
 		img = new XML('<img />'),
@@ -52,9 +59,6 @@ page.element.prototype.img = function(){
 		img['@style'] = 'display:block;';
 	}
 	
-	
-	//隐藏所有文本图层
-	page.psd.hiddenTextLayers();
 	
 	if(typeof(this.item.link) != 'undefined'){
 		elm = new XML('<a></a>');

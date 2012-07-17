@@ -20,8 +20,6 @@ var page = {};
  */
 page.init = function(data,option,psd){ 
 	page.psd = psd;
-	//隐藏所有文本图层
-	psd.hiddenTextLayers();
 	try{
 		page.option = option;
 		page.title = data.name;
