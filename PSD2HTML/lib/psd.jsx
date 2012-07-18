@@ -448,6 +448,21 @@ PSD.fn = PSD.prototype = {
 		PSD.colorSampler.move([UnitValue(x, 'px'), UnitValue(y, 'px')]);
 		return PSD.colorSampler.color.rgb.hexValue;
 	},
+	selectionIsMonochrome: function(region){
+		var	selection = this.doc.selection,
+			cs = this.doc.channels;
+			
+		selection.select(region);
+		
+		for(var i = 0, l = cs.length; i < l; i++){
+			var histogram = cs[i].histogram.concat();
+			histogram.sort().reverse();
+			if(histogram[1] != 0) return false;
+		}
+		//var his = this.doc.historyStates;
+		//this.doc.activeHistoryState = his[his.length - 1];
+		return true;
+	},
 	reset: function(){
 		this.doc.activeHistoryState = this.doc.historyStates.getByName("psdtohtml");
 		this.doc.save();
