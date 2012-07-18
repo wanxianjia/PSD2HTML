@@ -91,7 +91,7 @@ page.data.prototype.parse = function(item){
 		bottom = item.bottom,
 		size = item.textInfo.size,
 		lineHeight = item.textInfo.lineHeight,
-		contents = item.textInfo.contents.replace(/\r\n/g, "\r").replace(/\n/g, "\r"),
+		contents = item.textInfo.contents.replace(/\r\n/g, "\r").replace(/\n/g, "\r").replace(/(\s*$)/g,""),//去\r\n和最右边空格
 		textType = item.textInfo.textType,
 		widthOver = parseInt(size/4,10),//宽度误差
 		topOver = 0;//top误差
@@ -116,6 +116,19 @@ page.data.prototype.parse = function(item){
 	if(item.textInfo.textType == 'TextType.POINTTEXT' && contents.indexOf("\n")==-1 && new RegExp(contents.substr(contents.length-1)).test(this.unicode)){
 		width += size;
 		right += size;
+	}else if(item.textInfo.textType == 'TextType.PARAGRAPHTEXT' && contents.indexOf("\r") == -1 && new RegExp(contents.substr(contents.length-1,contents.length)).test(this.unicode)){
+		width += size;
+		right += size;
+	}else if(contents.indexOf("\r") > -1){
+		var o = contents.split('\r');
+		//有回车的换行
+		var prevLen = o[0].length,
+			lastLen = o[o.length-1].length,
+			lastStr = contents.substr(contents.length-1);
+		if(lastLen >= prevLen && new RegExp(lastStr).test(this.unicode)){
+			width += size;
+			right += size;
+		}
 	}else if(item.textInfo.textType == 'TextType.PARAGRAPHTEXT'){
 		//一行文字数量
 		var aRowTextlen = Math.round(item.width/size),
@@ -131,8 +144,8 @@ page.data.prototype.parse = function(item){
 			width += size;
 			right += size;
 		}
-	}
 	
+	}
 	
 	//left
 	if(page.option.builder == "normal"){
@@ -199,4 +212,4 @@ page.data.prototype.removeRepeat = function(){
 };
 
 
-page.data.prototype.unicode = ",.\/<>?;\':\"[]{}()!，。《》、？；‘：“｛｝【】！";
+page.data.prototype.unicode = ",.\/<>?;\':\"[]{}()!，。《》、？；‘：“｛｝【】！ ";

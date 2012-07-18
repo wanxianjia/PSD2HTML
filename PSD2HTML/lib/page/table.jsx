@@ -245,39 +245,29 @@ page.table.prototype.sortData = function(field,order){
 };
 
 /**
- * 随机抽取50处的颜色值来比较是否相同，如果是返回true和值,或者返回false和值
+ * 获取是否为纯色，如果是，返回true&色值，或则返回false&色值
  * @param {Object} left
  * @param {Object} top
  * @param {Object} right
  * @param {Object} bottom
  */
 page.table.prototype.getSolidColor = function(left,top,right,bottom){
-	if(left < 1){left=1;}
-	if(top <1){top=1;}
-	
-	var color = getColor(left,top);
-	
-	for(var i=0;i<50;i++){
-		var x = Math.floor(left+Math.random()*(right-left)),
-			y = Math.floor(top+Math.random()*(bottom-top)),
-			result = getColor(x,y);
-		if(color != result){
-			return {solid:false,value:'#'+color};
-		}
-		
-	}
-	
-	return {solid:true,value:'#'+color};
-	
 	//获取颜色
 	function getColor(x,y){
-		if(x<1){x=1;}
-		if(x>page.width-1){x = page.width-1;}
-		if(y<1){y=1;}
-		if(y>page.height-1){y=page.height-1;}
+		if(x<=1){x=1;}
+		else if(x>=page.width-1){x = page.width-1;}
+		else{x+=1;}
+		if(y<=1){y=1;}
+		else if(y>=page.height-1){y=page.height-1;}
+		else{y+=1;}
 		
-		return page.getPsdRGBColor(x,y);
+		return page.getPsdRGBColor(x+1,y);
 	}
+	
+	return {
+			solid:page.psd.selectionIsMonochrome([[left,top],[right,top],[right,bottom],[left,bottom]]),
+			value:'#'+ getColor(left,top)
+		};
 };
 
 /**

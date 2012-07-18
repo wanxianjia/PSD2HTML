@@ -141,23 +141,23 @@ page.element.prototype.text = function(){
 	
 	
 	var start = 0,
-		end = 0;
-	for(var o in pObj){
+		end = 0,
+		newlineLen = 0,
+		createP = true;
+	for(var o=0;o<pObj.length;o++){
 		start = end;
 		end += pObj[o].length + overValue;
 		var p = new XML('<p></p>');
-		isCreateP = true;
 		if(page.option.builder != "normal"){
 			p['@style'] = 'margin:0px;padding:0px;';
 		}else{
 			p['@class'] = 'paragraph';
 		}
-		var len = rangeData.length
+		var len = rangeData.length;
 		for(var i=0;i<rangeData.length;i++){
 			var textRange = rangeData[i],
 				curStart = textRange.range[0],
 				curEnd = textRange.range[1];
-				
 			if(start<=curStart && end+1>=curEnd && end>curStart){
 				var text = textContents.substring(curStart,curEnd);
 				var textTrim = text.replace(/^\s+/, "").replace(/\s+$/, "");
@@ -192,9 +192,10 @@ page.element.prototype.text = function(){
 							span['@style'] = lineCss.join(';')+';';
 						}
 					}
-					
-				}else{
-					isCreateP = false;
+					createP = true;
+					newlineLen ++;
+				}else if(newlineLen == 0){
+					createP = false;
 				}
 			}
 		}
@@ -207,7 +208,16 @@ page.element.prototype.text = function(){
 		if(p.toXMLString().indexOf("span")==-1){
 			p = new XML('<br/>');
 		}
-		elm.appendChild(p);
+		if(createP === true){
+			elm.appendChild(p);
+		}
+		//如果第一行就是BR，没有意思，直接干掉
+		/*if(newLineStart == 0 && p.toXMLString() == '<br/>'){
+			newLineStart == 0;
+		}else{
+			newLineStart ++;
+			elm.appendChild(p);
+		}*/
 		
 		
 	}
@@ -216,8 +226,8 @@ page.element.prototype.text = function(){
 
 page.element.prototype.getCss = function(parentStyle,textRange){
 	var lineCss = [];
-	if(textRange.size != parentStyle.size && textRange.size != 12){
-		lineCss.push('font-size:'+textRange.size+'px');
+	if(textRange.size != parentStyle.size && Math.round(textRange.size) != 12){
+		lineCss.push('font-size:'+Math.round(textRange.size)+'px');
 	}
 	if(textRange.color != parentStyle.color){
 		lineCss.push('color:#'+textRange.color+'');

@@ -173,8 +173,8 @@ page.formatHtml = function(htmlCode){
 	
 	htmlCode = html.join('');
 
-	//过滤多余的span
-	htmlCode = htmlCode.replace(/(<span>)(.*?)(<\/span>)/g,'$2');
+	//过滤多余的span，不可以去掉，文本中的空格要依赖span
+	//htmlCode = htmlCode.replace(/(<span>)(.*?)(<\/span>)/g,'$2');
 	//td内img去空格去换行
 	var img = htmlCode.split('<img'),
 		html = [];
@@ -191,7 +191,15 @@ page.formatHtml = function(htmlCode){
 	htmlCode = html.join('');
 	
 	//还原空格替代符
-	htmlCode = htmlCode.replace(new RegExp(page.spaceStr,'g'),' ');
+	if(page.option.builder == "normal"){
+		htmlCode = htmlCode.replace(new RegExp(page.spaceStr,'g'),' ');
+	}else{
+		htmlCode = htmlCode.replace(new RegExp(page.spaceStr,'g'),'&nbsp;');
+	}
+	
+	//去掉</p>和</div>中间的<br/>
+	htmlCode = htmlCode.replace(/(<\/p>\s*)(<br\/>\s?)*?(\s*<\/[^p])/g, '$1$3');
+	//htmlCode = htmlCode.replace(/(<\/p>)[^<]*?(<br\/><\/a>)/, '</p></a>');
 	return htmlCode;
 	
 };

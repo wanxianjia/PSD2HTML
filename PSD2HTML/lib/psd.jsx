@@ -1,4 +1,4 @@
-﻿// @include "json2-min.jsx"
+// @include "json2-min.jsx"
 // @include "web-fonts.jsx"
 
 //setting for app preferences
@@ -188,7 +188,7 @@ PSD.fn = PSD.prototype = {
 					// text justification
 					switch(textItem.justification.toString()){
 						case 'Justification.LEFT':
-							child.textInfo.textAlign = 'levft';
+							child.textInfo.textAlign = 'left';
 							break;
 						case 'Justification.RIGHT':
 							child.textInfo.textAlign = 'right';

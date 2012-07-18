@@ -25,14 +25,18 @@ page.css.prototype.get = function(){
 		style.push('text-indent:' + textInfo.indent + 'px');
 	}
 	
+	if(textInfo.italic == true){
+		style.push('font-style:italic');
+	}
+	
 	//对齐
 	style.push('text-align:' + textInfo.textAlign + '');
 	//非网页不需要这些样式
 	if(page.option.builder == "normal"){
 		//z-index
 		style.push('z-index:' + item.index);
-		style.push('top:' + item.top + 'px');
-		style.push('left:' + item.left + 'px');
+		style.push('top:' + Math.round(item.top) + 'px');
+		style.push('left:' + Math.round(item.left) + 'px');
 		if(textInfo.font != 'SimSun' && textInfo.font != 'NSimSun'){
 			if(textInfo.font.indexOf(' ')>-1 || textInfo.font.indexOf('-')>-1){
 				style.push('font-family:\''+textInfo.font+'\'');
@@ -53,8 +57,13 @@ page.css.prototype.get = function(){
 	
 	
 	//文字大小
-	style.push('font-size:' + textInfo.size + 'px');
+	style.push('font-size:' + Math.round(textInfo.size) + 'px');
 	style.push('line-height:' + textInfo.lineHeight +'px');
+	
+	if(textInfo.bold == true){
+		style.push('font-weight:bold');
+	}
+	
 	if(textInfo.color != '000000'){
 		style.push('color:#' + textInfo.color);
 	}
