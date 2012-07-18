@@ -198,7 +198,7 @@ page.formatHtml = function(htmlCode){
 	}
 	
 	//去掉</p>和</div>中间的<br/>
-	htmlCode = htmlCode.replace(/(<\/p>\s*)(<br\/>\s?)*?(\s*<\/[^p])/g, '$1$3');
+	htmlCode = htmlCode.replace(/(<\/p>\s*)(<br\/>[^<]*?)*?(\s*<\/[^p])/g, '$1$3');
 	//htmlCode = htmlCode.replace(/(<\/p>)[^<]*?(<br\/><\/a>)/, '</p></a>');
 	return htmlCode;
 	
