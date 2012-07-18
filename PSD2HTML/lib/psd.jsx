@@ -188,7 +188,7 @@ PSD.fn = PSD.prototype = {
 					// text justification
 					switch(textItem.justification.toString()){
 						case 'Justification.LEFT':
-							child.textInfo.textAlign = 'left';
+							child.textInfo.textAlign = 'levft';
 							break;
 						case 'Justification.RIGHT':
 							child.textInfo.textAlign = 'right';

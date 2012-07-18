@@ -298,6 +298,7 @@ page.table.prototype.setThead = function(){
 	if(color.solid === false){
 		var psdImg = page.getPsdImg(top,right,bottom,left);
 		th.appendChild(psdImg.element);
+		th['@align'] = 'right';
 	}else{
 		th['@bgcolor'] = color.value;
 		th.appendChild(new XML());
@@ -305,7 +306,6 @@ page.table.prototype.setThead = function(){
 	
 	th['@colspan'] = this.col+1;	
 	th['@height'] = bottom - top;
-	th['@align'] = 'right';
 	tr.appendChild(th);
 	
 	//创建一列表用来设定宽度
@@ -343,6 +343,7 @@ page.table.prototype.setTfoot = function(){
 	if(color.solid === false){
 		var psdImg = page.getPsdImg(top,right,bottom,left);
 		td.appendChild(psdImg.element);
+		td['@align'] = 'right';
 	}else{
 		td['@bgcolor'] = color.value;
 		td.appendChild(new XML());
@@ -350,7 +351,6 @@ page.table.prototype.setTfoot = function(){
 	
 	td['@colspan'] = this.col+1;	
 	td['@height'] = bottom - top;	
-	td['@align'] = 'right';
 	tr.appendChild(td);
 	this.tfoot.appendChild(tr);
 };
