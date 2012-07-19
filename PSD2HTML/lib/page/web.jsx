@@ -63,9 +63,9 @@ page.web.prototype.parse = function(){
 		var item = this.data.childs[i];
 		if(typeof(item.tag) == 'undefined'){
 			//普通背景图片
-			var bgImg = new XML('<div class="psd2html_bg style' + item.index + '"></div>');
+			var bgImg = new XML('<div class="psd2html_bg style' + i + '"></div>');
 			bgImg.appendChild(new XML());
-			styleCss.appendChild(new XML('.style' + item.index + '{height:' + (item.bottom - item.top) + 'px;background-image:url(slices/' + item.name + ');background-position:center top;}'));
+			styleCss.appendChild(new XML('.style' + i + '{height:' + (item.bottom - item.top) + 'px;background-image:url(slices/' + item.name + ');background-position:center top;}'));
 			body.appendChild(bgImg);
 		}
 	}
