@@ -31,6 +31,11 @@ page.css.prototype.get = function(){
 	
 	//对齐
 	style.push('text-align:' + textInfo.textAlign + '');
+	
+	style.push('zoom:1');
+	if(page.option.builder != "normal"){
+		//style.push('display:inline-block');
+	}
 	//非网页不需要这些样式
 	if(page.option.builder == "normal"){
 		//z-index

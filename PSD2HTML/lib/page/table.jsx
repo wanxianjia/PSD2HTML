@@ -51,6 +51,7 @@ page.table.prototype.createMain = function(){
 	this.tr = {};
 	this.td = {};
 	this.table['@width'] = page.width;
+	this.table['@style'] = 'table-layout:fixed';
 	
 	this.table.appendChild(this.thead);
 	this.table.appendChild(this.tbody);

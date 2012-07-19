@@ -1,4 +1,4 @@
-﻿/*
+/*
 <javascriptresource> 
 <name>PSD TO HTML</name> 
 <about>v1.0--https://github.com/wanxianjia/PSD2HTML</about> 
@@ -30,8 +30,7 @@ var APP = {version: '1.0'};
 				a: Group{\
 					j: RadioButton{text:"'+i18n("staticPage")+'", helpTip:"Normal page", data:"normal",value:true}\
 					e: RadioButton{text:"'+i18n("edm")+'", helpTip:"EDM", data:"EDM"},\
-					l: RadioButton{text:"'+i18n("bbs")+'", helpTip:"Editor code", data:"BBS"},\
-					i: RadioButton{text:"Export JSON and Image", data:"file"}\
+					l: RadioButton{text:"'+i18n("bbs")+'", helpTip:"Editor code", data:"BBS"}\
 				}\
 			},\
 			image: Group{\

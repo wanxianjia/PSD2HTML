@@ -98,7 +98,7 @@ page.data.prototype.parse = function(item){
 		
 	//宽度
 	width += widthOver;
-	
+	right += widthOver
 	if(typeof(lineHeight) == 'string'){
 		//如果行高为百分比，转换为数字
 		lineHeight = Math.round(size*parseInt(lineHeight)/100);
