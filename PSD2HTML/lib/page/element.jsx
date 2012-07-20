@@ -44,17 +44,29 @@ page.element.prototype.getTextElement = function(){
 page.element.prototype.blank = function(){
 	var a = new XML('<a href="'+this.item.link.href+'"></a>'),
 		className = 'style-'+page.option.i,
-		styleCss = ['top:'+this.item.top+'px'];
+		styleCss = [];
 		
 	a.appendChild(new XML());
 	
-	styleCss.push('left:'+ (this.item.left -  Math.round((page.option.width - 952) / 2))+'px');
-	styleCss.push('width:'+this.item.width+'px');
-	styleCss.push('height:'+this.item.height+'px');
+	if(page.option.builder == "normal"){
+		styleCss.push('top:'+this.item.top+'px');
+		styleCss.push('left:'+ (this.item.left -  Math.round((page.option.width - 952) / 2))+'px');
+		styleCss.push('width:'+this.item.width+'px');
+		styleCss.push('height:'+this.item.height+'px');
+		a['@class'] = 'absolute noDecoration '+className;
+		page.option.styleCss.appendChild('.'+className+'{'+styleCss.join(';')+';}'); 
+	}else{
+		var top = this.item.top,
+			left = this.item.left,
+			bottom = top + this.item.height,
+			right = left + this.item.width,
+			psdImgObj = page.getPsdImg(top,right,bottom,left);
+		
+		a['@style'] = styleCss.join(';')+';';
+		a.appendChild(psdImgObj.element);
+		
+	}
 	
-	a['@class'] = 'absolute noDecoration '+className; 
-	
-	page.option.styleCss.appendChild('.'+className+'{'+styleCss.join(';')+';}');
 	
 	return a;
 };

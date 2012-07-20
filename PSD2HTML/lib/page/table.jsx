@@ -51,7 +51,7 @@ page.table.prototype.createMain = function(){
 	this.tr = {};
 	this.td = {};
 	this.table['@width'] = page.width;
-	this.table['@style'] = 'table-layout:fixed';
+	this.table['@style'] = 'table-layout:fixed;';
 	
 	this.table.appendChild(this.thead);
 	this.table.appendChild(this.tbody);
@@ -89,6 +89,7 @@ page.table.prototype.oneColData = function(){
 	tr.appendChild(td);
 	
 	this.table['@width'] = page.width;
+	this.table['@style'] = 'table-layout:fixed;';
 	this.table.appendChild(tr);
 	
 };
