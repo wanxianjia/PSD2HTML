@@ -64,7 +64,7 @@ page.init = function(data,option,psd){
 		alert(i18n("processDone"));
 		
 	}catch(e){
-		alert('亲，出错了。\r-------------------\r参考信息：'+e.message+'\r-------------------\r信息反馈请联系肖武明\r旺旺：xiwm2001\r分机：35969');
+		alert(i18n.txtMap.errorMsg(e.message));
 	}
 	//显示所有文本图层
 	psd.visibleTextLayers();
