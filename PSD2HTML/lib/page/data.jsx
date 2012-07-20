@@ -113,7 +113,7 @@ page.data.prototype.parse = function(item){
 	bottom += topOver + 5;
 	
 	//单行而最后一个字符等于标点符合，那么他的宽度加上文字大小
-	if(item.textInfo.textType == 'TextType.POINTTEXT' && contents.indexOf("\n")==-1 && new RegExp(contents.substr(contents.length-1)).test(this.unicode)){
+	if(item.textInfo.textType == 'TextType.POINTTEXT' && contents.indexOf("\n")==-1 && new RegExp(contents.substr(contents.length-2)).test(this.unicode)){
 		width += size;
 		right += size;
 	}else if(item.textInfo.textType == 'TextType.PARAGRAPHTEXT' && contents.indexOf("\r") == -1 && new RegExp(contents.substr(contents.length-1,contents.length)).test(this.unicode)){

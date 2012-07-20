@@ -28,12 +28,14 @@ page.web.prototype.parse = function(){
 		title = new XML('<title>' + page.title + '</title>'),
 		body = new XML('<body></body>'),
 		doc = new XML('<div id="doc" class="page_doc"></div>'),
+		encode = new XML('<meta http-equiv="Content-Type" content="text/html; charset='+page.encode+'" />'),
 		pageContent = new XML('<div class="psd2html page"></div>'), 
 		styleCss = new XML('<style type="text/css"></style>');
 		len = this.data.childs.length;
 	
 	//头信息
 	head.appendChild(new XML('<meta name="builder" content="by psdToHtml,version 1.0" />'));
+	head.appendChild(new XML(encode));
 	//设置content的样式
 	styleCss.appendChild(new XML('.page{height:' + page.height + 'px;margin:0px auto -'+page.height+'px auto;}'));
 	//网页依赖的CSS/js文件	
@@ -41,9 +43,9 @@ page.web.prototype.parse = function(){
 	head.appendChild(new XML('<meta http-equiv="Content-Type" content="text/html; charset=' + page.encode + '" />'));
 	//以下引用的style文件要随着增量发布的时间戳而更新
 	head.appendChild(new XML('<link href="http://style.china.alibaba.com/app/bp/css/psd2html/1.0/global.20120709.css" rel="stylesheet" type="text/css" />'));
-	var importScript = new XML('<script src="http://style.china.alibaba.com/app/bp/js/psd2html/1.0/global.20120709.js" type="text/javascript"></script>');
-	importScript.appendChild(new XML());
-	head.appendChild(importScript);
+	//var importScript = new XML('<script src="http://style.china.alibaba.com/app/bp/js/psd2html/1.0/global.20120709.js" type="text/javascript"></script>');
+	//importScript.appendChild(new XML());
+	//head.appendChild(importScript);
 	//内联的CSS
 	head.appendChild(styleCss);
 	//网页标题

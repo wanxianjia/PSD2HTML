@@ -98,9 +98,11 @@ page.edmHtml = function(data){
 	var html = new XML('<html xmlns="http://www.w3.org/1999/xhtml"></html>'),
 		head = new XML('<head></head>'),
 		title = new XML('<title>' + data.name + '</title>'),
+		encode = new XML('<meta http-equiv="Content-Type" content="text/html; charset='+page.encode+'" />'),
 		body = new XML('<body></body>');
 	
 	body.appendChild(new page.table(data));
+	head.appendChild(encode);
 	head.appendChild(title);
 	html.appendChild(head);
 	html.appendChild(body);
@@ -197,9 +199,21 @@ page.formatHtml = function(htmlCode){
 		htmlCode = htmlCode.replace(new RegExp(page.spaceStr,'g'),'&nbsp;');
 	}
 	
+	//把“&amp;”字符替换成"&"
+	htmlCode = htmlCode.replace(new RegExp('&amp;','g'),"&");
+	
 	//去掉</p>和</div>中间的<br/>
 	htmlCode = htmlCode.replace(/(<\/p>\s*)(<br\/>[^<]*?)*?(\s*<\/[^p])/g, '$1$3');
 	//htmlCode = htmlCode.replace(/(<\/p>)[^<]*?(<br\/><\/a>)/, '</p></a>');
 	return htmlCode;
 	
 };
+
+/**
+ * 转义文本中的HTML 
+ */
+page.replaceHtml = function(strSource){
+	strSource = strSource.replace(/</g,"&lt;");
+	strSource = strSource.replace(/>/g,"&gt;");
+    return strSource;
+}

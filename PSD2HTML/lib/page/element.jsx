@@ -166,6 +166,7 @@ page.element.prototype.text = function(){
 					var span = new XML('<span></span>'),
 						//文本片段
 						textSpan = textContents.substring(curStart,curEnd);
+					textSpan = page.replaceHtml(textSpan);
 					span.appendChild(new XML(textSpan.replace(new RegExp(' ','g'),page.spaceStr)));
 					p.appendChild(span);
 					if(page.option.builder == "normal"){

@@ -386,15 +386,16 @@ page.table.prototype.insertRow = function(){
 				}
 				
 				//背景
-				var color = this.getSolidColor(item.object.left,item.object.top,item.object.right,item.object.bottom);
-				if(color.solid === false){
-					var psdImg = page.getPsdImg(item.object.top,item.object.right,item.object.bottom,item.object.left);
-					this.td[tdKey]['@background'] = 'slices/' + psdImg.imgObject.name;
-					this.td[tdKey]['@bgcolor'] = color.value;
-				}else{
-					this.td[tdKey]['@bgcolor'] = color.value;
+				if(item.object.tag == "text"){
+					var color = this.getSolidColor(item.object.left,item.object.top,item.object.right,item.object.bottom);
+					if(color.solid === false){
+						var psdImg = page.getPsdImg(item.object.top,item.object.right,item.object.bottom,item.object.left);
+						this.td[tdKey]['@background'] = 'slices/' + psdImg.imgObject.name;
+						this.td[tdKey]['@bgcolor'] = color.value;
+					}else{
+						this.td[tdKey]['@bgcolor'] = color.value;
+					}
 				}
-				
 			}else{
 				//没内容
 				var colspan = 0,
