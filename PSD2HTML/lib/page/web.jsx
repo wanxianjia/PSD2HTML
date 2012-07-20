@@ -12,7 +12,7 @@
  * @param {Object} data
  */
 page.web = function(data){
-	this.htmlCode = '';
+	this.htmlCode = null;
 	this.data = data;
 	this.textData = new page.data(data.childs).textData;
 	this.parse();

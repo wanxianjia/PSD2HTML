@@ -45,7 +45,7 @@ page.data = function(data){
  */
 page.data.prototype.getUsefulData = function(){
 	for(var i in this.data){
-		if(this.data[i].tag == 'text' || this.data[i].tag == 'img'){
+		if(this.data[i].tag == 'text' || this.data[i].tag == 'img' || this.data[i].tag == 'blank'){
 			var data = this.data[i];
 			//主体部分之外的
 			if(data.left < 0 || data.left>page.width || data.top<0 || data.top>page.height || data.right<0 || data.right>page.width || data.bottom<0||data.bottom >page.height){
@@ -174,7 +174,8 @@ page.data.prototype.parse = function(item){
 page.data.prototype.setLackTextObj = function(){
 	var textInfo = {
 		size:0,
-		lineHeight:0
+		lineHeight:0,
+		contents:page.spaceStr
 	};
 	return textInfo;
 };

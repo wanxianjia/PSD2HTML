@@ -30,7 +30,7 @@ page.init = function(data,option,psd){
 	page.psd = psd;
 	//隐藏所有文本
 	page.hideAllTextLayers();
-	try{
+	//try{
 		page.option = option;
 		page.title = data.name;
 		page.width = option.width;
@@ -63,9 +63,9 @@ page.init = function(data,option,psd){
 		
 		alert(i18n("processDone"));
 		
-	}catch(e){
-		alert('亲，出错了。\r-------------------\r参考信息：'+e.message+'\r-------------------\r信息反馈请联系肖武明\r旺旺：xiwm2001\r分机：35969');
-	}
+	//}catch(e){
+	//	alert('亲，出错了。\r-------------------\r参考信息：'+e.message+'\r-------------------\r信息反馈请联系肖武明\r旺旺：xiwm2001\r分机：35969');
+	//}
 	//显示所有文本图层
 	psd.visibleTextLayers();
 };
