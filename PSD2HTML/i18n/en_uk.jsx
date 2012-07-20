@@ -15,6 +15,6 @@ i18n.txtMap = {
 	aboutPSD2HTML 	: 'PSD TO HTML(V: 1.0) is a plugin to generate HTML from PSD files for Photoshop, gitHub repo: https://github.com/wanxianjia/PSD2HTML',
 	pathCannotIncludeDoubleBytes: 'Path can not include double bytes',
 	errorMsg :function(msg){
-		return '亲，出错了。\r-------------------\r参考信息：'+e.message+'\r-------------------\r信息反馈请联系\rxiaowuming@gmail.com\rokwxj@qq.com'
+		return 'Oops! Error occured.\r-------------------\rError message: '+e.message+'\r-------------------\rFeel free to contact us:\rxiaowuming@gmail.com\rokwxj@qq.com'
 	}
 }
