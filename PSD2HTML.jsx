@@ -113,7 +113,7 @@ var APP = {version: '1.0'};
 			if(!APP.OPTION.builder){
 				alert(i18n("selectPageType"));
 			}else{
-                  
+                APP.OPTION.output = APP.win.option.output.s.text;
 				APP.OPTION.image.quality = APP.win.option.image.q.s.text;
 				APP.win.close();
 				APP.win = new Window('palette{\
