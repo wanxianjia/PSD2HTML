@@ -1,4 +1,4 @@
-// @include "json2-min.jsx"
+﻿// @include "json2-min.jsx"
 // @include "web-fonts.jsx"
 
 //setting for app preferences
@@ -225,8 +225,8 @@ PSD.fn = PSD.prototype = {
 					_content.push(child);
 				}else if(this.imgReg.test(layer.name)){
 					child.tag = 'img';
-					var region = [[left, top], [right, top], [right, bottom], [left, bottom]];
-					child.src = this.exportSelection(region).name;
+					//var region = [[left, top], [right, top], [right, bottom], [left, bottom]];
+					//child.src = this.exportSelection(region).name;
 					
 					child.textInfo = undefined;
 					this.contentLayers.push(layer);
@@ -368,6 +368,7 @@ PSD.fn = PSD.prototype = {
 		var	selection = this.doc.selection, xset = [], yset = [];
 		selection.select(region);
 		selection.copy(true);
+		//selection.deselect();
 		
 		for(var i = 0, l = region.length; i < l; i++){
 			xset.push(region[i][0]);
@@ -456,8 +457,9 @@ PSD.fn = PSD.prototype = {
 		
 		for(var i = 0, l = cs.length; i < l; i++){
 			var histogram = cs[i].histogram.concat();
+			$.writeln(histogram.join('-'));
 			histogram.sort().reverse();
-			if(histogram[1] != 0) return false;
+			//if(histogram[1] != 0) return false;
 		}
 		//var his = this.doc.historyStates;
 		//this.doc.activeHistoryState = his[his.length - 1];
