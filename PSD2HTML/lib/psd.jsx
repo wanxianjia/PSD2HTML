@@ -459,7 +459,7 @@ PSD.fn = PSD.prototype = {
 			var histogram = cs[i].histogram.concat();
 			$.writeln(histogram.join('-'));
 			histogram.sort().reverse();
-			//if(histogram[1] != 0) return false;
+			if(histogram[1] != 0) return false;
 		}
 		//var his = this.doc.historyStates;
 		//this.doc.activeHistoryState = his[his.length - 1];
