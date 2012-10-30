@@ -102,6 +102,21 @@ PSD.fn = PSD.prototype = {
 	    }
 	    return effects;
 	},
+	// 获取当前图层 id
+	getLayerId: function(){
+		var ref = new ActionReference();
+		ref.putEnumerated(charIDToTypeID("Lyr "), charIDToTypeID("Ordn"), charIDToTypeID("Trgt"));
+		
+		var desc = executeActionGet(ref);
+		
+		 if (desc.hasKey( charIDToTypeID('LyrI'))){
+			 var desc = executeActionGet(ref);
+			 var layerId = desc.getInteger(charIDToTypeID('LyrI'));
+			 return layerId;
+		}else{
+				return -1;
+		}
+	},
 	// 获取图层信息
 	_getLayerInfo: function(layer, context, skip){
 		_index++;
