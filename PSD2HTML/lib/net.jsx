@@ -11,7 +11,7 @@
 				header:{
 					"Content-Type": "multipart/form-data",
 					//"Accept": "*/*",
-					"Content-Length": 319,
+					"Content-Length": 99999999999,
 					//"User-Agent": "PSD2HTML",
 					"Connection": "Keep-Alive",
 					"Pragma": "no-cache",
@@ -40,7 +40,7 @@
 			dataArr.push(" HTTP/1.1\r\n");
 			// 头
 			var header = opt.header;
-			var sp = "---------------------------aa"//+ (Math.random() * 10000 | 0) + +new Date;
+			var sp = "---------------------------p2h"+ (Math.random() * 10000 | 0) + +new Date;
 			
 			for(var k in header){
 				dataArr.push(k);
@@ -64,9 +64,10 @@
 				dataArr.push("--"+sp+"\r\n");
 				dataArr.push("Content-Disposition: form-data; ");
 				dataArr.push('name="'+k+'";');
-				dataArr.push('filename="'+(opt.files[k].fsName)+'"');
+				dataArr.push('filename="'+(opt.files[k].fsName.replace(/([^\x00-\xff])/g,  function(s){ return encodeURI(s)}))+'"');
 				dataArr.push("\r\n\r\n");
 				var f = opt.files[k];
+				f.encoding = "BINARY";
 				f.open('r');
 				var str = f.read();
 				f.close();
@@ -104,5 +105,5 @@ PSD.net.remote({
 	url:"http://127.0.0.1/upload",
 	port:8000,
 	data:{te:"wanxianjia"},
-	files:{psd:File("C:\\Users\\xianjia.wanxj\\Desktop\\test.txt")}
+	files:{psd:File("C:/Users/xianjia.wanxj/Desktop/服务介绍页面-我是采购商.png"), txt:File("C:/Users/xianjia.wanxj/Desktop/test.txt")}
 });
