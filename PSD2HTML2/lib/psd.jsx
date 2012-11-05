@@ -12,6 +12,7 @@ function PSD(option){
 	this.tree = {name:this.doc.name, width:this.doc.width.value, height:this.doc.height.value, imgCount:0, childs:[]};
 	this.textLayers = [];						//存储所有的文本图层
 	this.contentLayers = [];        			//存储所有的文本图层和图片
+	this.contentObjList = [];
 	this.allLayers = [];
 	this.linkReg = /^[aA]$|^[aA]-/;
 	this.imgReg = /img/;
@@ -63,7 +64,7 @@ PSD.fn = PSD.prototype = {
 		this.dir = Folder(this.output + '/' + this.getPSDName());
 		!this.dir.exists && this.dir.create();
 		
-		//this.createSnapshotOnStart();
+		this.createSnapshot();
 	},
 	// 遍历所有图层
 	parse: function(layers, context, skip){
@@ -121,60 +122,62 @@ PSD.fn = PSD.prototype = {
 	},
 	_getTextInfo: function(layer){
 		var textInfo = {};
-		if(!layer.kind || (layer.kind && layer.kind.toString() !== "LayerKind.TEXT")) return null;
-		
-		var textItem = layer.textItem;
-					
-		textInfo = {
-			/*color: textItem.color.rgb.hexValue, 
-			contents:textItem.contents, 
-			font: WEBFONTS.getWebFont(textItem.font), 
-			size: Math.round(textItem.size.value),
-			textType: textItem.kind.toString(),
-			bold: textItem.fauxBold,
-			italic: textItem.fauxItalic,
-			indent: Math.round(textItem.firstLineIndent.value),
-			underline: textItem.underline == UnderlineType.UNDERLINEOFF ? false : true,
-			textRange: this.getTextRange(),
-			position:{x: textItem.position[0].value, y: textItem.position[1].value},
-			leftIndent: textItem.leftIndent.value,
-			rightIndent: textItem.rightIndent.value*/
-		};
-		if(textItem.kind == TextType.PARAGRAPHTEXT){
-			textInfo.width = layer.textItem.width.value;
-			textInfo.height = layer.textItem.height.value;
-			
-			// text justification
-			switch(textItem.justification.toString()){
-				case 'Justification.LEFT':
-					textInfo.textAlign = 'left';
-					break;
-				case 'Justification.RIGHT':
-					textInfo.textAlign = 'right';
-					break;
-				case 'Justification.CENTER':
-					textInfo.textAlign = 'center';
-					break;
-				case 'Justification.CENTERJUSTIFIED':
-				case 'Justification.FULLYJUSTIFIED':
-				case 'Justification.LEFTJUSTIFIED':
-				case 'Justification.RIGHTJUSTIFIED':
-					textInfo.textAlign = 'justify';
-					break;
-				default:
-					textInfo.textAlign = 'left';
+		try{
+			if(!layer.kind || (layer.kind && layer.kind.toString() !== "LayerKind.TEXT")) return null;
+			var textItem = layer.textItem;
+						
+			textInfo = {
+				color: textItem.color.rgb.hexValue, 
+				contents: textItem.contents, 
+				font: WEBFONTS.getWebFont(textItem.font), 
+				size: Math.round(textItem.size.value),
+				textType: textItem.kind.toString(),
+				bold: textItem.fauxBold,
+				italic: textItem.fauxItalic,
+				indent: Math.round(textItem.firstLineIndent.value),
+				underline: textItem.underline == UnderlineType.UNDERLINEOFF ? false : true,
+				textRange: this.getTextRange(),
+				position:{x: textItem.position[0].value, y: textItem.position[1].value},
+				leftIndent: textItem.leftIndent.value,
+				rightIndent: textItem.rightIndent.value
+			};
+			if(textItem.kind == TextType.PARAGRAPHTEXT){
+				textInfo.width = layer.textItem.width.value;
+				textInfo.height = layer.textItem.height.value;
+				
+				// text justification
+				switch(textItem.justification.toString()){
+					case 'Justification.LEFT':
+						textInfo.textAlign = 'left';
+						break;
+					case 'Justification.RIGHT':
+						textInfo.textAlign = 'right';
+						break;
+					case 'Justification.CENTER':
+						textInfo.textAlign = 'center';
+						break;
+					case 'Justification.CENTERJUSTIFIED':
+					case 'Justification.FULLYJUSTIFIED':
+					case 'Justification.LEFTJUSTIFIED':
+					case 'Justification.RIGHTJUSTIFIED':
+						textInfo.textAlign = 'justify';
+						break;
+					default:
+						textInfo.textAlign = 'left';
 
+				}
 			}
+			// line height
+			if(!textItem.useAutoLeading){
+				textInfo.lineHeight = Math.round(textItem.leading.value);
+			}else{
+				try{
+					textInfo.lineHeight = Math.round(textItem.autoLeadingAmount) + '%';
+				}catch(e){}
+			}
+		}catch(e){
+			alert(e + " on layer " + layer.name);
 		}
-		// line height
-		if(!textItem.useAutoLeading){
-			textInfo.lineHeight = Math.round(textItem.leading.value);
-		}else{
-			try{
-				textInfo.lineHeight = Math.round(textItem.autoLeadingAmount) + '%';
-			}catch(e){}
-		}
-		
 		return textInfo;
 	},
 	_processTagsFun: {
@@ -189,32 +192,33 @@ PSD.fn = PSD.prototype = {
 			return layer;
 		},
 		a: function(layer){
-			layer.link = true;
 			
 			if(layer.typename === 'LayerSet'){
 				layer = layer.merge();
 				this._processTagsFun.img(layer);
 			}else if(layer.typename === 'ArtLayer'){
 				
-				/*if(layer.kind.toString () === "LayerKind.TEXT"){
-					var textItem = layer.textItem;
-					
-					if(WEBFONTS.indexOf(textItem.font) < 0 || this.getEffects().length > 0 || textItem.warpStyle !== WarpStyle.NONE){
-						layer.rasterize();		//栅格化
-						this._processTagsFun.img(layer);
-					}
-				}*/
+				if(layer.kind.toString () !== "LayerKind.TEXT"){
+					layer.tag = "img";
+				}
 			}
-		
+			layer.isLink = {href:"#"};
 			return layer;
 		}
 	},
     _processTags: function(tags, layer){
 		if(layer.kind && layer.kind.toString () === "LayerKind.TEXT"){
 			var textItem = layer.textItem;
-					
-			if(WEBFONTS.indexOf(textItem.font) < 0 || this.getEffects().length > 0 || textItem.warpStyle !== WarpStyle.NONE){
-				layer.rasterize();		//栅格化
+			
+			try{
+				if(WEBFONTS.indexOf(textItem.font) < 0 || this.getEffects().length > 0 || textItem.warpStyle !== WarpStyle.NONE){
+					layer.rasterize();		//栅格化
+				}else{
+					layer.tag = "text";
+				}
+			}catch(e){
+				layer.tag = "text";
+				alert(e+" on layer:"+layer.name);
 			}
 		}
 	
@@ -272,35 +276,37 @@ PSD.fn = PSD.prototype = {
 			id: id
 		}
 	
-		child.textInfo = this._getTextInfo(layer);
-        
-        var reg = /#img|#a/g;
-        var tags = layer.name.match(reg);
-        
+		var reg = /#img|#a/g;
+		var tags = layer.name.match(reg);
+
 		layer = this._processTags(tags, layer);
 		this.allLayers.push(layer);
-        
+
 		child.tag = layer.tag;
-		child.link = layer.link;
+		child.isLink = layer.isLink;
 		child.layer = layer;
-		
+	
+		child.textInfo = this._getTextInfo(layer);
+        
 		if(layer.typename === 'ArtLayer'){
 			
-			_content.push(child);
 			context.childs.push(child);
 			
 			if(layer.kind.toString () === "LayerKind.TEXT"){
 				this.contentLayers.push(layer);
 				this.textLayers.push(layer);
+				if(!child.tag) child.tag = "text";
+				this.contentObjList.push(child);
 			}
 		
 			if(layer.tag === "img"){
 				this.contentLayers.push(layer);
+				this.contentObjList.push(child);
 			}
 			
 		}else if(layer.typename == 'LayerSet'){
 				
-			var o = {type:layer.typename, name:layer.name, index:_index, childs:[]};
+			var o = {type:layer.typename, name:layer.name, index:id, childs:[]};
 			context.childs.push(o);
 			this.parse(layer.layers, o, skip);
 		}
@@ -317,8 +323,7 @@ PSD.fn = PSD.prototype = {
 		return img;
 		//this.visibleTextLayers();
 	},
-	exportImage: function(layer, index){
-		this.hiddenTextLayers();
+	exportLayer: function(layer){
 		try{
 			var bounds = layer.bounds;
 			layer.copy();
@@ -328,7 +333,7 @@ PSD.fn = PSD.prototype = {
 			newDoc.paste();
 			newDoc.layers[newDoc.layers.length - 1].remove();
 			
-			var img= new File(this.imagesFolder + "/layer_"+_index+".png");
+			var img= new File(this.imagesFolder + "/layer_"+layer.id+".png");
 			var options = new ExportOptionsSaveForWeb();
 			options.format = SaveDocumentType.PNG;
 			newDoc.exportDocument (img, ExportType.SAVEFORWEB, options);
@@ -336,7 +341,6 @@ PSD.fn = PSD.prototype = {
 		}catch(e){	
 			alert(e+'#####'+layer.name);
 		}
-		this.visibleTextLayers();
 	},
 	exportJSON: function(data, format){
 		var f = new File(this.dir + "/json.txt");
@@ -349,21 +353,10 @@ PSD.fn = PSD.prototype = {
 	getJSON: function(){
 		return this.tree;
 	},
-	hiddenTextLayers: function(){
-		for(var i = 0, l = this.contentLayers.length; i < l; i++){
-			if(!this.contentLayers[i].visible) continue;
-			this.contentLayers[i].visible = false;
-		}
-	},
-	visibleTextLayers: function(){
-		for(var i = 0, l = this.contentLayers.length; i < l; i++){
-			if(this.contentLayers[i].visible) continue;
-			this.contentLayers[i].visible = true;
-		}
-	},
+	
 	/* 自动切片并导出图片 */
 	autoSliceAndExport: function(exportConfig, height){
-		this.hiddenTextLayers();
+		this.contentLayers.hide();
 		
 		var conf = exportConfig || _exportConfig;
 		var extension = _getExtension(conf);
@@ -412,7 +405,7 @@ PSD.fn = PSD.prototype = {
 		}catch(e){
 			// TODO
 		}
-		this.visibleTextLayers();
+		this.contentLayers.show();
 		return _slices;
 	},
 	// 导出选择区域
@@ -460,10 +453,6 @@ PSD.fn = PSD.prototype = {
 		//this.exportJSON(data);
 		return data;
 	},
-	
-	getTextLayers: function(){
-		return _content;
-	},
 	// 获取text range
 	getTextRange: function(){
 		var desc = (function(){
@@ -507,6 +496,7 @@ PSD.fn = PSD.prototype = {
 		PSD.colorSampler.move([UnitValue(x, 'px'), UnitValue(y, 'px')]);
 		return PSD.colorSampler.color.rgb.hexValue;
 	},
+	// 判断所选区域是否单色
 	selectionIsMonochrome: function(region){
 		var	selection = this.doc.selection,
 			cs = this.doc.channels;
@@ -515,7 +505,6 @@ PSD.fn = PSD.prototype = {
 		
 		for(var i = 0, l = cs.length; i < l; i++){
 			var histogram = cs[i].histogram.concat();
-			$.writeln(histogram.join('-'));
 			histogram.sort().reverse();
 			if(histogram[1] != 0) return false;
 		}
@@ -523,51 +512,45 @@ PSD.fn = PSD.prototype = {
 		//this.doc.activeHistoryState = his[his.length - 1];
 		return true;
 	},
+	// 使PSD恢复到运行PSD2HTML插件之前的状态。
 	reset: function(){
-		this.doc.activeHistoryState = this.doc.historyStates.getByName("psdtohtml");
+		this.doc.activeHistoryState = this.doc.historyStates.getByName(this.lastSnapshotName);
 		this.doc.save();
 	},
-	createSnapshotOnStart: function(){
-		var his = this.doc.historyStates;
-		try{
-			// if has psdtohtml snapshot
-			var snapshot = his.getByName("psdtohtml");
-			this.doc.activeHistoryState = snapshot;
-			// delete it
-			var idDlt = charIDToTypeID( "Dlt " );
-			var desc175 = new ActionDescriptor();
-			var idnull = charIDToTypeID( "null" );
-				var ref131 = new ActionReference();
-				var idHstS = charIDToTypeID( "HstS" );
-				var idCrnH = charIDToTypeID( "CrnH" );
-				ref131.putProperty( idHstS, idCrnH );
-			desc175.putReference( idnull, ref131 );
-			executeAction( idDlt, desc175, DialogModes.NO );
-		}catch(e){
-			
-		}
-		// create snapshot
-		var idMk = charIDToTypeID( "Mk  " );
-		var desc202 = new ActionDescriptor();
-		var idnull = charIDToTypeID( "null" );
-			var ref163 = new ActionReference();
-			var idSnpS = charIDToTypeID( "SnpS" );
-			ref163.putClass( idSnpS );
-		desc202.putReference( idnull, ref163 );
-		var idFrom = charIDToTypeID( "From" );
-			var ref164 = new ActionReference();
-			var idHstS = charIDToTypeID( "HstS" );
-			var idCrnH = charIDToTypeID( "CrnH" );
-			ref164.putProperty( idHstS, idCrnH );
-		desc202.putReference( idFrom, ref164 );
-		var idNm = charIDToTypeID( "Nm  " );
-		desc202.putString( idNm, "psdtohtml" );
-		var idUsng = charIDToTypeID( "Usng" );
-		var idHstS = charIDToTypeID( "HstS" );
-		var idFllD = charIDToTypeID( "FllD" );
-		desc202.putEnumerated( idUsng, idHstS, idFllD );
-		executeAction( idMk, desc202, DialogModes.NO );
+	// 创建快照
+	createSnapshot: function(){
+		var desc = new ActionDescriptor();
+		var sref = new ActionReference();
+		sref.putClass(charIDToTypeID("SnpS")); 
+		desc.putReference(charIDToTypeID("null"), sref); 
+		var fref = new ActionReference(); 
+		fref.putProperty(charIDToTypeID("HstS"), charIDToTypeID("CrnH")); 
+		desc.putReference(charIDToTypeID("From"), fref ); 
+		var now = new Date(),
+			month = now.getMonth(),
+			date = now.getDate(),
+			hour = now.getHours(),
+			minute = now.getMinutes(),
+			second = now.getSeconds();
+		
+		var dateStr = (month + 1) + "-" + date + " " + hour + ":" + minute + ":" + second;
+		var sName = "PSD2HTML "+ dateStr;
+		this.lastSnapshotName = sName;
+		
+		desc.putString( charIDToTypeID( "Nm  " ), sName);
+		executeAction(charIDToTypeID("Mk  "), desc, DialogModes.NO ); 
 	}
 }
-
 })();
+
+Array.prototype.hide = function(){
+	for(var i = 0, len = this.length; i < len; i++){
+		if("visible" in this[i]) this[i].visible = false;
+	}
+};
+
+Array.prototype.show = function(){
+	for(var i = 0, len = this.length; i < len; i++){
+		if("visible" in this[i]) this[i].visible = true;
+	}
+};
