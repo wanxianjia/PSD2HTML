@@ -1,7 +1,19 @@
-/*
+﻿/*
 * the util file, will contain all the util method
 */ 
 
+PSD = $.global.PSD || {};
+PSD.util = {
+	log: function(){
+		var now = new Date();
+		var today = now.getFullYear() + "-" + (now.getMonth() + 1) + "-" + now.getDate();
+		var f = File(app.path+"/Presets/Scripts/PSD2HTML/log/log-"+today+".txt");
+		f.open("a");
+		f.write(Array.prototype.join.call(arguments, "#")+"\n");
+		f.close();
+	}
+}
+PSD.util.log($.fileName, $.line, "aaaa", "aaaa")
 String.prototype.trim = function() {
   return this.replace(/^[\s]+|[\s]+$/g, '');
 };
@@ -31,3 +43,4 @@ String.prototype.reverse = function() {
    }
    return r;
 };
+

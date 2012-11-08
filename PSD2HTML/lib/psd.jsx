@@ -1,10 +1,10 @@
 ﻿// @include "json2-min.jsx"
 // @include "web-fonts.jsx"
+// @include "util.jsx"
 
 //setting for app preferences
 app.preferences.rulerUnits = Units.PIXELS;
 app.preferences.typeUnits = TypeUnits.PIXELS;
-     
 
 function PSD(option){
 	this.doc = app.activeDocument;
@@ -113,18 +113,19 @@ PSD.fn = PSD.prototype = {
 		var desc = executeActionGet(ref);
 		
 		 if (desc.hasKey( charIDToTypeID('LyrI'))){
-			 var desc = executeActionGet(ref);
-			 var layerId = desc.getInteger(charIDToTypeID('LyrI'));
-			 return layerId;
+			var desc = executeActionGet(ref);
+			var layerId = desc.getInteger(charIDToTypeID('LyrI'));
+			return layerId;
 		}else{
-				return -1;
+			return -1;
 		}
 	},
 	_getTextInfo: function(layer){
 		var textInfo = {};
 		
-			if(!layer.kind || (layer.kind && layer.kind.toString() !== "LayerKind.TEXT")) return null;
-			var textItem = layer.textItem;
+		if(!layer.kind || (layer.kind && layer.kind.toString() !== "LayerKind.TEXT")) return null;
+		var textItem = layer.textItem;
+		
 		try{				
 			textInfo = {
 				color: textItem.color.rgb.hexValue, 
@@ -175,11 +176,11 @@ PSD.fn = PSD.prototype = {
 				try{
 					textInfo.lineHeight = Math.round(textItem.autoLeadingAmount) + '%';
 				}catch(e){
-					$.writeln("#001:" + e + " on layer " + layer.name);
+					PSD.util.log($.fileName, $.line, e, " on layer " + layer.name);
 				}
 			}
 		}catch(e){
-			$.writeln("#002:" + e + " on layer " + layer.name);
+			PSD.util.log($.fileName, $.line, e, " on layer " + layer.name);
 		}
 		return textInfo;
 	},
@@ -221,7 +222,7 @@ PSD.fn = PSD.prototype = {
 				}
 			}catch(e){
 				layer.tag = "text";
-				alert(e+" on layer:"+layer.name);
+				PSD.util.log($.fileName, $.line, e, " on layer " + layer.name);
 			}
 		}
 	
@@ -242,7 +243,9 @@ PSD.fn = PSD.prototype = {
 		
 		try{
 			if(skip && skip(layer)) return "skip this layer";
-		}catch(e){}
+		}catch(e){
+			PSD.util.log($.fileName, $.line , e, " on layer " + layer.name)
+		}
 		
 		this.doc.activeLayer = layer;
 		
@@ -324,7 +327,6 @@ PSD.fn = PSD.prototype = {
 		//$.writeln(img.length);
 		this.visibleTextLayers();
 		return img;
-		//this.visibleTextLayers();
 	},
 	exportImage: function(layer){
 
@@ -343,7 +345,7 @@ PSD.fn = PSD.prototype = {
 			newDoc.exportDocument (img, ExportType.SAVEFORWEB, options);
 			newDoc.close(SaveOptions.DONOTSAVECHANGES);
 		}catch(e){	
-			alert(e+'#####'+layer.name);
+			PSD.util.log($.fileName, $.line, e , layer.name);
 		}
 	},
 	exportJSON: function(data, format){
@@ -412,7 +414,7 @@ PSD.fn = PSD.prototype = {
 			}
 			selection.deselect();
 		}catch(e){
-			// TODO
+			PSD.util.log($.fileName, $.line, e , layer.name);
 		}
 		PSD.show(this.contentLayers);
 		return _slices;

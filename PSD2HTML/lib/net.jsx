@@ -1,5 +1,5 @@
 ﻿(function(){
-	PSD = {};
+	PSD = $.global.PSD || {};
 	PSD.net = {
 		remote:function(conf){
 			var opt = {
