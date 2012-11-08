@@ -13,7 +13,7 @@ PSD.util = {
 		f.close();
 	}
 }
-PSD.util.log($.fileName, $.line, "aaaa", "aaaa")
+
 String.prototype.trim = function() {
   return this.replace(/^[\s]+|[\s]+$/g, '');
 };
