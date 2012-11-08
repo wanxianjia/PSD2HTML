@@ -9,8 +9,11 @@ app.preferences.typeUnits = TypeUnits.PIXELS;
 function PSD(option){
 	this.doc = app.activeDocument;
 	this.docs = app.documents;
-	this.tree = {name:this.doc.name, width:this.doc.width.value, height:this.doc.height.value, imgCount:0, childs:[]};
-	this.contentLayers = [];        //存储所有的文本图层
+	this.tree = {name:this.doc.name, width:this.doc.width.value, height:this.doc.height.value, childs:[]};
+	this.textLayers = [];						//存储所有的文本图层
+	this.contentLayers = [];        			//存储所有的文本图层和图片
+	this.contentObjList = [];
+	this.allLayers = [];
 	this.linkReg = /^[aA]$|^[aA]-/;
 	this.imgReg = /img/;
 	this.layers = this.doc.layers;
@@ -61,10 +64,10 @@ PSD.fn = PSD.prototype = {
 		this.dir = Folder(this.output + '/' + this.getPSDName());
 		!this.dir.exists && this.dir.create();
 		
-		//this.createSnapshotOnStart();
+		this.createSnapshot();
 	},
 	// 遍历所有图层
-	parseLayers: function(layers, context, skip){
+	parse: function(layers, context, skip){
 		layers = layers || this.layers;
 	
 		if(this.option.exportImages){
@@ -117,149 +120,198 @@ PSD.fn = PSD.prototype = {
 				return -1;
 		}
 	},
+	_getTextInfo: function(layer){
+		var textInfo = {};
+		
+			if(!layer.kind || (layer.kind && layer.kind.toString() !== "LayerKind.TEXT")) return null;
+			var textItem = layer.textItem;
+		try{				
+			textInfo = {
+				color: textItem.color.rgb.hexValue, 
+				contents: textItem.contents, 
+				font: WEBFONTS.getWebFont(textItem.font), 
+				size: Math.round(textItem.size.value),
+				textType: textItem.kind.toString(),
+				bold: textItem.fauxBold,
+				italic: textItem.fauxItalic,
+				indent: Math.round(textItem.firstLineIndent.value),
+				underline: textItem.underline == UnderlineType.UNDERLINEOFF ? false : true,
+				textRange: this.getTextRange(),
+				position:{x: textItem.position[0].value, y: textItem.position[1].value},
+				leftIndent: textItem.leftIndent.value,
+				rightIndent: textItem.rightIndent.value
+			};
+        
+			if(textItem.kind == TextType.PARAGRAPHTEXT){
+				textInfo.width = layer.textItem.width.value;
+				textInfo.height = layer.textItem.height.value;
+				
+				// text justification
+				switch(textItem.justification.toString()){
+					case 'Justification.LEFT':
+						textInfo.textAlign = 'left';
+						break;
+					case 'Justification.RIGHT':
+						textInfo.textAlign = 'right';
+						break;
+					case 'Justification.CENTER':
+						textInfo.textAlign = 'center';
+						break;
+					case 'Justification.CENTERJUSTIFIED':
+					case 'Justification.FULLYJUSTIFIED':
+					case 'Justification.LEFTJUSTIFIED':
+					case 'Justification.RIGHTJUSTIFIED':
+						textInfo.textAlign = 'justify';
+						break;
+					default:
+						textInfo.textAlign = 'left';
+
+				}
+			}
+			// line height
+			if(!textItem.useAutoLeading){
+				textInfo.lineHeight = Math.round(textItem.leading.value);
+			}else{
+				try{
+					textInfo.lineHeight = Math.round(textItem.autoLeadingAmount) + '%';
+				}catch(e){
+					$.writeln("#001:" + e + " on layer " + layer.name);
+				}
+			}
+		}catch(e){
+			$.writeln("#002:" + e + " on layer " + layer.name);
+		}
+		return textInfo;
+	},
+	_processTagsFun: {
+		img: function(layer){
+			if(layer.typename === 'LayerSet'){
+				layer = layer.merge();
+			}else if(layer.typename === 'ArtLayer' && layer.kind.toString() === "LayerKind.TEXT"){
+				layer.rasterize(RasterizeType.ENTIRELAYER);		//栅格化
+			}
+		
+			layer.tag = "img";
+			return layer;
+		},
+		a: function(layer){
+			
+			if(layer.typename === 'LayerSet'){
+				layer = layer.merge();
+				this._processTagsFun.img(layer);
+			}else if(layer.typename === 'ArtLayer'){
+				
+				if(layer.kind.toString () !== "LayerKind.TEXT"){
+					layer.tag = "img";
+				}
+			}
+			layer.isLink = {href:"#"};
+			return layer;
+		}
+	},
+    _processTags: function(tags, layer){
+		if(layer.kind && layer.kind.toString() === "LayerKind.TEXT"){
+			var textItem = layer.textItem;
+			
+			try{
+				if(WEBFONTS.indexOf(textItem.font) < 0 || this.getEffects().length > 0 || textItem.warpStyle !== WarpStyle.NONE){
+					layer.rasterize(RasterizeType.ENTIRELAYER);		//栅格化
+				}else{
+					layer.tag = "text";
+				}
+			}catch(e){
+				layer.tag = "text";
+				alert(e+" on layer:"+layer.name);
+			}
+		}
+	
+		if(tags){
+			for(var i = 0, len = tags.length; i < len; i++){
+				layer = this._processTagsFun[tags[i].substring(1)].call(this, layer);
+			}
+		}
+		
+		return layer;
+    },
 	// 获取图层信息
 	_getLayerInfo: function(layer, context, skip){
-		_index++;
 		
 		context = context || this.tree;
 		
-		if(layer.typename === 'ArtLayer' && layer.visible === true){
-			try{
-				if(skip && skip(layer)) return;
-			}catch(e){}
+		if(layer.visible === false) return "the layer is hidden";
+		
+		try{
+			if(skip && skip(layer)) return "skip this layer";
+		}catch(e){}
+		
+		this.doc.activeLayer = layer;
+		
+		/* get layer bounds, fix layer bounds */
+		var bounds = layer.bounds,
+			left = bounds[0].value,
+			left = left > 0 ? left : 0;
+			right = bounds[2].value,
+			right = right < this.doc.width.value ? right : this.doc.width.value,
+			top = bounds[1].value,
+			top = top > 0 ? bounds[1].value : 0,
+			bottom = bounds[3].value,
+			bottom = bottom < this.doc.height.value ? bottom : this.doc.height.value;
+
+		if(right <= left || top >= bottom){
+			return "out of viewport";
+		}
+		var kind = layer.kind ? layer.kind.toString() : layer.typename;
+		var id = this.getLayerId();
+		_index = id;
+		layer.id = id;
+		
+		var child = {
+			type: layer.typename, 
+			name: layer.name, 
+			visible: layer.visible, 
+			left: left, top: top, 
+			right: right, bottom: bottom, 
+			width: right - left,
+			height: bottom - top,
+			kind: kind,
+			isBackgroundLayer: layer.isBackgroundLayer,
+			index: id,
+			id: id
+		}
+	
+		var reg = /#img|#a/g;
+		var tags = layer.name.match(reg);
+
+		layer = this._processTags(tags, layer);
+		this.allLayers.push(layer);
+
+		child.tag = layer.tag;
+		child.isLink = layer.isLink;
+		child.layer = layer;
+	
+		child.textInfo = this._getTextInfo(layer);
+        
+		if(layer.typename === 'ArtLayer'){
 			
-			this.doc.activeLayer = layer;
-			/* get layer bounds, fix layer bounds */
-			var bounds = layer.bounds,
-				left = bounds[0].value,
-				left = left > 0 ? left : 0;
-				right = bounds[2].value,
-				right = right < this.doc.width.value ? right : this.doc.width.value,
-				top = bounds[1].value,
-				top = top > 0 ? bounds[1].value : 0,
-				bottom = bounds[3].value,
-				bottom = bottom < this.doc.height.value ? bottom : this.doc.height.value;
-
-			if(right <= left || top >= bottom) return;		
-
-			var kind = layer.kind.toString();
-			var child = {
-				type:layer.typename, 
-				name:layer.name, 
-				visible:layer.visible, 
-				left:left, top:top, 
-				right:right, bottom:bottom, 
-				width:right - left,
-				height:bottom - top,
-				kind:kind,
-				isBackgroundLayer: layer.isBackgroundLayer,
-				index: _index
-			}
-
-			if(kind === 'LayerKind.TEXT'){
-				var textItem = layer.textItem;
-				
-				try{
-					if(WEBFONTS.indexOf(textItem.font) < 0 || this.getEffects().length > 0 || textItem.warpStyle !== WarpStyle.NONE){
-						if(this.linkReg.test(layer.name)){
-							child.link = {href: '#'};
-							child.tag = 'blank';
-							child.textInfo = undefined;
-							_content.push(child);
-						}
-						return;
-					}
-				}catch(e){
-					return;
-				}
-				try{
-					child.tag = 'text';
-					
-					child.textInfo = {
-						color: textItem.color.rgb.hexValue, 
-						contents:textItem.contents, 
-						font: WEBFONTS.getWebFont(textItem.font), 
-						size: Math.round(textItem.size.value),
-						textType: textItem.kind.toString(),
-						bold: textItem.fauxBold,
-						italic: textItem.fauxItalic,
-						indent: Math.round(textItem.firstLineIndent.value),
-						underline: textItem.underline == UnderlineType.UNDERLINEOFF ? false : true,
-						textRange: this.getTextRange(),
-						position:{x: textItem.position[0].value, y: textItem.position[1].value},
-						leftIndent: textItem.leftIndent.value,
-						rightIndent: textItem.rightIndent.value
-					};
-					if(textItem.kind == TextType.PARAGRAPHTEXT){
-						child.textInfo.width = layer.textItem.width.value;
-						child.textInfo.height = layer.textItem.height.value;
-					}
-					// line height
-					if(!textItem.useAutoLeading){
-						child.textInfo.lineHeight = Math.round(textItem.leading.value);
-					}else{
-						child.textInfo.lineHeight = Math.round(textItem.autoLeadingAmount) + '%';
-					}
-					// text justification
-					switch(textItem.justification.toString()){
-						case 'Justification.LEFT':
-							child.textInfo.textAlign = 'left';
-							break;
-						case 'Justification.RIGHT':
-							child.textInfo.textAlign = 'right';
-							break;
-						case 'Justification.CENTER':
-							child.textInfo.textAlign = 'center';
-							break;
-						case 'Justification.CENTERJUSTIFIED':
-						case 'Justification.FULLYJUSTIFIED':
-						case 'Justification.LEFTJUSTIFIED':
-						case 'Justification.RIGHTJUSTIFIED':
-							child.textInfo.textAlign = 'justify';
-							break;
-						default:
-							child.textInfo.textAlign = 'left';
-
-					}
-					// link
-					if(this.linkReg.test(layer.name)){
-						child.link = {href: '#'};
-					}
-				
-					this.contentLayers.push(layer);
-					_content.push(child);
-					
-				}catch(e){return;}
-			}else{
-				// link
-				if((this.linkReg.test(layer.name) && this.imgReg.test(layer.name)) || this.linkReg.test(layer.name)){
-					child.link = {href: '#'};
-					child.tag = 'img';
-					child.textInfo = undefined;
-					this.contentLayers.push(layer);
-					_content.push(child);
-				}else if(this.imgReg.test(layer.name)){
-					child.tag = 'img';
-					//var region = [[left, top], [right, top], [right, bottom], [left, bottom]];
-					//child.src = this.exportSelection(region).name;
-					
-					child.textInfo = undefined;
-					this.contentLayers.push(layer);
-					_content.push(child);
-				}
-
-				this.tree.imgCount++;
-				if(this.option.exportImages){
-					this.exportImage(layer, _index);
-				}
-			}
-            context.childs.push(child);
+			context.childs.push(child);
 			
-		}else if(layer.typename == 'LayerSet' && layer.visible === true){
+			if(layer.kind.toString () === "LayerKind.TEXT"){
+				this.contentLayers.push(layer);
+				this.textLayers.push(layer);
+				if(!child.tag) child.tag = "text";
+				this.contentObjList.push(child);
+			}
+		
+			if(layer.tag === "img"){
+				this.contentLayers.push(layer);
+				this.contentObjList.push(child);
+			}
+			
+		}else if(layer.typename == 'LayerSet'){
 				
-			var o = {type:layer.typename, name:layer.name, index:_index, childs:[]};
+			var o = {type:layer.typename, name:layer.name, index:id, childs:[]};
 			context.childs.push(o);
-			this.parseLayers(layer.layers, o, skip);
+			this.parse(layer.layers, o, skip);
 		}
 	},
 	exportPng: function(){
@@ -274,8 +326,8 @@ PSD.fn = PSD.prototype = {
 		return img;
 		//this.visibleTextLayers();
 	},
-	exportImage: function(layer, index){
-		this.hiddenTextLayers();
+	exportImage: function(layer){
+
 		try{
 			var bounds = layer.bounds;
 			layer.copy();
@@ -285,7 +337,7 @@ PSD.fn = PSD.prototype = {
 			newDoc.paste();
 			newDoc.layers[newDoc.layers.length - 1].remove();
 			
-			var img= new File(this.imagesFolder + "/layer_"+_index+".png");
+			var img= new File(this.imagesFolder + "/layer_"+layer.id+".png");
 			var options = new ExportOptionsSaveForWeb();
 			options.format = SaveDocumentType.PNG;
 			newDoc.exportDocument (img, ExportType.SAVEFORWEB, options);
@@ -293,7 +345,6 @@ PSD.fn = PSD.prototype = {
 		}catch(e){	
 			alert(e+'#####'+layer.name);
 		}
-		this.visibleTextLayers();
 	},
 	exportJSON: function(data, format){
 		var f = new File(this.dir + "/json.txt");
@@ -307,20 +358,14 @@ PSD.fn = PSD.prototype = {
 		return this.tree;
 	},
 	hiddenTextLayers: function(){
-		for(var i = 0, l = this.contentLayers.length; i < l; i++){
-			if(!this.contentLayers[i].visible) continue;
-			this.contentLayers[i].visible = false;
-		}
+		PSD.hide(this.contentLayers);
 	},
 	visibleTextLayers: function(){
-		for(var i = 0, l = this.contentLayers.length; i < l; i++){
-			if(this.contentLayers[i].visible) continue;
-			this.contentLayers[i].visible = true;
-		}
+		PSD.show(this.contentLayers);
 	},
 	/* 自动切片并导出图片 */
 	autoSliceAndExport: function(exportConfig, height){
-		this.hiddenTextLayers();
+		PSD.hide(this.contentLayers);
 		
 		var conf = exportConfig || _exportConfig;
 		var extension = _getExtension(conf);
@@ -369,7 +414,7 @@ PSD.fn = PSD.prototype = {
 		}catch(e){
 			// TODO
 		}
-		this.visibleTextLayers();
+		PSD.show(this.contentLayers);
 		return _slices;
 	},
 	// 导出选择区域
@@ -389,8 +434,7 @@ PSD.fn = PSD.prototype = {
 			xset.push(region[i][0]);
 			yset.push(region[i][1]);
 		}
-		// var width = Math.max.apply(null, xset) - Math.min.apply(null, xset),
-			// height = Math.max.apply(null, yset) - Math.min.apply(null, yset);
+		
 		xset.sort(function(a,b){return a-b;});
 		yset.sort(function(a,b){return a-b;});
 		var width = xset[xset.length-1] - xset[0],
@@ -416,10 +460,6 @@ PSD.fn = PSD.prototype = {
 		var data = {name: this.doc.name, imgCount:_sliceCount, childs:_slices.concat(_content)};
 		//this.exportJSON(data);
 		return data;
-	},
-	
-	getTextLayers: function(){
-		return _content;
 	},
 	// 获取text range
 	getTextRange: function(){
@@ -464,6 +504,7 @@ PSD.fn = PSD.prototype = {
 		PSD.colorSampler.move([UnitValue(x, 'px'), UnitValue(y, 'px')]);
 		return PSD.colorSampler.color.rgb.hexValue;
 	},
+	// 判断所选区域是否单色
 	selectionIsMonochrome: function(region){
 		var	selection = this.doc.selection,
 			cs = this.doc.channels;
@@ -472,7 +513,6 @@ PSD.fn = PSD.prototype = {
 		
 		for(var i = 0, l = cs.length; i < l; i++){
 			var histogram = cs[i].histogram.concat();
-			$.writeln(histogram.join('-'));
 			histogram.sort().reverse();
 			if(histogram[1] != 0) return false;
 		}
@@ -480,51 +520,45 @@ PSD.fn = PSD.prototype = {
 		//this.doc.activeHistoryState = his[his.length - 1];
 		return true;
 	},
+	// 使PSD恢复到运行PSD2HTML插件之前的状态。
 	reset: function(){
-		this.doc.activeHistoryState = this.doc.historyStates.getByName("psdtohtml");
+		this.doc.activeHistoryState = this.doc.historyStates.getByName(this.lastSnapshotName);
 		this.doc.save();
 	},
-	createSnapshotOnStart: function(){
-		var his = this.doc.historyStates;
-		try{
-			// if has psdtohtml snapshot
-			var snapshot = his.getByName("psdtohtml");
-			this.doc.activeHistoryState = snapshot;
-			// delete it
-			var idDlt = charIDToTypeID( "Dlt " );
-			var desc175 = new ActionDescriptor();
-			var idnull = charIDToTypeID( "null" );
-				var ref131 = new ActionReference();
-				var idHstS = charIDToTypeID( "HstS" );
-				var idCrnH = charIDToTypeID( "CrnH" );
-				ref131.putProperty( idHstS, idCrnH );
-			desc175.putReference( idnull, ref131 );
-			executeAction( idDlt, desc175, DialogModes.NO );
-		}catch(e){
-			
-		}
-		// create snapshot
-		var idMk = charIDToTypeID( "Mk  " );
-		var desc202 = new ActionDescriptor();
-		var idnull = charIDToTypeID( "null" );
-			var ref163 = new ActionReference();
-			var idSnpS = charIDToTypeID( "SnpS" );
-			ref163.putClass( idSnpS );
-		desc202.putReference( idnull, ref163 );
-		var idFrom = charIDToTypeID( "From" );
-			var ref164 = new ActionReference();
-			var idHstS = charIDToTypeID( "HstS" );
-			var idCrnH = charIDToTypeID( "CrnH" );
-			ref164.putProperty( idHstS, idCrnH );
-		desc202.putReference( idFrom, ref164 );
-		var idNm = charIDToTypeID( "Nm  " );
-		desc202.putString( idNm, "psdtohtml" );
-		var idUsng = charIDToTypeID( "Usng" );
-		var idHstS = charIDToTypeID( "HstS" );
-		var idFllD = charIDToTypeID( "FllD" );
-		desc202.putEnumerated( idUsng, idHstS, idFllD );
-		executeAction( idMk, desc202, DialogModes.NO );
+	// 创建快照
+	createSnapshot: function(){
+		var desc = new ActionDescriptor();
+		var sref = new ActionReference();
+		sref.putClass(charIDToTypeID("SnpS")); 
+		desc.putReference(charIDToTypeID("null"), sref); 
+		var fref = new ActionReference(); 
+		fref.putProperty(charIDToTypeID("HstS"), charIDToTypeID("CrnH")); 
+		desc.putReference(charIDToTypeID("From"), fref ); 
+		var now = new Date(),
+			month = now.getMonth(),
+			date = now.getDate(),
+			hour = now.getHours(),
+			minute = now.getMinutes(),
+			second = now.getSeconds();
+		
+		var dateStr = (month + 1) + "-" + date + " " + hour + ":" + minute + ":" + second;
+		var sName = "PSD2HTML "+ dateStr;
+		this.lastSnapshotName = sName;
+		
+		desc.putString( charIDToTypeID( "Nm  " ), sName);
+		executeAction(charIDToTypeID("Mk  "), desc, DialogModes.NO ); 
 	}
 }
-
 })();
+
+PSD.hide = function(layers){
+	for(var i = 0, len = layers.length; i < len; i++){
+		if("visible" in layers[i]) layers[i].visible = false;
+	}
+};
+
+PSD.show = function(layers){
+	for(var i = 0, len = layers.length; i < len; i++){
+		if("visible" in layers[i]) layers[i].visible = true;
+	}
+};

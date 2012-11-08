@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @author: wuming.xiaowm
  * @date : 6/24 2012
  * @description: HTML元素解析
@@ -42,7 +42,7 @@ page.element.prototype.getTextElement = function(){
  * 空白链接 
  */
 page.element.prototype.blank = function(){
-	var a = new XML('<a href="'+this.item.link.href+'"></a>'),
+	var a = new XML('<a href="'+this.item.isLink.href+'"></a>'),
 		className = 'style-'+page.option.i,
 		styleCss = [];
 		
@@ -50,7 +50,7 @@ page.element.prototype.blank = function(){
 	
 	if(page.option.builder == "normal"){
 		styleCss.push('top:'+this.item.top+'px');
-		styleCss.push('left:'+ (this.item.left -  Math.round((page.option.width - 952) / 2))+'px');
+		styleCss.push('left:'+ (this.item.left -  Math.round((page.option.width - 990) / 2))+'px');
 		styleCss.push('width:'+this.item.width+'px');
 		styleCss.push('height:'+this.item.height+'px');
 		a['@class'] = 'absolute noDecoration '+className;
@@ -88,9 +88,9 @@ page.element.prototype.img = function(){
 	}
 	
 	
-	if(typeof(this.item.link) != 'undefined'){
+	if(typeof(this.item.isLink) != 'undefined'){
 		elm = new XML('<a></a>');
-		elm['@href'] = this.item.link.href;
+		elm['@href'] = this.item.isLink.href;
 		elm.appendChild(img);
 	}else{
 		elm = img;
@@ -122,9 +122,9 @@ page.element.prototype.text = function(){
 		pObj = textContents.split('\r');
 	
 	//如果有链接
-	if(typeof(this.item.link) != 'undefined'){
+	if(typeof(this.item.isLink) != 'undefined'){
 		elm = new XML('<a></a>');
-		elm['@href'] = this.item.link.href;
+		elm['@href'] = this.item.isLink.href;
 	}
 	
 	//Css

@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @author: wuming.xiaowm
  * @date : 6/24 2012
  * @description: 生成器接口
@@ -29,7 +29,7 @@ page.spaceStr = '~~~space~~~';
 page.init = function(data,option,psd){ 
 	page.psd = psd;
 	//隐藏所有文本
-	page.hideAllTextLayers();
+	PSD.hide(page.psd.textLayers);
 	try{
 		page.option = option;
 		page.title = data.name;
@@ -67,7 +67,7 @@ page.init = function(data,option,psd){
 		alert(i18n.txtMap.errorMsg(e.message));
 	}
 	//显示所有文本图层
-	psd.visibleTextLayers();
+	PSD.show(page.psd.textLayers);
 };
 
 /**

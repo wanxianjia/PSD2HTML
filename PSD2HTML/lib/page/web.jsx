@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @author: wuming.xiaowm
  * @date : 6/24 2012
  * @description: 普通网页解析
@@ -73,10 +73,12 @@ page.web.prototype.parse = function(){
 	}
 	
 	for(var t in this.textData){
-		var item = this.textData[t];
-		page.option.i = i+parseInt(t,10);
-		page.option.styleCss = styleCss;
-		pageContent.appendChild(new page.element(item));
+		if(this.textData.hasOwnProperty(t)){
+			var item = this.textData[t];
+			page.option.i = i+parseInt(t,10);
+			page.option.styleCss = styleCss;
+			pageContent.appendChild(new page.element(item));
+		}
 	}
 	//CMS foot
 	//body.appendChild('#parse("$pageInfo.footer")');

@@ -1,4 +1,4 @@
-// @include "../lib/json2-min.jsx"
+﻿// @include "../lib/json2-min.jsx"
 // @include "../lib/psd.jsx"
 // @include "../lib/page.jsx"
 // @include "../lib/i18n.jsx"
@@ -15,12 +15,7 @@
 		alert(i18n("pathCannotIncludeDoubleBytes")+':['+res[1]+']');
 		return;
 	}
-	psd.parseLayers(null, null, function(layer){
-		if(layer.isBackgroundLayer === true){
-			layer.isBackgroundLayer = false;
-		}
-		if(layer.kind != LayerKind.TEXT && !psd.linkReg.test(layer.name) && !psd.imgReg.test(layer.name)) return true;
-	});
+	psd.parse();
 
 	//图片输出设置
 	var option = new ExportOptionsSaveForWeb();
@@ -35,9 +30,9 @@
 
 	var data = null;
 	if(APP.OPTION.builder != "normal"){
-		data = psd.getTextLayersAndSlices(option,-1);
+		data = {name: psd.doc.name, childs:psd.autoSliceAndExport().concat(psd.contentObjList)};
 	}else{
-	   data = psd.getTextLayersAndSlices(option);
+		data = {name: psd.doc.name, childs:psd.autoSliceAndExport().concat(psd.contentObjList)};
 	}
 	new page.init(data,{
 		'width':psd.getWidth(),
@@ -47,6 +42,7 @@
 		'path':psd.dir + "/index.html",
 		'exportConfig':option
 	},psd);
+	psd.reset();
 	psd = null;
 })();
 

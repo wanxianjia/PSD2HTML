@@ -11,8 +11,8 @@
 				header:{
 					"Content-Type": "multipart/form-data",
 					//"Accept": "*/*",
-					"Content-Length": 99999999999,
-					//"User-Agent": "PSD2HTML",
+					"Content-Length": 99999999,
+					"User-Agent": "PSD2HTML",
 					"Connection": "Keep-Alive",
 					"Pragma": "no-cache",
 					//"Referer": "http://127.0.0.1:8000/"
@@ -105,5 +105,5 @@ PSD.net.remote({
 	url:"http://127.0.0.1/upload",
 	port:8000,
 	data:{te:"wanxianjia"},
-	files:{psd:File("C:/Users/xianjia.wanxj/Desktop/服务介绍页面-我是采购商.png"), txt:File("C:/Users/xianjia.wanxj/Desktop/test.txt")}
+	files:{psd:File("C:/Users/xianjia.wanxj/Desktop/Icall组件优化（11.5）.jpg"), txt:File("C:/Users/xianjia.wanxj/Desktop/test.txt")}
 });

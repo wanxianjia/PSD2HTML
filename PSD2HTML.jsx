@@ -126,7 +126,7 @@ var APP = {version: '1.0'};
 				if(APP.OPTION.builder === 'file'){
 					$.evalFile(File($.fileName).parent+'/PSD2HTML/builder/importFile.jsx');
 				}else{
-                    $.evalFile(File($.fileName).parent+'/PSD2HTML/builder/toPage.jsx');
+                    $.evalFile(File($.fileName).parent+'/PSD2HTML2/plug-in/toPage.jsx');
                 }
 				APP.win.close();
 			}
