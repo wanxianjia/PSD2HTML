@@ -2,8 +2,7 @@
 * the util file, will contain all the util method
 */ 
 
-PSD = PSD || {};
-PSD.util = {
+$.util = {
 	log: function(){
 		var now = new Date();
 		var today = now.getFullYear() + "-" + (now.getMonth() + 1) + "-" + now.getDate();

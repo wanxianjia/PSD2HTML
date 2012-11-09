@@ -176,11 +176,11 @@ PSD.fn = PSD.prototype = {
 				try{
 					textInfo.lineHeight = Math.round(textItem.autoLeadingAmount) + '%';
 				}catch(e){
-					PSD.util.log($.fileName, $.line, e, " on layer " + layer.name);
+					$.util.log($.fileName, $.line, e, " on layer " + layer.name);
 				}
 			}
 		}catch(e){
-			PSD.util.log($.fileName, $.line, e, " on layer " + layer.name);
+			$.util.log($.fileName, $.line, e, " on layer " + layer.name);
 		}
 		return textInfo;
 	},
@@ -204,6 +204,15 @@ PSD.fn = PSD.prototype = {
 				
 				if(layer.kind.toString () !== "LayerKind.TEXT"){
 					layer.tag = "img";
+				}else{
+					var textItem = layer.textItem;
+					try{
+						if(WEBFONTS.indexOf(textItem.font) < 0 || this.getEffects().length > 0 || textItem.warpStyle !== WarpStyle.NONE){
+							this._processTagsFun.img(layer);
+						}
+					}catch(e){
+						$.util.log($.fileName, $.line, e, " on layer " + layer.name);
+					}
 				}
 			}
 			layer.isLink = {href:"#"};
@@ -212,18 +221,7 @@ PSD.fn = PSD.prototype = {
 	},
     _processTags: function(tags, layer){
 		if(layer.kind && layer.kind.toString() === "LayerKind.TEXT"){
-			var textItem = layer.textItem;
-			
-			try{
-				if(WEBFONTS.indexOf(textItem.font) < 0 || this.getEffects().length > 0 || textItem.warpStyle !== WarpStyle.NONE){
-					layer.rasterize(RasterizeType.ENTIRELAYER);		//栅格化
-				}else{
-					layer.tag = "text";
-				}
-			}catch(e){
-				layer.tag = "text";
-				PSD.util.log($.fileName, $.line, e, " on layer " + layer.name);
-			}
+			layer.tag = "text";
 		}
 	
 		if(tags){
@@ -244,7 +242,7 @@ PSD.fn = PSD.prototype = {
 		try{
 			if(skip && skip(layer)) return "skip this layer";
 		}catch(e){
-			PSD.util.log($.fileName, $.line , e, " on layer " + layer.name)
+			$.util.log($.fileName, $.line , e, " on layer " + layer.name)
 		}
 		
 		this.doc.activeLayer = layer;
@@ -345,7 +343,7 @@ PSD.fn = PSD.prototype = {
 			newDoc.exportDocument (img, ExportType.SAVEFORWEB, options);
 			newDoc.close(SaveOptions.DONOTSAVECHANGES);
 		}catch(e){	
-			PSD.util.log($.fileName, $.line, e , layer.name);
+			$.util.log($.fileName, $.line, e , layer.name);
 		}
 	},
 	exportJSON: function(data, format){
@@ -414,7 +412,7 @@ PSD.fn = PSD.prototype = {
 			}
 			selection.deselect();
 		}catch(e){
-			PSD.util.log($.fileName, $.line, e , layer.name);
+			$.util.log($.fileName, $.line, e , layer.name);
 		}
 		PSD.show(this.contentLayers);
 		return _slices;
