@@ -2,7 +2,7 @@
 * the util file, will contain all the util method
 */ 
 
-PSD = $.global.PSD || {};
+PSD = PSD || {};
 PSD.util = {
 	log: function(){
 		var now = new Date();

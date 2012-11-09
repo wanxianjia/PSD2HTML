@@ -212,6 +212,7 @@ page.element.prototype.text = function(){
 						
 						if(typeof(this.cssMap[lineCss.join('')]) != 'undefined'){
 							cssName = this.cssMap[lineCss.join('')];
+							span['@class'] = cssName;
 						}else{
 							this.cssMap[lineCss.join('')] = cssName;
 							if(lineCss.length>0){
