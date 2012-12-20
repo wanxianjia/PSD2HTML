@@ -199,7 +199,7 @@ PSD.fn = PSD.prototype = {
 			
 			if(layer.typename === 'LayerSet'){
 				layer = layer.merge();
-				this._processTagsFun.img(layer);
+				layer = this._processTagsFun.img(layer);
 			}else if(layer.typename === 'ArtLayer'){
 				
 				if(layer.kind.toString () !== "LayerKind.TEXT"){
@@ -208,7 +208,7 @@ PSD.fn = PSD.prototype = {
 					var textItem = layer.textItem;
 					try{
 						if(WEBFONTS.indexOf(textItem.font) < 0 || this.getEffects().length > 0 || textItem.warpStyle !== WarpStyle.NONE){
-							this._processTagsFun.img(layer);
+							layer = this._processTagsFun.img(layer);
 						}
 					}catch(e){
 						$.util.log($.fileName, $.line, e, " on layer " + layer.name);
@@ -296,11 +296,21 @@ PSD.fn = PSD.prototype = {
 			
 			context.childs.push(child);
 			
-			if(layer.kind.toString () === "LayerKind.TEXT"){
-				this.contentLayers.push(layer);
-				this.textLayers.push(layer);
-				if(!child.tag) child.tag = "text";
-				this.contentObjList.push(child);
+			if(layer.kind.toString() === "LayerKind.TEXT"){
+				var textItem = layer.textItem;
+				try{
+					if(WEBFONTS.indexOf(textItem.font) < 0 || this.getEffects().length > 0 || textItem.warpStyle !== WarpStyle.NONE){
+						//layer = this._processTagsFun.img(layer);
+					}else{
+						this.contentLayers.push(layer);
+						this.textLayers.push(layer);
+						if(!child.tag) child.tag = "text";
+						this.contentObjList.push(child);
+					}
+				}catch(e){
+					$.util.log($.fileName, $.line, e, " on layer " + layer.name);
+				}
+				
 			}
 		
 			if(layer.tag === "img"){
