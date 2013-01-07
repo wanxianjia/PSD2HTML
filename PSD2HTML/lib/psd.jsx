@@ -177,10 +177,12 @@ PSD.fn = PSD.prototype = {
 					textInfo.lineHeight = Math.round(textItem.autoLeadingAmount) + '%';
 				}catch(e){
 					$.util.log($.fileName, $.line, e, " on layer " + layer.name);
+					return null;
 				}
 			}
 		}catch(e){
 			$.util.log($.fileName, $.line, e, " on layer " + layer.name);
+			return null;
 		}
 		return textInfo;
 	},
@@ -247,6 +249,11 @@ PSD.fn = PSD.prototype = {
 		
 		this.doc.activeLayer = layer;
 		
+		var reg = /#img|#a|#ig/g;
+		var tags = layer.name.match(reg);
+
+		if(tags && tags[0] === '#ig') return 'skip';
+		
 		/* get layer bounds, fix layer bounds */
 		var bounds = layer.bounds,
 			left = bounds[0].value,
@@ -280,24 +287,25 @@ PSD.fn = PSD.prototype = {
 			id: id
 		}
 	
-		var reg = /#img|#a/g;
-		var tags = layer.name.match(reg);
-
-		layer = this._processTags(tags, layer);
+		if(tags) layer = this._processTags(tags, layer);
 		this.allLayers.push(layer);
 
 		child.tag = layer.tag;
 		child.isLink = layer.isLink;
 		child.layer = layer;
 	
-		child.textInfo = this._getTextInfo(layer);
         
 		if(layer.typename === 'ArtLayer'){
 			
 			context.childs.push(child);
 			
 			if(layer.kind.toString() === "LayerKind.TEXT"){
+				child.textInfo = this._getTextInfo(layer);
+				
+				if(child.textInfo === null) return 'read text info error';
+				
 				var textItem = layer.textItem;
+				
 				try{
 					if(WEBFONTS.indexOf(textItem.font) < 0 || this.getEffects().length > 0 || textItem.warpStyle !== WarpStyle.NONE){
 						//layer = this._processTagsFun.img(layer);
