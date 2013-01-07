@@ -241,18 +241,22 @@ PSD.fn = PSD.prototype = {
 		
 		if(layer.visible === false) return "the layer is hidden";
 		
+		this.doc.activeLayer = layer;
+		
+		var reg = /#img|#a|#ig/g;
+		var tags = layer.name.match(reg);
+
+		if(!tags && layer.typename === 'ArtLayer' && layer.kind.toString() !== "LayerKind.TEXT"){
+			return 'skip this layer';
+		}
+		
 		try{
 			if(skip && skip(layer)) return "skip this layer";
 		}catch(e){
 			$.util.log($.fileName, $.line , e, " on layer " + layer.name)
 		}
 		
-		this.doc.activeLayer = layer;
-		
-		var reg = /#img|#a|#ig/g;
-		var tags = layer.name.match(reg);
-
-		if(tags && tags[0] === '#ig') return 'skip';
+		if(tags && tags[0] === '#ig') return 'ignore this layer';
 		
 		/* get layer bounds, fix layer bounds */
 		var bounds = layer.bounds,
