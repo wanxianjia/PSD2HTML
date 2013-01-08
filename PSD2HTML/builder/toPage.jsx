@@ -44,5 +44,6 @@
 	},psd);
 	psd.reset();
 	psd = null;
+	$.cg();
 })();
 

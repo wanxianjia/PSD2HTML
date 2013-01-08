@@ -149,7 +149,7 @@ page.data.prototype.parse = function(item){
 	
 	//left
 	if(page.option.builder == "normal"){
-		left -= Math.round((page.option.width - 952) / 2);
+		left -= Math.round((page.option.width - 990) / 2);
 	}else{
 		left = left;
 	}

@@ -98,7 +98,7 @@ page.element.prototype.img = function(){
 	var styleCss ='width:'+this.item.width+'px;height:'+this.item.height+'px;';
 	if(page.option.builder == "normal"){
 		var cssName = "style"+page.option.i;
-		styleCss += 'top:'+this.item.top+'px;left:'+(this.item.left - (page.option.width - 952) / 2)+'px;display:block;';
+		styleCss += 'top:'+this.item.top+'px;left:'+(this.item.left - (page.option.width - 990) / 2)+'px;display:block;';
 		elm['@class'] = cssName+" absolute";
 		
 		

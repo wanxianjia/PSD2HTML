@@ -42,7 +42,7 @@ page.web.prototype.parse = function(){
 	head.appendChild(new XML('<link href="http://img.china.alibaba.com/favicon.ico" rel="shortcut icon" />'));
 	head.appendChild(new XML('<meta http-equiv="Content-Type" content="text/html; charset=' + page.encode + '" />'));
 	//以下引用的style文件要随着增量发布的时间戳而更新
-	head.appendChild(new XML('<link href="http://style.china.alibaba.com/app/bp/css/psd2html/1.0/global.20120709.css" rel="stylesheet" type="text/css" />'));
+	head.appendChild(new XML('<link href="http://style.china.alibaba.com/app/bp/css/psd2html/global-1.0.1.css" rel="stylesheet" type="text/css" />'));
 	//var importScript = new XML('<script src="http://style.china.alibaba.com/app/bp/js/psd2html/1.0/global.20120709.js" type="text/javascript"></script>');
 	//importScript.appendChild(new XML());
 	//head.appendChild(importScript);
